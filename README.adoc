@@ -1,108 +1,344 @@
-// SPDX-License-Identifier: CC-BY-SA-4.0
-// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-// SPDX-FileCopyrightText: 2024-2026 Jonathan D.A. Jewell (hyperpolymath)
-= {{PROJECT_NAME}}
+= Chronicles of Slavia Prototype
 :toc:
-:toc-placement: preamble
+:toclevels: 2
+:sectanchors:
+:sectlinks:
 
-// ── Licensing ───────────────────────────────────────────────────────────────
-image:https://img.shields.io/badge/Code-MPL--2.0-blue.svg?logo=mozilla[Code licence: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
-image:https://img.shields.io/badge/Docs-CC--BY--SA--4.0-blue.svg?logo=creativecommons[Docs licence: CC-BY-SA-4.0,link="https://creativecommons.org/licenses/by-sa/4.0/"]
-image:https://img.shields.io/badge/Provenance-Quantum--Safe-blueviolet[Quantum-Safe Provenance,link="docs/legal/EXHIBIT-B-QUANTUM-SAFE.txt"]
+Code licence: MPL-2.0 +
+Docs licence: CC-BY-SA-4.0 +
+Status: Private exploratory prototype +
+Repository standard: Rhodium Standard Repository aligned
 
-// ── Standard & quality gates ────────────────────────────────────────────────
-image:https://img.shields.io/badge/RSR-Rhodium_Standard-9C27B0[Rhodium Standard Repository,link="https://github.com/hyperpolymath/rhodium-standard-repositories"]
-image:https://www.bestpractices.dev/projects/{{OPENSSF_BP_ID}}/badge[OpenSSF Best Practices,link="https://www.bestpractices.dev/projects/{{OPENSSF_BP_ID}}"]
-image:https://api.scorecard.dev/projects/github.com/{{OWNER}}/{{REPO}}/badge[OpenSSF Scorecard,link="https://scorecard.dev/viewer/?uri=github.com/{{OWNER}}/{{REPO}}"]
-image:https://sonarcloud.io/api/project_badges/measure?project={{OWNER}}_{{REPO}}&metric=alert_status[SonarQube Quality Gate,link="https://sonarcloud.io/summary/new_code?id={{OWNER}}_{{REPO}}"]
-image:https://archive.softwareheritage.org/badge/origin/https://{{FORGE}}/{{OWNER}}/{{REPO}}/[Archived in Software Heritage,link="https://archive.softwareheritage.org/browse/origin/?origin_url=https://{{FORGE}}/{{OWNER}}/{{REPO}}"]
+# [IMPORTANT]
 
-// ── Provenance & ecosystem ──────────────────────────────────────────────────
-image:https://img.shields.io/badge/Idris-Inside-5E5086?logo=idris&logoColor=white[Idris Inside,link="https://github.com/hyperpolymath/proven"]
-image:https://img.shields.io/badge/Zig-Zero--overhead-F7A41D?logo=zig&logoColor=black[Zig Zero-overhead FFI,link="https://github.com/hyperpolymath/typed-wasm"]
-image:https://api.thegreenwebfoundation.org/greencheckimage/{{FORGE}}[Green Web,link="https://www.thegreenwebfoundation.org/green-web-check/?url={{FORGE}}"]
+This repository is currently a private exploratory prototype.
 
-{{PROJECT_DESCRIPTION}}
+It is intended to preserve and develop the early playable and design work for *Chronicles of Slavia* without losing it inside chat history.
 
-[IMPORTANT]
-====
-*This file is a template.* You are reading `README.adoc` from the *RSR template repo*
-(or a freshly-cloned copy of it). Run `just init` to replace every `{{PLACEHOLDER}}`
-token with your project's details, then delete this admonition. Until you do, the
-`{{...}}` markers below are intentional placeholders, not content.
-====
+# Although the intended estate split is MPL-2.0 for code and CC-BY-SA-4.0 for prose documentation, publication and wider reuse decisions are not yet final. Treat this repository as private working material unless and until it is explicitly published.
 
 == What this is
 
-A new repository scaffolded from the *Rhodium Standard Repository (RSR)* template:
-a batteries-included starting point that ships with CI/CD, machine-readable project
-metadata, an AI-agent gatekeeper protocol, a formally-typed ABI/FFI seam
-(Idris2 + Zig), container and reproducible-build scaffolding, and governance
-infrastructure — all wired and passing the RSR validators on day one.
+*Chronicles of Slavia Prototype* is a mythic 2D puzzle-platform prototype about two girls, Anya and Donna, whose bond shapes a world of memory, medicine, folklore, and moral choice.
 
-Replace this section with a description of *your* project once initialised.
+The central strapline is:
+
+[quote]
+
+---
+
+What do you become when the world breaks?
+
+---
+
+The core world principle is:
+
+[quote]
+
+---
+
+Slavia is not just geography. It is memory, medicine, folklore, and moral choice.
+
+---
+
+The current focus is:
+
+* *Level 1* — The First Tear
+* *Zone A* — Border Path
+
+This first playable mock is deliberately small. It is not trying to build the whole game. It exists to test the emotional grammar of the game in its simplest form.
+
+== Current prototype goal
+
+The current Zone A prototype should show that:
+
+* Anya moves, stirs, quickens, and excites.
+* Donna steadies, settles, calms, and holds.
+* Natural animals answer them differently.
+* Donna can stabilize what Anya crosses.
+* The Rift interrupts the natural answer of the world.
+
+The prototype succeeds if the player can feel:
+
+[quote]
+
+---
+
+Anya and Donna are different. +
+They need each other. +
+Slavia itself knows this.
+
+---
 
 == Quick start
 
-[source,bash]
-----
-# 1. Create a repo from this template (or clone it), then from the repo root:
-just init                # interactive bootstrap: fills every {{PLACEHOLDER}}
+Open the browser prototype directly:
 
-# 2. See the available tasks:
-just                     # lists all phases (build, test, validate, audit, ...)
+## [source,sh]
 
-# 3. Check the repo still satisfies the RSR shape:
-just validate            # structure + metadata checks
-----
+## prototype/zone-a/index.html
 
-`just init` prompts for the project name, owner, author, licence contact, and the
-other values listed in `.machine_readable/ai/PLACEHOLDERS.adoc`, substitutes them
-across the tree, validates the result, and (if available) runs the `k9-svc` checks.
+No build step is currently required.
 
-== What you get
+Open the file in a modern web browser.
 
-* *Machine-readable metadata* (`.machine_readable/descriptiles/`) — `STATE`, `META`,
-  `ECOSYSTEM`, `PLAYBOOK`, `AGENTIC`, `NEUROSYM`, `CLADE`, and `anchors/ANCHOR`,
-  in a2ml, so tools and agents can read the project's state and boundaries.
-* *AI gatekeeper protocol* — `0-AI-MANIFEST.a2ml` is the universal entry point that
-  tells an AI agent how to work in this repo before it touches anything.
-* *Typed ABI/FFI seam* — `src/interface/Abi/` (Idris2 type + layout proofs) over
-  `src/interface/ffi/` (Zig implementation), with generated C headers.
-* *CI/CD* — GitHub Actions for quality, security (CodeQL, Scorecard, secret
-  scanning), multi-forge mirroring, and RSR anti-pattern enforcement.
-* *Supply-chain & reproducibility* — container layering (stapeln), Guix shells,
-  SBOM, and signing hooks.
-* *Governance* — `GOVERNANCE.adoc`, `MAINTAINERS.adoc`, `.github/` community health
-  files, and a release `AUDIT.adoc` gate.
+== Controls
+
+[cols="1,2",options="header"]
+|===
+| Control
+| Action
+
+| `A` / `D` or Arrow Keys
+| Move
+
+| `Space`
+| Jump
+
+| `Tab`
+| Switch between Anya and Donna
+
+| `E`
+| Interact / use ability
+
+| `R`
+| Restart prototype
+|===
+
+== What is currently implemented
+
+The current browser mock includes:
+
+* a side-scrolling Zone A layout
+* Anya and Donna as simple drawn canvas characters
+* character switching
+* a shrine interaction
+* birds that respond differently to Anya and Donna
+* an unstable bridge
+* Donna's bridge-stabilising action
+* Anya crossing after Donna stabilises the bridge
+* an overlook requiring both characters
+* a Rift trigger ending
+
+== Core design principles
+
+=== Slavia
+
+Slavia is not only a fantasy location.
+
+It is a world where places remember, remedies matter, folklore acts, and moral decisions leave marks on the land.
+
+Slavia is therefore:
+
+* memory
+* medicine
+* folklore
+* moral choice
+
+=== Anya
+
+Anya is associated with Chaos, movement, courage, excitement, and quickening.
+
+Prototype role:
+
+* faster movement
+* slightly more agile
+* stirs birds and living things
+* represents the force that wakes the world
+
+Visual direction:
+
+* very long dark hair, slightly chaotic
+* Ukrainian-inspired blue and yellow accents
+* red embroidery motifs
+* light, forward-moving silhouette
+
+=== Donna
+
+Donna is associated with Order, care, structure, calm, and settling.
+
+Prototype role:
+
+* slower movement
+* stabilises the bridge
+* settles birds and living things
+* represents the force that lets the world hold
+
+Visual direction:
+
+* very long dark hair in a tidy bun
+* Bulgarian-inspired white, green, and red accents
+* grounded, upright silhouette
+* stronger, steadier posture
+
+=== Living Taxis
+
+Animals in Slavia are not tools, pets, buttons, or controllable units.
+
+Anya and Donna do not command animals. They change the rhythm of the living world around them.
+
+Anya tends to:
+
+* excite
+* quicken
+* stir
+* embolden
+* agitate
+
+Donna tends to:
+
+* calm
+* slow
+* settle
+* quieten
+* reassure
+
+Natural animals respond according to their own nature.
+
+If an animal does not respond naturally, this is meaningful. It may suggest corruption, possession, enchantment, false life, fear beyond normal fear, or Rift influence.
+
+=== The bridge metaphor
+
+The bridge is the first playable metaphor of the game.
+
+Anya wants to cross. +
+The bridge will not hold. +
+Donna steadies it. +
+Anya crosses because Donna has made the path hold.
+
+This is the game in miniature.
 
 == Repository map
 
-[cols="1,3"]
+[cols="1,3",options="header"]
 |===
-| Path | What lives there
+| Path
+| Purpose
 
-| `0-AI-MANIFEST.a2ml`      | Universal entry point for AI agents (read first).
-| `.machine_readable/`      | Project metadata, policies, contractiles, AI configs.
-| `src/interface/`          | Typed ABI (Idris2) + FFI (Zig) + generated headers.
-| `docs/`                   | Onboarding, status, governance, practice, decisions.
-| `build/`, `Justfile`      | Task orchestration (`just` phases delegate to `build/just/*.just`).
-| `.github/`                | Workflows + community health files.
-| `tests/`, `benches/`      | Test suites and benchmarks.
+| `README.adoc`
+| This project overview.
+
+| `LICENSE-INTENT.md`
+| Current licensing intent and private status note.
+
+| `docs/design/`
+| Design notes, world principles, mechanics, and parking-lot material.
+
+| `docs/prompts/`
+| Prompts used to scaffold or regenerate repository structure.
+
+| `prototype/zone-a/`
+| Browser-based mock prototype for Level 1, Zone A.
+
+| `prototype/zone-a/index.html`
+| Current playable JavaScript/canvas mock.
+
+| `prototype/zone-a/README.md`
+| Local instructions for the Zone A prototype.
+
+| `assets/`
+| Placeholder location for future art, sound, reference, and production assets.
+
+| `.machine_readable/`
+| Future Rhodium Standard Repository / estate metadata, if enabled.
+
+| `0-AI-MANIFEST.a2ml`
+| Future AI-agent entrypoint, if enabled.
 |===
 
-== Where to go next
+== Development status
 
-* `EXPLAINME.adoc` — the engineering deep-dive: how the pieces actually work.
-* `AFFIRMATION.adoc` — the dated, signed honesty snapshot of the repo's true state.
-* `AUDIT.adoc` — the release audit gate.
-* `.machine_readable/ai/PLACEHOLDERS.adoc` — the full placeholder reference.
+This project is at the exploratory playable-prototype stage.
+
+Current focus:
+
+. Keep Zone A small.
+. Refine the existing emotional beats.
+. Avoid adding major new systems too early.
+. Preserve larger ideas in design notes rather than implementing them immediately.
+
+Do not add yet:
+
+* combat
+* inventory
+* multiplayer
+* full class system
+* full NPC factions
+* full boss design
+* Level 2
+* full animal AI
+* save/load system
+* production art pipeline
+
+== Parked design directions
+
+The following ideas are important but not currently implemented.
+
+=== Apothecary and class paths
+
+A future apothecary scene may introduce class-like paths through questions of virtue, medicine, and moral diagnosis.
+
+Possible Anya paths:
+
+* Runner
+* Flicker
+* Wildheart
+
+Possible Donna paths:
+
+* Pillar
+* Architect
+* Guardian
+
+The apothecary's central question may be:
+
+[quote]
+
+---
+
+What do you become when the world breaks?
+
+---
+
+=== Absence mechanic
+
+If Anya is absent, the world becomes over-settled, muted, heavy, slow, and sedated.
+
+If Donna is absent, the world becomes over-stirred, noisy, unstable, fast, and turbulent.
+
+This should eventually make the player feel the cost of separation not only through missing abilities, but through the whole changed behaviour of Slavia.
+
+=== Mirror of Misalignment
+
+A future corruption boss may weaponise Anya and Donna's flaws against each other.
+
+This is currently parked and should not be implemented in Zone A.
+
+== Repository standard intent
+
+This repository is intended to align over time with the Rhodium Standard Repository pattern.
+
+Relevant estate-level intentions may include:
+
+* machine-readable project metadata
+* AI-agent working boundaries
+* explicit provenance and attribution
+* OpenSSF-oriented security checks
+* reproducible build hooks where appropriate
+* Software Heritage archival once publication is appropriate
+* clear distinction between code, docs, assets, branding, and commercial rights
+
+At this stage, the prototype should remain simple.
 
 == Licence
 
-Code, configuration and scripts are link:LICENSE[Mozilla Public License 2.0]
-(`MPL-2.0`); prose documentation is `CC-BY-SA-4.0`. Both texts live in
-`LICENSES/`, and per-file `SPDX-License-Identifier` headers are authoritative.
-The GitHub-detected licence is MPL-2.0 (the root `LICENSE`). Long-term
-attribution uses Quantum-Safe Provenance — see
-link:docs/legal/EXHIBIT-B-QUANTUM-SAFE.txt[the Quantum-Safe Provenance exhibit].
+Intended licence split:
+
+* Code, configuration, and scripts: MPL-2.0
+* Prose documentation and design notes: CC-BY-SA-4.0
+
+However, this repository is currently private exploratory work.
+
+Per-file SPDX headers should be treated as authoritative once added.
+
+Until the project is explicitly published, do not assume any grant beyond the stated private working context.
