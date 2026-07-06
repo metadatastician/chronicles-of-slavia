@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronicles of Slavia - Zone A: Border Path</title>
+    <style>
+        body { margin: 0; padding: 0; background: #1a1a2e; overflow: hidden; font-family: sans-serif; }
+        canvas { display: block; background: #16213e; }
+        #ui { position: absolute; top: 10px; left: 10px; color: #eaeaea; font-size: 12px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; }
+        #ui h1 { margin: 0 0 5px 0; font-size: 14px; color: #0f3460; }
+        #ui p { margin: 2px 0; }
+        #title { text-align: center; color: #e94560; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h1>Zone A: Border Path</h1>
+        <p><strong>Active:</strong> <span id="active-char">Anya</span></p>
+        <p><strong>Status:</strong> <span id="status">Exploring...</span></p>
+    </div>
+    <canvas id="game"></canvas>
+    <div id="title">What do you become when the world breaks?</div>
+    
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // World dimensions
+        const GROUND = canvas.height - 100;
+        
+        // Game state
+        let activeChar = 'anya';
+        let anya = { x: 200, y: GROUND, width: 40, height: 60, speed: 8, jumping: false, velY: 0, color: '#4a90e2' };
+        let donna = { x: 250, y: GROUND, width: 40, height: 60, speed: 5, jumping: false, velY: 0, color: '#50c878' };
+        let birds = [];
+        let bridge = { x: 600, y: GROUND - 20, width: 200, height: 10, stabilized: false, stableBy: null };
+        let shrine = { x: 400, y: GROUND - 50, width: 60, height: 80, text: 'Two lands, one heart.', read: false };
+        let overlook = { x: 1000, y: GROUND - 100, width: 150, height: 20, reached: false };
+        let riftAwakened = false;
+        let gameEnded = false;
+        
+        // Keys state
+        const keys = { a: false, d: false, ArrowLeft: false, ArrowRight: false, Space: false, Tab: false, e: false, r: false };
+        
+        // Initialize birds
+        for (let i = 0; i < 5; i++) {
+            birds.push({
+                x: 400 + Math.random() * 100,
+                y: GROUND - 100 + Math.random() * 50,
+                radius: 10 + Math.random() * 5,
+                color: '#f8f8f2',
+                settled: false,
+                stirred: false
+            });
+        }
+        
+        // Event listeners
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = true;
+            if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = true;
+            if (e.code === 'Space') keys.Space = true;
+            if (e.code === 'Tab') keys.Tab = true;
+            if (e.code === 'KeyE') keys.e = true;
+            if (e.code === 'KeyR') keys.r = true;
+            
+            // Prevent Tab from switching focus
+            if (e.code === 'Tab') e.preventDefault();
+        });
+        
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = false;
+            if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = false;
+            if (e.code === 'Space') keys.Space = false;
+            if (e.code === 'Tab') keys.Tab = false;
+            if (e.code === 'KeyE') keys.e = false;
+            if (e.code === 'KeyR') keys.r = false;
+        });
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Helper: get active character
+        function getActive() {
+            return activeChar === 'anya' ? anya : donna;
+        }
+        
+        function getInactive() {
+            return activeChar === 'anya' ? donna : anya;
+        }
+        
+        // Switch character
+        function switchCharacter() {
+            if (keys.Tab && !keys.Tab.prev) {
+                activeChar = activeChar === 'anya' ? 'donna' : 'anya';
+                document.getElementById('active-char').textContent = activeChar.charAt(0).toUpperCase() + activeChar.slice(1);
+                document.getElementById('status').textContent = 'Switched to ' + activeChar + '!';
+                setTimeout(() => { document.getElementById('status').textContent = 'Exploring...'; }, 1500);
+            }
+            keys.Tab.prev = keys.Tab;
+        }
+        
+        // Movement
+        function moveCharacter() {
+            const char = getActive();
+            
+            // Horizontal movement
+            if (keys.a || keys.ArrowLeft) {
+                char.x -= char.speed;
+            }
+            if (keys.d || keys.ArrowRight) {
+                char.x += char.speed;
+            }
+            
+            // Boundary checks
+            char.x = Math.max(0, Math.min(canvas.width - char.width, char.x));
+            
+            // Jumping
+            if (keys.Space && !keys.Space.prev && !char.jumping) {
+                char.jumping = true;
+                char.velY = -15;
+            }
+            keys.Space.prev = keys.Space;
+            
+            // Gravity
+            if (char.jumping) {
+                char.y += char.velY;
+                char.velY += 0.8;
+                
+                // Land on ground or bridge
+                if (char.y + char.height >= GROUND) {
+                    char.y = GROUND - char.height;
+                    char.jumping = false;
+                    char.velY = 0;
+                }
+                
+                // Land on bridge if stabilized
+                if (bridge.stabilized && char.y + char.height >= bridge.y && char.y + char.height <= bridge.y + bridge.height &&
+                    char.x + char.width > bridge.x && char.x < bridge.x + bridge.width) {
+                    char.y = bridge.y - char.height;
+                    char.jumping = false;
+                    char.velY = 0;
+                }
+            }
+        }
+        
+        // Interaction
+        function checkInteractions() {
+            const char = getActive();
+            
+            // Shrine interaction
+            if (keys.e && !keys.e.prev && !shrine.read &&
+                char.x + char.width > shrine.x && char.x < shrine.x + shrine.width &&
+                char.y + char.height > shrine.y && char.y < shrine.y + shrine.height) {
+                shrine.read = true;
+                document.getElementById('status').textContent = 'Shrine: "' + shrine.text + '"';
+                setTimeout(() => { document.getElementById('status').textContent = 'Exploring...'; }, 3000);
+            }
+            
+            // Bridge stabilization (Donna only)
+            if (activeChar === 'donna' && !bridge.stabilized &&
+                char.x + char.width > bridge.x && char.x < bridge.x + bridge.width &&
+                char.y + char.height >= bridge.y - 5 && char.y < bridge.y + bridge.height + 5) {
+                bridge.stabilized = true;
+                bridge.stableBy = 'donna';
+                document.getElementById('status').textContent = 'Donna stabilized the bridge!';
+                setTimeout(() => { document.getElementById('status').textContent = 'Exploring...'; }, 2000);
+            }
+            
+            // Overlook (both characters needed)
+            if (!overlook.reached &&
+                anya.x + anya.width > overlook.x && anya.x < overlook.x + overlook.width &&
+                anya.y + anya.height >= overlook.y && anya.y < overlook.y + overlook.height &&
+                donna.x + donna.width > overlook.x && donna.x < overlook.x + overlook.width &&
+                donna.y + donna.height >= overlook.y && donna.y < overlook.y + overlook.height) {
+                overlook.reached = true;
+                document.getElementById('status').textContent = 'Both reached the overlook! The world feels whole...';
+            }
+            
+            // Rift awakens after overlook
+            if (overlook.reached && !riftAwakened) {
+                setTimeout(() => {
+                    riftAwakened = true;
+                    document.getElementById('status').textContent = 'The Rift awakens! The birds stop answering...';
+                    // Stir birds (rift effect)
+                    birds.forEach(b => { b.stirred = true; b.settled = false; });
+                }, 2000);
+            }
+            
+            // Game end
+            if (riftAwakened && !gameEnded) {
+                setTimeout(() => {
+                    gameEnded = true;
+                    document.getElementById('status').textContent = 'PROTOTYPE END: Rift interruption.';
+                }, 3000);
+            }
+            
+            // Bird responses based on active character
+            birds.forEach(bird => {
+                const dist = Math.sqrt(Math.pow(getActive().x - bird.x, 2) + Math.pow(getActive().y - bird.y, 2));
+                if (dist < 80) {
+                    if (activeChar === 'anya') {
+                        bird.stirred = true;
+                        bird.settled = false;
+                    } else if (activeChar === 'donna') {
+                        bird.settled = true;
+                        bird.stirred = false;
+                    }
+                }
+            });
+            
+            keys.e.prev = keys.e;
+        }
+        
+        // Reset
+        function checkReset() {
+            if (keys.r && !keys.r.prev) {
+                // Reset positions
+                anya.x = 200; anya.y = GROUND - anya.height;
+                donna.x = 250; donna.y = GROUND - donna.height;
+                activeChar = 'anya';
+                document.getElementById('active-char').textContent = 'Anya';
+                
+                // Reset world state
+                birds.forEach(b => { b.stirred = false; b.settled = false; });
+                bridge.stabilized = false;
+                bridge.stableBy = null;
+                shrine.read = false;
+                overlook.reached = false;
+                riftAwakened = false;
+                gameEnded = false;
+                
+                document.getElementById('status').textContent = 'Reset! Exploring...';
+                setTimeout(() => { document.getElementById('status').textContent = 'Exploring...'; }, 1000);
+            }
+            keys.r.prev = keys.r;
+        }
+        
+        // Draw bird
+        function drawBird(bird) {
+            ctx.beginPath();
+            ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
+            
+            // Bird color changes based on state
+            if (riftAwakened) {
+                ctx.fillStyle = '#ff4444'; // Red when rift awakens
+            } else if (bird.stirred) {
+                ctx.fillStyle = '#ffaa44'; // Orange when stirred
+            } else if (bird.settled) {
+                ctx.fillStyle = '#88ff88'; // Light green when settled
+            } else {
+                ctx.fillStyle = bird.color;
+            }
+            ctx.fill();
+            
+            // Wings
+            ctx.beginPath();
+            ctx.moveTo(bird.x - bird.radius, bird.y);
+            ctx.lineTo(bird.x - bird.radius * 1.5, bird.y - bird.radius / 2);
+            ctx.moveTo(bird.x + bird.radius, bird.y);
+            ctx.lineTo(bird.x + bird.radius * 1.5, bird.y - bird.radius / 2);
+            ctx.strokeStyle = '#333';
+            ctx.stroke();
+        }
+        
+        // Draw character
+        function drawCharacter(char, isActive) {
+            const alpha = isActive ? 1 : 0.6;
+            
+            // Body
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = char.color;
+            ctx.fillRect(char.x, char.y, char.width, char.height);
+            
+            // Hair (Anya: chaotic, Donna: bun)
+            ctx.fillStyle = '#1a1a2e';
+            if (char === anya) {
+                // Anya's chaotic hair
+                ctx.beginPath();
+                ctx.moveTo(char.x + char.width/2, char.y);
+                ctx.bezierCurveTo(
+                    char.x - 10, char.y - 40,
+                    char.x + char.width + 10, char.y - 30,
+                    char.x + char.width/2, char.y - 20
+                );
+                ctx.bezierCurveTo(
+                    char.x + char.width/2, char.y - 60,
+                    char.x + char.width/2, char.y - 60,
+                    char.x + char.width/2, char.y - 20
+                );
+                ctx.fill();
+            } else {
+                // Donna's tidy bun
+                ctx.beginPath();
+                ctx.arc(char.x + char.width/2, char.y - 10, 12, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Name tag
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.font = '10px sans-serif';
+            ctx.fillText(char === anya ? 'Anya' : 'Donna', char.x + 5, char.y + char.height + 15);
+            
+            // Active indicator
+            if (isActive) {
+                ctx.strokeStyle = '#ff0';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(char.x - 2, char.y - 2, char.width + 4, char.height + 4);
+            }
+            
+            ctx.globalAlpha = 1;
+        }
+        
+        // Draw bridge
+        function drawBridge() {
+            ctx.fillStyle = bridge.stabilized ? '#8b5a2b' : '#654321';
+            ctx.fillRect(bridge.x, bridge.y, bridge.width, bridge.height);
+            
+            // Support beams
+            for (let i = 0; i < 5; i++) {
+                const x = bridge.x + (i * bridge.width / 4);
+                ctx.fillStyle = '#4a4a4a';
+                ctx.fillRect(x, bridge.y, 5, -40);
+            }
+        }
+        
+        // Draw shrine
+        function drawShrine() {
+            ctx.fillStyle = '#2a2a3a';
+            ctx.fillRect(shrine.x, shrine.y, shrine.width, shrine.height);
+            
+            // Shrine roof
+            ctx.beginPath();
+            ctx.moveTo(shrine.x - 10, shrine.y);
+            ctx.lineTo(shrine.x + shrine.width / 2, shrine.y - 30);
+            ctx.lineTo(shrine.x + shrine.width + 10, shrine.y);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Shrine text (if read, show as known)
+            if (shrine.read) {
+                ctx.fillStyle = '#e0e0e0';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(shrine.text, shrine.x + shrine.width/2, shrine.y - 40);
+                ctx.textAlign = 'left';
+            }
+        }
+        
+        // Draw overlook
+        function drawOverlook() {
+            ctx.fillStyle = '#3a3a4a';
+            ctx.fillRect(overlook.x, overlook.y, overlook.width, overlook.height);
+            
+            // Railing
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(overlook.x, overlook.y);
+            ctx.lineTo(overlook.x + overlook.width, overlook.y);
+            ctx.stroke();
+        }
+        
+        // Draw ground
+        function drawGround() {
+            ctx.fillStyle = '#2a3a2a';
+            ctx.fillRect(0, GROUND, canvas.width, 100);
+            
+            // Grass tufts
+            ctx.fillStyle = '#3a5a3a';
+            for (let i = 0; i < canvas.width; i += 20) {
+                ctx.fillRect(i + Math.random() * 10, GROUND, 10, 10 + Math.random() * 10);
+            }
+        }
+        
+        // Game loop
+        function gameLoop() {
+            // Clear
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw world
+            drawGround();
+            drawShrine();
+            drawBridge();
+            drawOverlook();
+            
+            // Draw characters (inactive first, active on top)
+            if (activeChar === 'anya') {
+                drawCharacter(donna, false);
+                drawCharacter(anya, true);
+            } else {
+                drawCharacter(anya, false);
+                drawCharacter(donna, true);
+            }
+            
+            // Draw birds
+            birds.forEach(drawBird);
+            
+            // Update state
+            switchCharacter();
+            moveCharacter();
+            checkInteractions();
+            checkReset();
+            
+            // Continue loop
+            if (!gameEnded) {
+                requestAnimationFrame(gameLoop);
+            } else {
+                // Show restart hint
+                ctx.fillStyle = 'rgba(255,0,0,0.3)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff';
+                ctx.font = '24px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('PROTOTYPE COMPLETE - Press R to restart', canvas.width/2, canvas.height/2);
+                ctx.textAlign = 'left';
+            }
+        }
+        
+        // Start game
+        gameLoop();
+    </script>
+</body>
+</html>
