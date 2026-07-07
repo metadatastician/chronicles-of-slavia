@@ -5,21 +5,18 @@
 
 use std::fmt;
 
-/// Why a crossing was refused. "Donna steadies what Anya crosses."
+/// Why a crossing was refused.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CrossError {
-    /// Donna has not steadied the bridge yet — there is nothing safe to cross.
+    /// The crossing has not been made passable yet — there is nothing safe to
+    /// cross. In Zone A, Donna has not steadied it.
     BridgeUnstable,
-    /// The active character is not the one who crosses (only a stirring
-    /// character crosses; a settling one steadies).
-    NotTheCrosser,
 }
 
 impl fmt::Display for CrossError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            CrossError::BridgeUnstable => f.write_str("the bridge has not been steadied"),
-            CrossError::NotTheCrosser => f.write_str("this character steadies, she does not cross"),
+            CrossError::BridgeUnstable => f.write_str("the crossing has not been made passable"),
         }
     }
 }

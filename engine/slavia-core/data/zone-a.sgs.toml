@@ -13,17 +13,17 @@ zone = "A"
 name = "Border Path"
 
 # --- Characters -------------------------------------------------------------
-# The emotional grammar: Anya stirs the world, Donna settles it. The mechanic
-# keys off `influence`, never the name.
+# Attunement — the taxis gift — belongs to Anya and Donna alone. Anya raises
+# taxis, Donna lowers it. Anyone else would have no `attunement` at all.
 [[characters]]
 id = "anya"
 name = "Anya"
-influence = "stir"
+attunement = "raise"
 
 [[characters]]
 id = "donna"
 name = "Donna"
-influence = "settle"
+attunement = "lower"
 
 # --- Animals ("living taxis") -----------------------------------------------
 # Natural animals answer the girls. A non-natural nature would be a diagnostic

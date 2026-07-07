@@ -50,11 +50,29 @@ diagnostic natures already in `03-living-taxis.md` (possessed, masking, …). Th
 core must therefore treat animal-affecting as an ability an actor *holds*, tagged
 by **category** (attune vs dominate), not as a side effect of a temperament.
 
-## Magnitude — experience magnifies and hones
+## It is an aura, and mastery is control as much as strength
 
-The ability is not fixed. With experience it can be **magnified and honed** — a
-mastery/strength dimension that grows over the Chronicle. Base strength at the
-start; stronger, sharper, more selective later.
+The gift is an **aura** — it emanates from the girls and acts on what they pass,
+passively. (A useful touchstone: the *Nen / Zen* aura discipline in *Hunter ×
+Hunter* — an aura you first leak, then learn to sense, contain, and direct.)
+
+Mastery therefore has **two axes**, not one:
+
+- **Strength** — how far and how powerfully the aura reaches.
+- **Control** — how reliably and selectively it acts.
+
+**Early on, control is low.** The aura is leaky and unbidden, and the two girls'
+auras differ, so the *same spot* answers each of them differently:
+
+> Donna walks past a point and nothing happens — she simply reaches the other
+> side. Anya walks past the *same* point and an animal hops out and becomes part
+> of a moment in the game.
+
+This is a feature: low control means emergent, character-flavoured surprises
+(Anya's raised taxis draws creatures out; Donna's lowered taxis lets them lie
+still). With experience the aura is **magnified and honed** — stronger, sharper,
+more deliberate — until late in the Chronicle it can be aimed, contained, or
+withheld at will.
 
 ## Terrain — home amplifies, opponent attenuates
 
@@ -81,6 +99,36 @@ On top of magnitude and terrain sit item- and curse-based modifiers:
     effect(actor) × magnitude(mastery) × terrain × objects × curses
       ── gated by ── animal nature
       ── overridden by ── the Rift
+
+## Locked polarities force cooperation (early game)
+
+Because early control is low, each girl is **stuck with her own polarity** — she
+cannot fake the other's effect. An animal is *useful* only when its taxis state
+matches the need, so the puzzle becomes *which girl does this situation call
+for?*
+
+- Need an animal **active** (a dog to get up and fetch something)? Donna will
+  struggle — the dog would rather be stroked, and nuzzles her. **Anya** raises
+  its taxis and solves it.
+- Need an animal **calm** (a panicked creature settled before it is any use)?
+  Anya makes it worse. **Donna** settles it.
+
+So the early game is built on the two **playing off each other** — constant
+switching, complementarity as the core loop. Later, once that dynamic is
+well-established and mastery has grown, the demand shifts: they must use the gift
+more **deliberately and effectively** (aimed, combined, withheld), not just
+alternate polarities.
+
+## The gift is one solution, not the only one
+
+The taxis ability belongs to **Anya and Donna alone** — no NPC has it — and
+**class inflects how it manifests**. But the *outcomes* it produces are not
+theirs exclusively. A puzzle the gift can solve usually has other solutions too:
+an unsteady stream crossing can be **settled by Donna**, *or* reached another way
+entirely — felling a tree across it, dropping stones to step on. Only the two
+girls have the *gift*; the *goal* is open to other means. Crossing itself is not
+a power — anyone crosses what is passable; the puzzle is that *something* must
+first make it so.
 
 ## Zone A scope — base only
 

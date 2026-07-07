@@ -13,7 +13,7 @@
 //! If these tests pass, the *sacred logic* underneath those five lines holds —
 //! whatever renderer we later put on top.
 
-use slavia_core::{zone_a, Animal, CrossError, Influence, Nature, Response, World};
+use slavia_core::{zone_a, Animal, Character, CrossError, Nature, Response, Taxis, World};
 
 fn world() -> World {
     World::new(zone_a())
@@ -24,8 +24,9 @@ fn spec_loads_with_two_girls_and_the_grove_birds() {
     let s = zone_a();
     assert_eq!(s.meta.zone, "A");
     assert_eq!(s.characters.len(), 2);
-    assert_eq!(s.character("anya").unwrap().influence, Influence::Stir);
-    assert_eq!(s.character("donna").unwrap().influence, Influence::Settle);
+    // The gift belongs to Anya and Donna: Anya raises taxis, Donna lowers it.
+    assert_eq!(s.character("anya").unwrap().attunement, Some(Taxis::Raise));
+    assert_eq!(s.character("donna").unwrap().attunement, Some(Taxis::Lower));
     assert_eq!(s.animal("grove-birds").unwrap().nature, Nature::Natural);
     assert_eq!(s.beats.len(), 7);
     assert_eq!(
@@ -46,25 +47,42 @@ fn anya_stirs_and_donna_settles_the_grove_birds() {
     assert_eq!(w.approach("grove-birds"), Some(Response::Settled));
 }
 
-/// Beat: Stream bridge. Success line 3 — Donna steadies what Anya crosses.
+/// The gift is Anya and Donna's alone. An actor without attunement leaves the
+/// animal untouched — this is why the core keys off an ability an actor *holds*,
+/// not a temperament (`docs/design/06`).
 #[test]
-fn donna_steadies_the_bridge_before_anya_can_cross() {
+fn an_actor_without_the_gift_leaves_the_animal_unmoved() {
+    let birds = zone_a().animal("grove-birds").unwrap().clone();
+    let bystander = Character {
+        id: "villager".into(),
+        name: "A villager".into(),
+        attunement: None,
+    };
+    assert_eq!(
+        birds.respond(bystander.attunement, false),
+        Response::Unmoved
+    );
+}
+
+/// Beat: Stream bridge. Success line 3 — Donna steadies what Anya crosses.
+/// Crossing itself is not a gift — anyone crosses what is passable — but in
+/// Zone A only Donna can *make* it passable.
+#[test]
+fn donna_steadies_the_crossing_before_anyone_can_cross() {
     let mut w = world();
 
-    // As Anya, an unsteadied bridge cannot be crossed...
+    // As Anya, an unsteadied crossing cannot be crossed...
     assert_eq!(w.cross(), Err(CrossError::BridgeUnstable));
-    // ...and Anya cannot steady it herself (she stirs, she does not settle).
+    // ...and Anya cannot steady it herself (she raises taxis, she does not settle).
     assert!(!w.stabilize_bridge());
     assert!(!w.bridge_stable);
 
-    // Donna steadies it.
+    // Donna settles it.
     assert!(w.switch_to("donna"));
     assert!(w.stabilize_bridge());
     assert!(w.bridge_stable);
-    // But Donna is not the one who crosses.
-    assert_eq!(w.cross(), Err(CrossError::NotTheCrosser));
 
-    // Anya crosses what Donna steadied.
+    // Now that it is passable, Anya crosses it.
     assert!(w.switch_to("anya"));
     assert_eq!(w.cross(), Ok(()));
     assert!(w.crossed);
@@ -88,7 +106,7 @@ fn the_rift_interrupts_the_answer() {
 
 /// The diagnostic rule (not exercised by Zone A's shipped data, but the grammar
 /// must already hold for later zones): a non-natural animal betrays itself by
-/// failing to answer naturally.
+/// failing to answer naturally — even to an attuned reach.
 #[test]
 fn a_corrupted_animal_does_not_answer_naturally() {
     let corrupted = Animal {
@@ -98,11 +116,11 @@ fn a_corrupted_animal_does_not_answer_naturally() {
         location: None,
     };
     assert_eq!(
-        corrupted.respond(Influence::Settle, false),
+        corrupted.respond(Some(Taxis::Lower), false),
         Response::Unnatural(Nature::Corrupted),
     );
     assert_eq!(
-        corrupted.respond(Influence::Stir, false),
+        corrupted.respond(Some(Taxis::Raise), false),
         Response::Unnatural(Nature::Corrupted),
     );
 }

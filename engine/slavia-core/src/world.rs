@@ -5,7 +5,7 @@
 //! handful of state transitions that make up Zone A.
 
 use crate::animal::Response;
-use crate::character::{Character, Influence};
+use crate::character::{Character, Taxis};
 use crate::error::CrossError;
 use crate::spec::Spec;
 
@@ -20,9 +20,9 @@ pub struct World {
     active_id: String,
     /// Whether the Rift has awakened (the Fracture beat).
     pub rift_active: bool,
-    /// Whether the bridge has been steadied by a settling character.
+    /// Whether the stream crossing has been made passable.
     pub bridge_stable: bool,
-    /// Whether a stirring character has crossed the steadied bridge.
+    /// Whether anyone has crossed the passable crossing.
     pub crossed: bool,
 }
 
@@ -66,18 +66,24 @@ impl World {
         }
     }
 
-    /// The active character reaches out to an animal. Returns `None` if there
-    /// is no such animal; otherwise the animal's [`Response`] under the current
-    /// world state (notably whether the Rift is active).
+    /// The active character reaches out to an animal. Returns `None` if there is
+    /// no such animal; otherwise the animal's [`Response`] under the current
+    /// world state (the character's attunement, and whether the Rift is active).
     pub fn approach(&self, animal_id: &str) -> Option<Response> {
         let animal = self.spec.animal(animal_id)?;
-        Some(animal.respond(self.active().influence, self.rift_active))
+        Some(animal.respond(self.active().attunement, self.rift_active))
     }
 
-    /// Steady the bridge. Only a *settling* character can — this is Donna's act.
-    /// Returns `false` if the active character stirs rather than settles.
+    /// Settle the unsteady stream crossing so it can be crossed.
+    ///
+    /// In Zone A the only available way is **Donna** — a character whose gift
+    /// *lowers* taxis stills the crossing's unsteady motion. Returns `false` if
+    /// the active character cannot (Anya cannot; she raises, she does not
+    /// settle). The crossing is a *multi-solution* puzzle: other means (felling
+    /// a tree, stepping stones) could also set it passable in later zones — the
+    /// gift is one solution, not the only one (`docs/design/06`).
     pub fn stabilize_bridge(&mut self) -> bool {
-        if self.active().influence == Influence::Settle {
+        if self.active().attunement == Some(Taxis::Lower) {
             self.bridge_stable = true;
             true
         } else {
@@ -85,13 +91,9 @@ impl World {
         }
     }
 
-    /// Cross the bridge. Only a *stirring* character crosses, and only what a
-    /// settling character has already steadied — "Donna steadies what Anya
-    /// crosses."
+    /// Cross the crossing. Crossing is not a gift — anyone crosses what is
+    /// passable — so this needs only that the crossing has been made passable.
     pub fn cross(&mut self) -> Result<(), CrossError> {
-        if self.active().influence != Influence::Stir {
-            return Err(CrossError::NotTheCrosser);
-        }
         if !self.bridge_stable {
             return Err(CrossError::BridgeUnstable);
         }

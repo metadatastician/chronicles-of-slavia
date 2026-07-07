@@ -30,7 +30,7 @@ pub mod spec;
 pub mod world;
 
 pub use animal::{Animal, Nature, Response};
-pub use character::{Character, Influence};
+pub use character::{Character, Taxis};
 pub use error::{CrossError, SpecError};
 pub use spec::{Beat, Meta, Spec};
 pub use world::World;
