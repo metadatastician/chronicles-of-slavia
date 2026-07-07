@@ -119,6 +119,22 @@ well-established and mastery has grown, the demand shifts: they must use the gif
 more **deliberately and effectively** (aimed, combined, withheld), not just
 alternate polarities.
 
+### Late mastery: distance, persistence, and a hard moral limit
+
+With control mastered, the gift reaches **at a distance**, and an effect can be
+**left running** while its caster acts elsewhere. Example: a beehive Anya cannot
+pass without the bees erupting into activity — so Donna passes first (she settles
+them), and then Anya, from range, sets the swarm as an **impenetrable cloud of
+activity guarding her rear** so no one can sneak up, while she does something
+else somewhere else.
+
+The hard limit holds no matter the mastery: **attunement amplifies a thing's
+nature, it never perverts it.** Anya can make bees intensely active; she *cannot*
+make them "go nuts killing people." Turning a creature into a weapon against its
+own nature is **domination** — the enemies' category, not hers. Mastery buys
+reach, persistence, and precision; it never buys the power to make a creature
+betray what it is.
+
 ## The gift is one solution, not the only one
 
 The taxis ability belongs to **Anya and Donna alone** — no NPC has it — and
