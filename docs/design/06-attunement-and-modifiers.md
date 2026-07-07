@@ -119,6 +119,28 @@ well-established and mastery has grown, the demand shifts: they must use the gif
 more **deliberately and effectively** (aimed, combined, withheld), not just
 alternate polarities.
 
+### Auras combine — cover, suppression, and sheltering
+
+Cooperation is not only *taking turns*; auras interact when the girls are near
+each other.
+
+- **Sound cover.** A raised, active swarm is *loud*, and that noise is itself a
+  tool — it masks movement and sound (a listening/stealth use, echoing
+  `03-living-taxis.md`) while also denying a spot to others by sheer activity.
+- **Holding back (suppression).** A girl can withhold or dampen her own aura so
+  it stops triggering things — Anya *holding back* near the bees so she does not
+  rile them. (Nen touchstone: *Zetsu*, hiding one's aura.) A control skill: weak
+  early, deliberate later.
+- **Sheltering (proximity).** The stronger aura in a place can cover a companion.
+  Where Donna is strong — her terrain, or high mastery — she can stay close at
+  **full aura** and make a zone *safe enough to pass*, so Anya crosses inside her
+  shelter with her own aura held back. The pair move as one calmed field.
+
+So the same bee-choked path has several readings: Anya alone cannot pass (she
+inflames them); Donna alone passes (she calms her way through); and later Donna
+can **escort** Anya through under her settling aura. Which reading is available
+depends on mastery, terrain, and whether they act apart or together.
+
 ### Late mastery: distance, persistence, and a hard moral limit
 
 With control mastered, the gift reaches **at a distance**, and an effect can be
