@@ -7,26 +7,48 @@ This doc says *why*, *who else can*, and *what changes the strength*.
 
 Affecting animals is a **special ability Anya and Donna carry** — it is part of
 who they are, not a generic property that any calm or excitable character would
-have. It is **passive**: they change the rhythm of the world by being present.
+have. It is **passive**: they change the rhythm of the world by being present,
+and it **embues and surrounds** what is near them, honed as they develop.
 
-- **Anya** stirs — excites, quickens, emboldens, agitates.
-- **Donna** settles — calms, slows, quietens, reassures.
+What they modulate is **taxis** — the rate and direction of a living thing's
+motion and response (the biology sense: the *taxis* of an organism toward or away
+from a stimulus). Hence "living taxis" (`03-living-taxis.md`).
 
-The animal's own nature still decides the result (`03-living-taxis.md`), and the
-Rift still overrides everything once awake (`02-zone-a-design.md`, Fracture).
+- **Anya raises the taxis** — quickens, emboldens, brings confidence, dispels
+  panic. She draws out an animal's vitality. This is *not* aggression or ferocity.
+- **Donna lowers the taxis** — calms, settles, steadies, reassures. She draws
+  out an animal's peace.
 
-## Others can be attuned too
+Crucially, both work **with the animal's own nature**, drawing out its genuine,
+best self — never imposing an alien state. The animal's nature decides what
+"raised" or "lowered" actually looks like for it (`03-living-taxis.md`), and the
+Rift overrides everything once awake (`02-zone-a-design.md`, Fracture).
 
-Attunement is a *capability an actor holds*, and Anya and Donna are not the only
-ones who hold it. **Enemies may manipulate animals** with different effect kinds:
+## Enemies dominate — a different category, against nature and will
 
-- making them **ferocious** (enrage)
-- making them **obedient** (dominate/compel)
+Other actors can affect animals too, but **enemy power is the opposite of
+attunement**. Where Anya and Donna draw out an animal's own nature and leave its
+will intact, **enemies override the will** — they impose a state the animal
+would not choose:
 
-So the model is: an actor applies an *effect kind* to an animal. Anya = stir,
-Donna = settle, an enemy = enrage / dominate / … . This is why the core must
-treat animal-affecting as an ability an actor *has*, not as a side effect of a
-stir/settle temperament.
+- **Obedience** — the animal is made *mindless, will-less, an instrument under
+  instruction*. This is **not** Donna's settling: a settled animal is at peace
+  and still itself; an obeying one is enslaved.
+- **Ferocity** — imposed rage. This is **not** Anya's emboldening: Anya lifts an
+  animal's confidence, she does not make it savage.
+
+So there are two categories of animal-effect, and the moral line between them is
+the point (`01-world-principle.md`: courage, care, betrayal all leave marks):
+
+| Category   | Who         | Relationship to the animal                    |
+|------------|-------------|-----------------------------------------------|
+| Attunement | Anya, Donna | *with* nature and will — draws out its best    |
+| Domination | enemies     | *against* nature and will — strips or imposes  |
+
+A dominated animal is, by definition, no longer natural — this ties into the
+diagnostic natures already in `03-living-taxis.md` (possessed, masking, …). The
+core must therefore treat animal-affecting as an ability an actor *holds*, tagged
+by **category** (attune vs dominate), not as a side effect of a temperament.
 
 ## Magnitude — experience magnifies and hones
 
