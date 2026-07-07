@@ -110,6 +110,33 @@ The imbalance is a standing difficulty pressure on the free sister's rescue, and
 it lifts only when they are **reunited**. (This details the *Absence mechanic* in
 `05-parking-lot.md` — the two need each other, and the world itself shows it.)
 
+## Prolonged imbalance — slow drift, and the Rift can make it stark
+
+Sustained time in a **complement** terrain behaves like a slow, partial version
+of absence: the land drains the girl's contribution until the world tilts toward
+the opposite pole — quietly at first, then unhealthily if it goes on far too
+long. This is a **long-arc drift**, felt across levels, not within one, and
+usually **subtle**.
+
+- **Donna, long in swampland** — her settling is drained, so the world grows
+  over-vivid and **agitated**; under very long exposure the **colour space
+  itself shifts** (over-saturated, wrong) and it becomes problematic.
+- **Anya, long in tundra** — her vivacity is drained by the deadness of the grey
+  trees, so the world grows **less vivid, shallow, sluggish**, its colours
+  greying, motion slowing.
+
+Their **moods** drift with it (Anya disturbed by the deadness; Donna set on
+edge). The mitigation is each other: staying **close — company and togetherness**
+— slows the drift and buys time in a hostile land.
+
+Note the consistency: a **complement terrain acts like *partial absence***,
+tilting the world the same direction the separation mechanic does. Anything that
+drains a girl's contribution — being taken, or being long in hostile ground —
+leans the world toward her opposite; proximity and reunion restore it.
+
+Under the **Rift**, this drift is no longer subtle: the Rift's corruption can
+make the same effect **far more stark**.
+
 ## Objects and curses — the modifier pipeline
 
 On top of magnitude and terrain sit item- and curse-based modifiers:
