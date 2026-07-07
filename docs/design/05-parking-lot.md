@@ -20,6 +20,18 @@ If Donna is missing, the world becomes turbulent and over-stirred.
 
 Forest spirits, mountain spirits, mixed spirits, corrupted spirits.
 
+## Attunement modifiers (see 06-attunement-and-modifiers.md)
+
+Deferred subsystems of the animal ability:
+
+- Enemy animal-manipulation (ferocious / obedient).
+- Mastery — the ability magnified and honed with experience.
+- Terrain traits — home amplifies, opponent attenuates (Anya forest/tundra, Donna mountains/swampland).
+- Object magnifiers.
+- Curses that attenuate or reverse effects.
+
+Zone A ships the base case only.
+
 ## Full Chronicle I
 
 Not yet. First make Zone A work.
