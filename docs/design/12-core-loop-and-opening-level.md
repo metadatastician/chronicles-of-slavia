@@ -39,7 +39,16 @@ first four steps clearly before asking for the rest.
 
 ## Where this stands relative to built canon
 
-**Two tensions, not yet reconciled — flagging rather than picking a side:**
+**Resolved** by `14-chronicle-i-rift-between-nations.md`: this draft is Chronicle
+I's own opening *level* ("The First Tear," `00-start-here.md`), whose zones
+(A–E, `08`) are the granular breakdown of exactly these five sections — Zone A
+is calm/before, Zone B is where the Tear actually opens, Zones C/D are the
+Personality Zones alone, Zone E is the reunion. The two tensions below were
+real, but only because this draft and the built Zone A were describing
+different *zones of the same level*, not competing designs of Zone A itself.
+Kept for the record of how the resolution was reached.
+
+**The original two tensions (for the record):**
 
 - **Timing of the Tear.** Here it opens *early* (Section 2), right after a
   brief ordinary-world intro. In the built Zone A, the fracture is the *last*
