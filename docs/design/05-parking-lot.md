@@ -16,6 +16,9 @@ If Anya is missing, the world becomes sedated and over-settled.
 
 If Donna is missing, the world becomes turbulent and over-stirred.
 
+Elaborated as a capture/rescue difficulty + reunion mechanic in
+`06-attunement-and-modifiers.md` ("Separation tilts the world").
+
 ## NPC factions
 
 Forest spirits, mountain spirits, mixed spirits, corrupted spirits.

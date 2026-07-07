@@ -74,17 +74,41 @@ still). With experience the aura is **magnified and honed** — stronger, sharpe
 more deliberate — until late in the Chronicle it can be aimed, contained, or
 withheld at will.
 
-## Terrain — home amplifies, opponent attenuates
+## Terrain — the land favours its own
 
-Each girl is *of* a place, and the land answers her differently:
+Each girl is *of* a place, and the land answers her differently — not only her
+aura, but her whole self:
 
-| Girl  | Home terrain (amplifies) | Opponent terrain (attenuates) |
-|-------|--------------------------|-------------------------------|
-| Anya  | forest                   | tundra                        |
-| Donna | mountains                | swampland                     |
+| Girl  | Native (favours her) | Complement (weakens her) |
+|-------|----------------------|--------------------------|
+| Anya  | forest               | tundra                   |
+| Donna | mountains            | swampland                |
 
-On home terrain the effect is stronger; on opponent terrain it is diminished or
-nullified; on neutral ground it is base.
+- **Aura** — stronger on native ground, diminished or nullified on complement
+  ground, base on neutral ground.
+- **Potentiality** — her powers reach further and hit harder at home.
+- **Survival** — she takes **less** damage on native ground and **more** on
+  complement ground, and on her native ground she even **heals** over time.
+
+So *where* a fight or a puzzle happens is itself a lever: draw an enemy onto your
+terrain, or dread being forced onto theirs.
+
+## Separation tilts the world (balance)
+
+Together, Anya and Donna hold the world's taxis in **balance** — one raising, one
+lowering. Apart, that balance is lost and the world leans wholesale toward
+whoever remains:
+
+- **Donna taken** (only Anya's raising is left): the world grows
+  **over-agitated** — turbulent, on edge — and stays that way, harder to move
+  through, until Anya finds her.
+- **Anya taken** (only Donna's lowering is left): the world grows **over-sedate,
+  lifeless** — dulled and still — and stays that way, harder to rouse, until
+  Donna reaches her.
+
+The imbalance is a standing difficulty pressure on the free sister's rescue, and
+it lifts only when they are **reunited**. (This details the *Absence mechanic* in
+`05-parking-lot.md` — the two need each other, and the world itself shows it.)
 
 ## Objects and curses — the modifier pipeline
 
