@@ -64,6 +64,26 @@ Used sparingly: level endings and major story beats.
   wall-runs, switch, Donna stabilizes the wall. The advanced-mastery mechanic —
   pairs naturally with the aura mastery/control arc in `06`.
 
+## Class synergies — build choices that reshape the duo abilities
+
+The class each girl takes (`04-classes-parking-lot.md`) doesn't only change her
+*solo* play — it modifies the *combined* abilities above, so the pairing of
+their two builds becomes its own layer of expression. Examples:
+
+- **Sprinter + Pillar** (speed × strength) — Dual-Charge Stabilization charges
+  faster, Lift & Launch becomes a super-jump, mixed zones read more
+  predictably.
+- **Flicker + Architect** (time × logic) — Emotional Echo trails last longer,
+  switch-timing puzzles get easier, time-logic hybrid puzzles unlock.
+- **Wildheart + Guardian** (chaos × protection) — Dual Pulse becomes a
+  shockwave, Chaos–Order Resonance affects larger objects, corrupted zones
+  clear faster.
+
+The point is **meaningful build choice without branching the story**: variety
+and player expression live in the mechanical layer (which classes, which
+synergy), while the narrative stays single-track. Replayability and depth
+without a combinatorial explosion of plot.
+
 ## Why it's kept, and where it sits
 
 It makes their personalities, their relationship, and their cooperation all
