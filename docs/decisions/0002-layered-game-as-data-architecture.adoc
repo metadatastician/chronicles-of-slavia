@@ -1,0 +1,75 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Architecture Decision Record: 0002-layered-game-as-data-architecture
+
+# 2. Layered, game-as-data architecture with a proven-first rules core
+
+Date: 2026-07-07
+
+## Status
+
+Proposed
+
+## Context
+
+Chronicles of Slavia needs a way forward that offers *maximum flexibility*
+while keeping the design logic already established in `docs/design/` intact.
+
+Two forces are in tension:
+
+* The design canon is deliberately, tightly scoped (Level 1, Zone A only) and
+  written declaratively — beats, response rules, a five-line success condition.
+* A single hand-coded browser mock (`prototype/zone-a/index.html`) couples that
+  design to one runtime (browser + JS) and will drift from the prose docs.
+
+We do not yet know which engine the finished game should use, and committing to
+one now (browser, Godot, Bevy, …) would be a large, hard-to-reverse bet made
+with the least information we will ever have.
+
+## Decision
+
+Adopt a four-layer, renderer-agnostic architecture:
+
+* *L0 — Design canon* (`docs/design/`): human-authored narrative truth.
+* *L1 — Slavia Game Spec (SGS)*: the design compiled into declarative data
+  (`engine/slavia-core/data/*.sgs.toml`).
+* *L2 — `slavia-core`*: a pure Rust rules core that interprets the SGS and
+  enforces the emotional grammar. Renders nothing.
+* *L3 — renderer*: a swappable skin over L2 (browser / Godot / native).
+
+Two sequencing commitments:
+
+1. *Lock the sacred logic first.* Build and prove L2 before any renderer, with
+   Zone A's success condition encoded as executable tests
+   (`engine/slavia-core/tests/zone_a.rs`). This is milestone *M0*.
+2. *Defer the engine choice to M2.* Rust wins cleanly for the core (typed,
+   verifiable, wasm- and native-portable). The renderer engine is chosen later,
+   on evidence from a working Zone A, not up front.
+
+Work is executed by orchestrated agents ("Opus managing friends") with the
+owner reviewing at each milestone gate.
+
+## Consequences
+
+### Positive
+
+- The runtime can be swapped by writing one new L3 adapter; L0–L2 are untouched.
+  This is the maximum-flexibility guarantee.
+- The game's meaning lives in data + a proven core, not in a renderer, so the
+  design and the code cannot silently drift.
+- The core is verifiable — the estate "prove exactness" ethos applies to the
+  logic that matters most.
+- The hardest, least-informed decision (the engine) is deferred until there is
+  evidence to make it well.
+
+### Negative
+
+- Up-front indirection: a spec format and a core, before anything is on screen.
+- The existing browser mock becomes a throwaway reference rather than the path.
+
+### Neutral
+
+- The SGS is TOML for now; the format is an implementation detail behind
+  `Spec::from_toml` and can change without touching the rules.
+- The machine-readable estate identity (`CLADE`/`STATE`) still carries the
+  `rsr-template-repo` placeholders; re-homing it is a separate, owner-gated step.

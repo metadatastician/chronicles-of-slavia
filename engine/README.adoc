@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Slavia engine
+
+A layered, renderer-agnostic engine for Chronicles of Slavia. The point of the
+layering is *maximum flexibility*: the game's meaning lives in data and a pure
+rules core, so the runtime (browser, Godot, native) can be swapped without
+touching the design.
+
+[cols="1,3a"]
+|===
+| Layer | What it is
+
+| *L1 — Slavia Game Spec (SGS)*
+| Declarative data describing a zone: characters, animals, beats.
+  `slavia-core/data/*.sgs.toml`. The design canon in `docs/design/` is compiled
+  into this. Change the game by changing this data.
+
+| *L2 — `slavia-core`*
+| The pure rules core — the emotional grammar (Anya stirs / Donna settles / the
+  animal's nature decides / Donna steadies what Anya crosses / the Rift
+  interrupts). Renders nothing. This is the *sacred logic*, and it is proven by
+  tests before any renderer exists.
+
+| *L3 — renderer*
+| A swappable skin over L2. **Deliberately absent for now** — the engine
+  decision (stay-web / Godot / native) is deferred to milestone M2, made on
+  evidence from a working Zone A rather than up front.
+|===
+
+== Run the tests
+
+[source,sh]
+----
+cd engine
+cargo test
+----
+
+`slavia-core/tests/zone_a.rs` encodes Zone A's five-beat prototype success
+condition (`docs/design/00-start-here.md`) as executable assertions. If it is
+green, the sacred logic holds.
+
+== Status
+
+Milestone *M0* — the rules core, proven. Next: *M1*, wire the first renderer
+over this core so Zone A can be *felt*, not just asserted.
+
+See `docs/decisions/0002-layered-game-as-data-architecture.adoc` for the why.

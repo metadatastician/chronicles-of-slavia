@@ -1,0 +1,71 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# Slavia Game Spec (SGS) — Layer 1 data. Zone A: Border Path.
+#
+# This file is the renderer-agnostic source of truth for the zone. The design
+# canon in docs/design/ is compiled into data here; slavia-core interprets it;
+# any renderer (L3) is a skin over it. Change the game by changing this data.
+
+[meta]
+level = "Level 1 — The First Tear"
+zone = "A"
+name = "Border Path"
+
+# --- Characters -------------------------------------------------------------
+# The emotional grammar: Anya stirs the world, Donna settles it. The mechanic
+# keys off `influence`, never the name.
+[[characters]]
+id = "anya"
+name = "Anya"
+influence = "stir"
+
+[[characters]]
+id = "donna"
+name = "Donna"
+influence = "settle"
+
+# --- Animals ("living taxis") -----------------------------------------------
+# Natural animals answer the girls. A non-natural nature would be a diagnostic
+# signal — Zone A ships only natural birds, on purpose.
+[[animals]]
+id = "grove-birds"
+species = "birds"
+nature = "natural"
+location = "bird-grove"
+
+# --- Beats ------------------------------------------------------------------
+# The seven beats of Zone A, in order (docs/design/02-zone-a-design.md).
+[[beats]]
+id = "forest-entrance"
+title = "Forest entrance"
+teaches = "movement"
+
+[[beats]]
+id = "bird-grove"
+title = "Bird grove"
+teaches = "the girls change the rhythm of the world, they do not command it"
+
+[[beats]]
+id = "shrine"
+title = "Shrine"
+text = "Two lands, one heart."
+
+[[beats]]
+id = "stream-bridge"
+title = "Stream bridge"
+teaches = "Donna steadies what Anya crosses"
+
+[[beats]]
+id = "ridge-path"
+title = "Ridge path"
+
+[[beats]]
+id = "overlook"
+title = "Overlook"
+text = "For a moment, the world feels whole."
+
+[[beats]]
+id = "fracture"
+title = "Fracture prelude"
+text = "The Rift awakens. The birds stop answering normally."
