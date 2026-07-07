@@ -23,9 +23,11 @@ touching the design.
   tests before any renderer exists.
 
 | *L3 — renderer*
-| A swappable skin over L2. **Deliberately absent for now** — the engine
-  decision (stay-web / Godot / native) is deferred to milestone M2, made on
-  evidence from a working Zone A rather than up front.
+| A swappable skin over L2. First spike lives in `slavia-zone-a` — a **Bevy**
+  renderer for Zone A (schematic, coloured blocks). It holds only view state and
+  forwards input; every rule decision goes through `Session` → `slavia-core`.
+  The *final* engine decision (Bevy / Fyrox / other) is still M2, made on
+  evidence from this working spike rather than up front.
 |===
 
 == Run the tests
@@ -33,16 +35,36 @@ touching the design.
 [source,sh]
 ----
 cd engine
-cargo test
+cargo test -p slavia-core                          # the rules core (L2)
+cargo test -p slavia-zone-a --no-default-features  # the play controller, no Bevy
 ----
 
 `slavia-core/tests/zone_a.rs` encodes Zone A's five-beat prototype success
-condition (`docs/design/00-start-here.md`) as executable assertions. If it is
-green, the sacred logic holds.
+condition (`docs/design/00-start-here.md`) as executable assertions; the
+`slavia-zone-a` session test walks the same five beats through the exact intents
+the renderer calls. If both are green, the sacred logic and its wiring hold —
+no display needed.
+
+== Play Zone A
+
+[source,sh]
+----
+cd engine
+cargo run -p slavia-zone-a
+----
+
+Opens a window (needs a display — under WSL2 this is WSLg). Controls print to the
+terminal: `Tab` switch girl, `A/D`/arrows move, `E` reach out to the birds, `S`
+settle the crossing (Donna only), `C` cross, `R` awaken the Rift, `Esc` quit.
+The birds recolour by response, the crossing solidifies when settled, the sky
+darkens at the Fracture, and five pips along the top fill as each beat happens.
+
+Build note: uses Bevy's `x11` backend only (no `wayland`), so it builds without
+`libwayland-dev`. Add the `wayland` feature back if that dev lib is installed.
 
 == Status
 
-Milestone *M0* — the rules core, proven. Next: *M1*, wire the first renderer
-over this core so Zone A can be *felt*, not just asserted.
+Milestone *M1* — a first playable renderer (Bevy) over the proven core.
+Next: *M2*, the deliberate engine decision, made on evidence from this spike.
 
 See `docs/decisions/0002-layered-game-as-data-architecture.adoc` for the why.

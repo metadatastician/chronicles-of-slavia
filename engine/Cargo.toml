@@ -13,4 +13,4 @@
 
 [workspace]
 resolver = "2"
-members = ["slavia-core"]
+members = ["slavia-core", "slavia-zone-a"]
