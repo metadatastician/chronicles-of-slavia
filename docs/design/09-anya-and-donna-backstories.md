@@ -77,8 +77,29 @@ her order. It needed her order.
 
 Her order is not rigid — it is **protective**.
 
+## Why they work, despite the contrast
+
+Their differences (chaos/impulse/motion vs. order/logic/stability) are the
+engine of the game — but underneath the contrast they share the traits that
+actually make them the chosen pair:
+
+- **Courage** — both push forward even when afraid.
+- **Loyalty** — neither abandons the other; the emotional spine of the story.
+- **Curiosity** — both want to understand Slavia, even by opposite routes.
+- **Resilience** — they keep going even when the Rift reacts violently.
+
+These are what justify the combined-ability system (`11`) and the special
+connection below, not just narrative convenience.
+
 ## The pairing
 
 Neither girl fell by accident, and neither fell alone — the Rift needed exactly
 what each of them already was. See `01-world-principle.md` ("Why the Rift chose
 both") for how their two natures are, in-world, one guardian spirit split in two.
+
+They can also **sense each other across the Rift itself** — not merely that the
+world tilts in a missing girl's absence (`06-attunement-and-modifiers.md`,
+*Separation tilts the world*), but a direct awareness of one another that
+survives the barrier between them. This is the mechanical basis for rescue
+missions, echo puzzles, and split-path levels: the world can separate their
+bodies, but never fully their bond.
