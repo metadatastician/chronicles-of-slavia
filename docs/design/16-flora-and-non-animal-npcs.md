@@ -34,7 +34,8 @@ layer (vines, reeds, brambles, blooming platforms).
   - **Food plants** — edible *or* poisonous. **Not** pure healing; they *help*
     (sustenance, minor effects) or *harm* (poison). A lesser, situational tier.
   - **Craft plants** — fibres for the **physical repair** of clothing, the
-    protection layer (`17-clothing-repair-and-pattern-weaving.md`).
+    protection layer (`17-clothing-repair-and-pattern-weaving.md`). Fibres come
+    from **plants**, never harvested from living animals (`03`).
   - **Pattern plants** — tinctures / dyes / special fibres: the materials for
     **pattern weaving**, the embroidery upgrades — "the proper stuff" (`17`).
 

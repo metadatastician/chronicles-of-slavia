@@ -20,7 +20,22 @@ grounding — Ukrainian **Berehynia** line, Bulgarian **Kanatitsa / Elbetitsa**
 line. Patterns are **dormant when the cloth is in Tatters** and snap back when it
 is repaired (the *knowledge* persists; the *fabric* must carry it).
 
-### What patterns DO — the scale rule (read this first)
+### What patterns are FOR — mostly SOCIAL, identity, and culture
+
+The **primary** purpose is narrative and social, not power. A pattern is a
+**blueprint of who you are** — region, lineage, what you have earned — and NPCs
+and spirits *read* it. Their reactions gate on it:
+
+> "You have THAT pattern? Then of course you are welcome here."
+
+So patterns act as diegetic **keys, recognition, reputation, allegiance and
+trust** — opening doors, earning safe passage, marking kinship, unlocking what
+an NPC will say or offer. This is where the clever, specific links to Ukrainian
+/ Bulgarian / Slavic folk meaning live: a given motif *means* something real,
+and whoever knows it responds accordingly. Patterns are first **a language you
+wear**, and only second a quiet sharpening of your gift.
+
+### What patterns DO mechanically — the scale rule (read this first)
 
 **Patterns are extensions and refinements of the skills, interactions, and moods
 the girls already have — NOT new cosmic powers.** Keep them at the scale of the
@@ -35,6 +50,17 @@ spinning-bird-kicks). Patterns are *passive and ambient* — part of who she is
 and how she is present in the world (like the aura, `06`), not buttons she
 presses. The girls **relate** to a living world; they do not execute combos on
 it. If it wants a hotkey and a cooldown, it is the wrong shape.
+
+### Explicit NOTs (things the design has ruled out)
+
+- **No combat power-fantasy.** Anya does not slay armies; Donna is not Atlas
+  holding up the world. No "you are ready to destroy the enemy."
+- **The dress does not accrete living things**, and it does **not** pull wool /
+  fibres / materials from living animals. Craft and pattern materials come from
+  **plants** (`16`) — never harvested from creatures. This is consistent with
+  the core rule that the girls change the world's rhythm but never *command or
+  consume* animals (`03`).
+- **No triggered special moves** (restated): passive/ambient, not a moveset.
 
 In-scale examples (owner defines the real set — these only calibrate scale):
 - Anya's stir **reaches a little further**, or lingers a beat longer.
