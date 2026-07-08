@@ -59,7 +59,7 @@ const beats = {
 };
 
 let state;
-function reset() {
+function reset(introTime = 5.5) {
   state = {
     active: 'anya',
     anya:  girl('anya',  160, null, 6.4),
@@ -100,8 +100,9 @@ function update(dt) {
     state.active = state.active === 'anya' ? 'donna' : 'anya';
     say(state.active === 'anya' ? 'Anya — she stirs the world.' : 'Donna — she settles it.', 2);
   }
-  // restart
-  if (tap('KeyR')) { reset(); return; }
+  // restart — clear the tap BEFORE returning, or 'KeyR' stays "just-pressed"
+  // forever and the game re-resets every frame (stuck on the start screen).
+  if (tap('KeyR')) { reset(0.8); tapped.clear(); return; }
 
   const a = active();
   // horizontal move
