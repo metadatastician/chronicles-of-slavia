@@ -173,10 +173,14 @@ function update(dt) {
     say('Nature answers them — quickened by Anya, calmed by Donna.', 3.5); state._natureMsg = true;
   }
 
-  // --- shrine ---
+  // --- shrine: readable only BEFORE the Rift; miss it and it can't be heard ---
   if (tap('KeyE') && !state.shrineRead && Math.abs(a.x + a.w/2 - beats.shrine) < 70) {
-    state.shrineRead = true;
-    say('The shrine reads: “Two lands, one heart.”', 4);
+    if (state.rift < 0.3) {
+      state.shrineRead = true;
+      say('The shrine reads: “Two lands, one heart.”', 4);
+    } else {
+      say('The shrine will not answer now — its light has turned wrong.', 3);
+    }
   }
 
   // --- bridge: Donna steadies what Anya crosses ---
@@ -205,7 +209,9 @@ function update(dt) {
     state.rift = Math.min(1, state.rift + dt * 0.6);
     if (state.rift >= 1 && !state.riftDone) {
       state.riftDone = true; state.done.rift = true;
-      say('The Rift awakens. The birds stop answering. — end of the prelude —', 8);
+      say(state.shrineRead
+        ? 'The Rift awakens. The birds stop answering. — end of the prelude —'
+        : 'The Rift awakens. The unheard shrine glows wrong. — end of the prelude —', 8);
     } else if (!state.done.rift) {
       say('Something tears at the edge of the world…', 2);
     }
@@ -308,11 +314,20 @@ function drawStreamAndBridge(d){
 }
 function drawShrine(){
   const x = beats.shrine, y = GROUND-96;
+  const bad = state.rift > 0 && !state.shrineRead;         // reached the Rift unheard
+  // glow behind the shrine — warm if read, angry red pulse if it was missed
+  if (state.shrineRead || bad){
+    const pulse = 0.5 + 0.5*Math.sin(performance.now()*0.006);
+    const gc = bad ? `rgba(230,40,40,${0.22 + 0.4*pulse})` : 'rgba(233,120,90,0.20)';
+    const grd = ctx.createRadialGradient(x, y+30, 4, x, y+30, 78 + (bad?pulse*22:0));
+    grd.addColorStop(0, gc); grd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(x, y+30, 90, 0, 6.28); ctx.fill();
+  }
   ctx.fillStyle = '#39323f'; ctx.fillRect(x-22, y, 44, 96);
   ctx.beginPath(); ctx.moveTo(x-34,y); ctx.lineTo(x, y-30); ctx.lineTo(x+34,y); ctx.closePath();
   ctx.fillStyle='#4a3f52'; ctx.fill();
-  // a heart-rune, warmer once read
-  ctx.fillStyle = state.shrineRead ? '#e94f6a' : '#7a6f82';
+  // heart-rune: warm if read, wrong/angry red if missed before the Rift, else dim
+  ctx.fillStyle = state.shrineRead ? '#e94f6a' : (bad ? '#ff2e2e' : '#7a6f82');
   ctx.beginPath(); ctx.arc(x-6,y+38,7,0,6.28); ctx.arc(x+6,y+38,7,0,6.28);
   ctx.moveTo(x-13,y+41); ctx.lineTo(x,y+58); ctx.lineTo(x+13,y+41); ctx.fill();
   if (state.shrineRead){ ctx.fillStyle='#e8e0d8'; ctx.font='italic 15px Georgia'; ctx.textAlign='center';
@@ -354,7 +369,7 @@ function drawAura(g, warm){
 const LINEN='#f2ede0', EMRED='#b5202a', EMBLK='#241a1a', GOLD='#d7a63f', SKIN='#e9c4a0',
       HUTSUL_SKIRT='#5e1d2a', KEPTAR='#8a5a2c', CORAL='#d8402e', ANYA_HAIR='#6b3a1e',
       RHODOPE_SUKMAN='#221d2c', RIZA='#efe8da', RHODOPE_APRON='#7a2130',
-      RHODOPE_STRIPE='#c98a3a', SCARF='#6f2030';
+      RHODOPE_STRIPE='#c98a3a', SCARF='#39415a', DONNA_HAIR='#2c2620';
 function rhomb(x,y,s,col){ ctx.fillStyle=col; ctx.beginPath();
   ctx.moveTo(x,y-s); ctx.lineTo(x+s,y); ctx.lineTo(x,y+s); ctx.lineTo(x-s,y); ctx.closePath(); ctx.fill(); }
 function crossX(x,y,s,col){ ctx.strokeStyle=col; ctx.lineWidth=1;
@@ -368,14 +383,13 @@ function drawGirl(g, activeOne){
   const v = g.verve;
   const cx = g.x + g.w/2, footY = g.y + g.h;
   const duck = g.duck || 0;
-  const H = g.h * (1 - duck*0.24);
+  const H = g.h;   // constant; ducking sinks the hips (hipDrop) — it must not shrink her
   const air = !g.onGround;
   const gait = g.gait || 0;
   const lean = Math.max(-0.30, Math.min(0.30, (g.vx||0) * 0.04 * (0.5 + v)));
   const stride = Math.sin(g.walk) * gait;
   const bounce = Math.abs(Math.sin(g.walk)) * gait * (1 + v*1.3);
   const breathe = Math.sin(g.idle || 0) * 0.6 * (1 - gait);
-  const armSwing = air ? 0 : Math.sin(g.walk) * gait * 3;
   // skirt billows as she falls, narrows as she rises — heavier dress billows less
   const billow = (air ? (g.vy||0) : 0) * 0.03 * (1.1 - v*0.4);
   const bw = Math.max(0.85, Math.min(1.3, 1 + billow));
@@ -388,8 +402,9 @@ function drawGirl(g, activeOne){
   ctx.scale(g.facing || 1, 1);
   ctx.rotate(lean * 0.3);
 
-  const yWaist=-H*0.50, yChest=-H*0.62, yShoulder=-H*0.72, yNeck=-H*0.76,
-        yHead=-H*0.86, rHead=H*0.092, yHemTop=-H*0.15;
+  const hipDrop = H * 0.28 * duck;              // hips sink for a real crouch (not a shrink)
+  const yWaist=-H*0.50+hipDrop, yChest=-H*0.62+hipDrop, yShoulder=-H*0.72+hipDrop,
+        yNeck=-H*0.76+hipDrop, yHead=-H*0.86+hipDrop, rHead=H*0.092, yHemTop=-H*0.15+hipDrop*0.6;
   const hipW=g.w*0.34, shW=g.w*0.33, hemW=g.w*0.5*bw;
 
   // boots peeking below the hem, stepping with the walk
@@ -428,17 +443,18 @@ function drawGirl(g, activeOne){
   ctx.moveTo(-hipW*0.9, yWaist); ctx.lineTo(hipW*0.9, yWaist);
   ctx.lineTo(shW, yShoulder); ctx.lineTo(-shW, yShoulder); ctx.closePath(); ctx.fill();
 
-  // sleeves + arms — hang at the sides with a small fore/aft swing (no splay)
+  // sleeves + arms — hang STRAIGHT at the sides (front-facing figure, so no
+  // horizontal swing = no crab/wave). Only a subtle vertical bob when walking.
   for (const side of [-1, 1]){
-    const sx = side * shW * 0.98;
-    const sw = armSwing * side;                       // opposite arms swing
+    const sx = side * shW * 0.92;
+    const ay = (!air && gait > 0.08) ? Math.sin(g.walk + (side>0 ? Math.PI : 0)) * gait * (1 + v*1.2) : 0;
     ctx.fillStyle = anya ? LINEN : RIZA;              // puffed upper sleeve
     ctx.beginPath(); ctx.ellipse(sx, yShoulder + H*0.05, g.w*0.10, H*0.085, 0, 0, 6.28); ctx.fill();
     ctx.fillStyle = EMRED; ctx.fillRect(sx - g.w*0.09, yShoulder + H*0.015, g.w*0.18, 1.8);
     ctx.fillStyle = anya ? LINEN : RIZA;              // forearm hanging down
-    ctx.fillRect(sx - g.w*0.035 + sw, yShoulder + H*0.12, g.w*0.07, H*0.14);
+    ctx.fillRect(sx - g.w*0.035, yShoulder + H*0.12 + ay, g.w*0.07, H*0.13);
     ctx.fillStyle = SKIN;                             // hand
-    ctx.beginPath(); ctx.arc(sx + sw, yShoulder + H*0.27, g.w*0.045, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.arc(sx, yShoulder + H*0.27 + ay, g.w*0.045, 0, 6.28); ctx.fill();
   }
 
   if (anya){
@@ -495,12 +511,24 @@ function drawGirl(g, activeOne){
       ctx.quadraticCurveTo(rb[0]*rHead*0.6+hairX*0.9, yHead+rHead*2.2+hairLift, rb[0]*rHead*0.3+hairX*1.4, yHead+rHead*3.6+hairLift*1.3);
       ctx.stroke(); }
   } else {
-    // Rhodope headscarf — neat, covered, barely moves (stability)
-    ctx.fillStyle=SCARF;
-    ctx.beginPath(); ctx.arc(0, yHead-1, rHead+1.5, Math.PI, 0);
-    ctx.lineTo(rHead+1, yHead+rHead*0.6); ctx.lineTo(-rHead-1, yHead+rHead*0.6); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.arc(-rHead*0.9 + hairX*0.15, yHead+rHead*0.4, 2.2, 0, 6.28); ctx.fill();
-    emBand(-rHead, rHead, yHead-rHead*0.6, 1.8);
+    // dark hair framing the face (drawn under the kerchief)
+    ctx.fillStyle = DONNA_HAIR;
+    ctx.beginPath();
+    ctx.arc(0, yHead, rHead+1, Math.PI*0.95, Math.PI*0.05, true);
+    ctx.lineTo(rHead*0.9, yHead + rHead*0.95); ctx.lineTo(-rHead*0.9, yHead + rHead*0.95);
+    ctx.closePath(); ctx.fill();
+    // a folded kerchief over the crown and back — NOT a full cap (no mushroom)
+    ctx.fillStyle = SCARF;
+    ctx.beginPath();
+    ctx.moveTo(-rHead-1, yHead-1);
+    ctx.quadraticCurveTo(0, yHead - rHead*1.7, rHead+1, yHead-1);
+    ctx.quadraticCurveTo(rHead*0.4, yHead + rHead*0.15, 0, yHead + rHead*0.28);
+    ctx.quadraticCurveTo(-rHead*0.4, yHead + rHead*0.15, -rHead-1, yHead-1);
+    ctx.closePath(); ctx.fill();
+    // knot at the back with a tiny sway + a woven edge
+    ctx.beginPath(); ctx.arc(-rHead*0.85 + hairX*0.1, yHead + rHead*0.45, 1.9, 0, 6.28); ctx.fill();
+    ctx.strokeStyle = RHODOPE_STRIPE; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-rHead-1, yHead-1); ctx.quadraticCurveTo(0, yHead - rHead*1.5, rHead+1, yHead-1); ctx.stroke();
   }
   ctx.lineWidth=1;
   ctx.restore();
