@@ -1,429 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chronicles of Slavia - Zone A: Border Path</title>
-    <style>
-        body { margin: 0; padding: 0; background: #1a1a2e; overflow: hidden; font-family: sans-serif; }
-        canvas { display: block; background: #16213e; }
-        #ui { position: absolute; top: 10px; left: 10px; color: #eaeaea; font-size: 12px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; }
-        #ui h1 { margin: 0 0 5px 0; font-size: 14px; color: #0f3460; }
-        #ui p { margin: 2px 0; }
-        #title { text-align: center; color: #e94560; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronicles of Slavia — Zone A: Border Path</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #05060c; overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif; color: #eae6df;
+  }
+  #wrap { position: fixed; inset: 0; display: grid; place-items: center; }
+  canvas { image-rendering: auto; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
+  #hint {
+    position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+    font-size: 13px; color: #9aa; letter-spacing: .3px; opacity: .85;
+    background: rgba(0,0,0,.35); padding: 6px 14px; border-radius: 20px;
+    pointer-events: none; white-space: nowrap;
+  }
+</style>
 </head>
 <body>
-    <div id="ui">
-        <h1>Zone A: Border Path</h1>
-        <p><strong>Active:</strong> <span id="active-char">Anya</span></p>
-        <p><strong>Status:</strong> <span id="status">Exploring...</span></p>
-    </div>
-    <canvas id="game"></canvas>
-    <div id="title">What do you become when the world breaks?</div>
-    
-    <script>
-        // Canvas setup
-        const canvas = document.getElementById('game');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        
-        // World dimensions
-        const GROUND = canvas.height - 100;
-        
-        // Game state
-        let activeChar = 'anya';
-        let anya = { x: 200, y: GROUND, width: 40, height: 60, speed: 8, jumping: false, velY: 0, color: '#4a90e2' };
-        let donna = { x: 250, y: GROUND, width: 40, height: 60, speed: 5, jumping: false, velY: 0, color: '#50c878' };
-        let birds = [];
-        let bridge = { x: 600, y: GROUND - 20, width: 200, height: 10, stabilized: false, stableBy: null };
-        let shrine = { x: 400, y: GROUND - 50, width: 60, height: 80, text: 'Two lands, one heart.', read: false };
-        let overlook = { x: 1000, y: GROUND - 100, width: 150, height: 20, reached: false };
-        let riftAwakened = false;
-        let gameEnded = false;
-        
-        // Keys state
-        const keys = { a: false, d: false, ArrowLeft: false, ArrowRight: false, Space: false, Tab: false, e: false, r: false };
-        
-        // Initialize birds
-        for (let i = 0; i < 5; i++) {
-            birds.push({
-                x: 400 + Math.random() * 100,
-                y: GROUND - 100 + Math.random() * 50,
-                radius: 10 + Math.random() * 5,
-                color: '#f8f8f2',
-                settled: false,
-                stirred: false
-            });
-        }
-        
-        // Event listeners
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = true;
-            if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = true;
-            if (e.code === 'Space') keys.Space = true;
-            if (e.code === 'Tab') keys.Tab = true;
-            if (e.code === 'KeyE') keys.e = true;
-            if (e.code === 'KeyR') keys.r = true;
-            
-            // Prevent Tab from switching focus
-            if (e.code === 'Tab') e.preventDefault();
-        });
-        
-        window.addEventListener('keyup', (e) => {
-            if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = false;
-            if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = false;
-            if (e.code === 'Space') keys.Space = false;
-            if (e.code === 'Tab') keys.Tab = false;
-            if (e.code === 'KeyE') keys.e = false;
-            if (e.code === 'KeyR') keys.r = false;
-        });
-        
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-        
-        // Helper: get active character
-        function getActive() {
-            return activeChar === 'anya' ? anya : donna;
-        }
-        
-        function getInactive() {
-            return activeChar === 'anya' ? donna : anya;
-        }
-        
-        // Switch character
-        function switchCharacter() {
-            if (keys.Tab && !keys.Tab.prev) {
-                activeChar = activeChar === 'anya' ? 'donna' : 'anya';
-                document.getElementById('active-char').textContent = activeChar.charAt(0).toUpperCase() + activeChar.slice(1);
-                document.getElementById('status').textContent = 'Switched to ' + activeChar + '!';
-                setTimeout(() => { document.getElementById('status').textContent = 'Exploring...'; }, 1500);
-            }
-            keys.Tab.prev = keys.Tab;
-        }
-        
-        // Movement
-        function moveCharacter() {
-            const char = getActive();
-            
-            // Horizontal movement
-            if (keys.a || keys.ArrowLeft) {
-                char.x -= char.speed;
-            }
-            if (keys.d || keys.ArrowRight) {
-                char.x += char.speed;
-            }
-            
-            // Boundary checks
-            char.x = Math.max(0, Math.min(canvas.width - char.width, char.x));
-            
-            // Jumping
-            if (keys.Space && !keys.Space.prev && !char.jumping) {
-                char.jumping = true;
-                char.velY = -15;
-            }
-            keys.Space.prev = keys.Space;
-            
-            // Gravity
-            if (char.jumping) {
-                char.y += char.velY;
-                char.velY += 0.8;
-                
-                // Land on ground or bridge
-                if (char.y + char.height >= GROUND) {
-                    char.y = GROUND - char.height;
-                    char.jumping = false;
-                    char.velY = 0;
-                }
-                
-                // Land on bridge if stabilized
-                if (bridge.stabilized && char.y + char.height >= bridge.y && char.y + char.height <= bridge.y + bridge.height &&
-                    char.x + char.width > bridge.x && char.x < bridge.x + bridge.width) {
-                    char.y = bridge.y - char.height;
-                    char.jumping = false;
-                    char.velY = 0;
-                }
-            }
-        }
-        
-        // Interaction
-        function checkInteractions() {
-            const char = getActive();
-            
-            // Shrine interaction
-            if (keys.e && !keys.e.prev && !shrine.read &&
-                char.x + char.width > shrine.x && char.x < shrine.x + shrine.width &&
-                char.y + char.height > shrine.y && char.y < shrine.y + shrine.height) {
-                shrine.read = true;
-                document.getElementById('status').textContent = 'Shrine: "' + shrine.text + '"';
-                setTimeout(() => { document.getElementById('status').textContent = 'Exploring...'; }, 3000);
-            }
-            
-            // Bridge stabilization (Donna only)
-            if (activeChar === 'donna' && !bridge.stabilized &&
-                char.x + char.width > bridge.x && char.x < bridge.x + bridge.width &&
-                char.y + char.height >= bridge.y - 5 && char.y < bridge.y + bridge.height + 5) {
-                bridge.stabilized = true;
-                bridge.stableBy = 'donna';
-                document.getElementById('status').textContent = 'Donna stabilized the bridge!';
-                setTimeout(() => { document.getElementById('status').textContent = 'Exploring...'; }, 2000);
-            }
-            
-            // Overlook (both characters needed)
-            if (!overlook.reached &&
-                anya.x + anya.width > overlook.x && anya.x < overlook.x + overlook.width &&
-                anya.y + anya.height >= overlook.y && anya.y < overlook.y + overlook.height &&
-                donna.x + donna.width > overlook.x && donna.x < overlook.x + overlook.width &&
-                donna.y + donna.height >= overlook.y && donna.y < overlook.y + overlook.height) {
-                overlook.reached = true;
-                document.getElementById('status').textContent = 'Both reached the overlook! The world feels whole...';
-            }
-            
-            // Rift awakens after overlook
-            if (overlook.reached && !riftAwakened) {
-                setTimeout(() => {
-                    riftAwakened = true;
-                    document.getElementById('status').textContent = 'The Rift awakens! The birds stop answering...';
-                    // Stir birds (rift effect)
-                    birds.forEach(b => { b.stirred = true; b.settled = false; });
-                }, 2000);
-            }
-            
-            // Game end
-            if (riftAwakened && !gameEnded) {
-                setTimeout(() => {
-                    gameEnded = true;
-                    document.getElementById('status').textContent = 'PROTOTYPE END: Rift interruption.';
-                }, 3000);
-            }
-            
-            // Bird responses based on active character
-            birds.forEach(bird => {
-                const dist = Math.sqrt(Math.pow(getActive().x - bird.x, 2) + Math.pow(getActive().y - bird.y, 2));
-                if (dist < 80) {
-                    if (activeChar === 'anya') {
-                        bird.stirred = true;
-                        bird.settled = false;
-                    } else if (activeChar === 'donna') {
-                        bird.settled = true;
-                        bird.stirred = false;
-                    }
-                }
-            });
-            
-            keys.e.prev = keys.e;
-        }
-        
-        // Reset
-        function checkReset() {
-            if (keys.r && !keys.r.prev) {
-                // Reset positions
-                anya.x = 200; anya.y = GROUND - anya.height;
-                donna.x = 250; donna.y = GROUND - donna.height;
-                activeChar = 'anya';
-                document.getElementById('active-char').textContent = 'Anya';
-                
-                // Reset world state
-                birds.forEach(b => { b.stirred = false; b.settled = false; });
-                bridge.stabilized = false;
-                bridge.stableBy = null;
-                shrine.read = false;
-                overlook.reached = false;
-                riftAwakened = false;
-                gameEnded = false;
-                
-                document.getElementById('status').textContent = 'Reset! Exploring...';
-                setTimeout(() => { document.getElementById('status').textContent = 'Exploring...'; }, 1000);
-            }
-            keys.r.prev = keys.r;
-        }
-        
-        // Draw bird
-        function drawBird(bird) {
-            ctx.beginPath();
-            ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
-            
-            // Bird color changes based on state
-            if (riftAwakened) {
-                ctx.fillStyle = '#ff4444'; // Red when rift awakens
-            } else if (bird.stirred) {
-                ctx.fillStyle = '#ffaa44'; // Orange when stirred
-            } else if (bird.settled) {
-                ctx.fillStyle = '#88ff88'; // Light green when settled
-            } else {
-                ctx.fillStyle = bird.color;
-            }
-            ctx.fill();
-            
-            // Wings
-            ctx.beginPath();
-            ctx.moveTo(bird.x - bird.radius, bird.y);
-            ctx.lineTo(bird.x - bird.radius * 1.5, bird.y - bird.radius / 2);
-            ctx.moveTo(bird.x + bird.radius, bird.y);
-            ctx.lineTo(bird.x + bird.radius * 1.5, bird.y - bird.radius / 2);
-            ctx.strokeStyle = '#333';
-            ctx.stroke();
-        }
-        
-        // Draw character
-        function drawCharacter(char, isActive) {
-            const alpha = isActive ? 1 : 0.6;
-            
-            // Body
-            ctx.globalAlpha = alpha;
-            ctx.fillStyle = char.color;
-            ctx.fillRect(char.x, char.y, char.width, char.height);
-            
-            // Hair (Anya: chaotic, Donna: bun)
-            ctx.fillStyle = '#1a1a2e';
-            if (char === anya) {
-                // Anya's chaotic hair
-                ctx.beginPath();
-                ctx.moveTo(char.x + char.width/2, char.y);
-                ctx.bezierCurveTo(
-                    char.x - 10, char.y - 40,
-                    char.x + char.width + 10, char.y - 30,
-                    char.x + char.width/2, char.y - 20
-                );
-                ctx.bezierCurveTo(
-                    char.x + char.width/2, char.y - 60,
-                    char.x + char.width/2, char.y - 60,
-                    char.x + char.width/2, char.y - 20
-                );
-                ctx.fill();
-            } else {
-                // Donna's tidy bun
-                ctx.beginPath();
-                ctx.arc(char.x + char.width/2, char.y - 10, 12, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            // Name tag
-            ctx.fillStyle = 'rgba(255,255,255,0.8)';
-            ctx.font = '10px sans-serif';
-            ctx.fillText(char === anya ? 'Anya' : 'Donna', char.x + 5, char.y + char.height + 15);
-            
-            // Active indicator
-            if (isActive) {
-                ctx.strokeStyle = '#ff0';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(char.x - 2, char.y - 2, char.width + 4, char.height + 4);
-            }
-            
-            ctx.globalAlpha = 1;
-        }
-        
-        // Draw bridge
-        function drawBridge() {
-            ctx.fillStyle = bridge.stabilized ? '#8b5a2b' : '#654321';
-            ctx.fillRect(bridge.x, bridge.y, bridge.width, bridge.height);
-            
-            // Support beams
-            for (let i = 0; i < 5; i++) {
-                const x = bridge.x + (i * bridge.width / 4);
-                ctx.fillStyle = '#4a4a4a';
-                ctx.fillRect(x, bridge.y, 5, -40);
-            }
-        }
-        
-        // Draw shrine
-        function drawShrine() {
-            ctx.fillStyle = '#2a2a3a';
-            ctx.fillRect(shrine.x, shrine.y, shrine.width, shrine.height);
-            
-            // Shrine roof
-            ctx.beginPath();
-            ctx.moveTo(shrine.x - 10, shrine.y);
-            ctx.lineTo(shrine.x + shrine.width / 2, shrine.y - 30);
-            ctx.lineTo(shrine.x + shrine.width + 10, shrine.y);
-            ctx.closePath();
-            ctx.fill();
-            
-            // Shrine text (if read, show as known)
-            if (shrine.read) {
-                ctx.fillStyle = '#e0e0e0';
-                ctx.font = '10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(shrine.text, shrine.x + shrine.width/2, shrine.y - 40);
-                ctx.textAlign = 'left';
-            }
-        }
-        
-        // Draw overlook
-        function drawOverlook() {
-            ctx.fillStyle = '#3a3a4a';
-            ctx.fillRect(overlook.x, overlook.y, overlook.width, overlook.height);
-            
-            // Railing
-            ctx.strokeStyle = '#666';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(overlook.x, overlook.y);
-            ctx.lineTo(overlook.x + overlook.width, overlook.y);
-            ctx.stroke();
-        }
-        
-        // Draw ground
-        function drawGround() {
-            ctx.fillStyle = '#2a3a2a';
-            ctx.fillRect(0, GROUND, canvas.width, 100);
-            
-            // Grass tufts
-            ctx.fillStyle = '#3a5a3a';
-            for (let i = 0; i < canvas.width; i += 20) {
-                ctx.fillRect(i + Math.random() * 10, GROUND, 10, 10 + Math.random() * 10);
-            }
-        }
-        
-        // Game loop
-        function gameLoop() {
-            // Clear
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw world
-            drawGround();
-            drawShrine();
-            drawBridge();
-            drawOverlook();
-            
-            // Draw characters (inactive first, active on top)
-            if (activeChar === 'anya') {
-                drawCharacter(donna, false);
-                drawCharacter(anya, true);
-            } else {
-                drawCharacter(anya, false);
-                drawCharacter(donna, true);
-            }
-            
-            // Draw birds
-            birds.forEach(drawBird);
-            
-            // Update state
-            switchCharacter();
-            moveCharacter();
-            checkInteractions();
-            checkReset();
-            
-            // Continue loop
-            if (!gameEnded) {
-                requestAnimationFrame(gameLoop);
-            } else {
-                // Show restart hint
-                ctx.fillStyle = 'rgba(255,0,0,0.3)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#fff';
-                ctx.font = '24px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('PROTOTYPE COMPLETE - Press R to restart', canvas.width/2, canvas.height/2);
-                ctx.textAlign = 'left';
-            }
-        }
-        
-        // Start game
-        gameLoop();
-    </script>
+<div id="wrap"><canvas id="game" width="1280" height="720"></canvas></div>
+<div id="hint">A / D move &nbsp;·&nbsp; Space jump &nbsp;·&nbsp; Tab switch girl &nbsp;·&nbsp; E reach out / read &nbsp;·&nbsp; R restart</div>
+<script>
+"use strict";
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+// Fit the fixed-resolution canvas into the window, preserving aspect (letterbox).
+function fit() {
+  const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+  canvas.style.width = (W * s) + 'px';
+  canvas.style.height = (H * s) + 'px';
+}
+window.addEventListener('resize', fit); fit();
+
+// ---- input (with proper edge detection) -----------------------------------
+const down = new Set(), tapped = new Set();
+addEventListener('keydown', e => {
+  const k = e.code;
+  if (['Tab','Space','ArrowLeft','ArrowRight','ArrowUp'].includes(k)) e.preventDefault();
+  if (!down.has(k)) tapped.add(k);
+  down.add(k);
+});
+addEventListener('keyup', e => down.delete(k(e)));
+function k(e){ return e.code; }
+const held = c => down.has(c);
+const tap  = c => tapped.has(c);
+
+// ---- world layout ---------------------------------------------------------
+const GROUND = 560;
+const GORGE = { x0: 596, x1: 724 };            // the stream gap the bridge spans
+const beats = {
+  entrance: 140, grove: 340, shrine: 500, bridge: 660,
+  ridge: 860, overlook: 1050, fracture: 1210
+};
+
+let state;
+function reset() {
+  state = {
+    active: 'anya',
+    anya:  girl('anya',  160, null, 6.4),
+    donna: girl('donna', 210, null, 4.8),
+    _natureMsg: false,
+    birds: Array.from({length: 7}, (_, i) => ({
+      x: beats.grove - 40 + (i * 16), baseY: 360 + (i % 3) * 22,
+      y: 360, phase: Math.random() * 6.28, mood: 'neutral', flap: 0
+    })),
+    bridgeStable: false,
+    shrineRead: false,
+    whole: false,
+    rift: 0,                 // 0 = dormant, else rising 0..1
+    riftDone: false,
+    msg: 'Two girls. One heart. A quiet border, before the world breaks.',
+    msgT: 6,
+    intro: 5.5,
+    done: { stirred:false, settled:false, crossed:false, whole:false, rift:false }
+  };
+}
+function girl(id, x, _c, speed) {
+  return { id, x, y: GROUND, w: 34, h: 62, speed, vy: 0, onGround: true, bob: Math.random()*6 };
+}
+reset();
+
+function active(){ return state[state.active]; }
+function other(){ return state.active === 'anya' ? state.donna : state.anya; }
+function say(t, dur=3){ state.msg = t; state.msgT = dur; }
+
+// ---- update ----------------------------------------------------------------
+let last = performance.now();
+function update(dt) {
+  if (state.intro > 0) { state.intro -= dt; }
+  if (state.msgT > 0) state.msgT -= dt;
+
+  // switch girl
+  if (tap('Tab')) {
+    state.active = state.active === 'anya' ? 'donna' : 'anya';
+    say(state.active === 'anya' ? 'Anya — she stirs the world.' : 'Donna — she settles it.', 2);
+  }
+  // restart
+  if (tap('KeyR')) { reset(); return; }
+
+  const a = active();
+  // horizontal move
+  let dx = 0;
+  if (held('KeyA') || held('ArrowLeft'))  dx -= 1;
+  if (held('KeyD') || held('ArrowRight')) dx += 1;
+  a.x += dx * a.speed * dt * 60;
+
+  // the gorge is impassable until Donna steadies the bridge
+  if (!state.bridgeStable) {
+    if (dx > 0 && a.x + a.w > GORGE.x0 && a.x < GORGE.x0) a.x = GORGE.x0 - a.w;
+    if (dx < 0 && a.x < GORGE.x1 && a.x + a.w > GORGE.x1) a.x = GORGE.x1;
+  }
+  a.x = Math.max(40, Math.min(W - 40 - a.w, a.x));
+
+  // jump + gravity
+  if ((tap('Space') || tap('ArrowUp')) && a.onGround) { a.vy = -13.5; a.onGround = false; }
+  a.vy += 34 * dt; a.y += a.vy * dt * 60;
+  let floor = GROUND - a.h;
+  // stand on the bridge planks when stable
+  if (state.bridgeStable && a.x + a.w > GORGE.x0 - 6 && a.x < GORGE.x1 + 6) floor = GROUND - a.h;
+  if (a.y >= floor) { a.y = floor; a.vy = 0; a.onGround = true; }
+
+  // idle bob
+  for (const g of [state.anya, state.donna]) g.bob += dt * 3;
+
+  // --- the living taxis: the active girl's aura moves the grove birds ---
+  const auraR = 150;
+  for (const b of state.birds) {
+    b.phase += dt * (b.mood === 'stirred' ? 9 : b.mood === 'settled' ? 1.6 : 4);
+    const near = Math.hypot(a.x + a.w/2 - b.x, a.y - b.y) < auraR;
+    if (state.rift > 0.4) {
+      b.mood = 'disrupted';
+    } else if (near) {
+      b.mood = state.active === 'anya' ? 'stirred' : 'settled';
+      if (b.mood === 'stirred') state.done.stirred = true;
+      if (b.mood === 'settled') state.done.settled = true;
+    }
+    // motion by mood
+    const target = b.mood === 'stirred' ? b.baseY - 70 - Math.sin(b.phase)*22
+                 : b.mood === 'settled' ? b.baseY + 46 + Math.sin(b.phase*0.5)*3
+                 : b.mood === 'disrupted' ? b.baseY + 30 : b.baseY + Math.sin(b.phase)*8;
+    b.y += (target - b.y) * Math.min(1, dt * (b.mood === 'stirred' ? 6 : 3));
+    b.flap = b.mood === 'stirred' ? 0.9 : b.mood === 'settled' ? 0.15 : b.mood === 'disrupted' ? 0 : 0.4;
+    if (state.rift > 0.4) b.x += 0; // frozen in place
+  }
+  const firstStir = state.done.stirred, firstSettle = state.done.settled;
+  if (firstStir && firstSettle && state.msgT <= 0 && !state.bridgeStable && !state._natureMsg) {
+    say('Nature answers them — quickened by Anya, calmed by Donna.', 3.5); state._natureMsg = true;
+  }
+
+  // --- shrine ---
+  if (tap('KeyE') && !state.shrineRead && Math.abs(a.x + a.w/2 - beats.shrine) < 70) {
+    state.shrineRead = true;
+    say('The shrine reads: “Two lands, one heart.”', 4);
+  }
+
+  // --- bridge: Donna steadies what Anya crosses ---
+  if (!state.bridgeStable && Math.abs(a.x + a.w/2 - beats.bridge) < 110) {
+    if (state.active === 'donna') {        // Donna's calm settles the crossing on approach
+      state.bridgeStable = true;
+      say('Donna steadies the crossing. Now Anya can cross.', 4);
+    } else if (tap('KeyE')) {
+      say('The crossing is unsteady — only Donna can settle it.', 3);
+    }
+  }
+  // record the crossing
+  if (state.bridgeStable && a.x > GORGE.x1 && !state.done.crossed) {
+    state.done.crossed = true;
+    say('Anya crosses what Donna steadied.', 3);
+  }
+
+  // --- overlook: the world briefly feels whole ---
+  if (!state.whole && a.x + a.w/2 > beats.overlook - 30) {
+    state.whole = true; state.done.whole = true;
+    say('From the overlook, for a moment, the world feels whole.', 4);
+  }
+
+  // --- the Fracture ---
+  if (state.whole && !state.riftDone && a.x + a.w/2 > beats.fracture - 30) {
+    state.rift = Math.min(1, state.rift + dt * 0.6);
+    if (state.rift >= 1 && !state.riftDone) {
+      state.riftDone = true; state.done.rift = true;
+      say('The Rift awakens. The birds stop answering. — end of the prelude —', 8);
+    } else if (!state.done.rift) {
+      say('Something tears at the edge of the world…', 2);
+    }
+  } else if (state.rift > 0 && state.rift < 1) {
+    state.rift = Math.min(1, state.rift + dt * 0.6);
+  }
+
+  tapped.clear();
+}
+
+// ---- drawing ---------------------------------------------------------------
+function draw() {
+  const rift = state.rift, desat = rift * 0.6;
+
+  // sky (dusk), darkening as the Rift rises
+  const sky = ctx.createLinearGradient(0, 0, 0, GROUND);
+  sky.addColorStop(0, mix('#241a3a', '#05040a', rift));
+  sky.addColorStop(0.55, mix('#3a2f57', '#0a0713', rift));
+  sky.addColorStop(1, mix('#c9825f', '#241326', Math.min(1, rift*1.2)));
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, W, GROUND);
+
+  // stars appear as it darkens
+  if (rift > 0.2) { ctx.fillStyle = `rgba(255,255,255,${(rift-0.2)*0.5})`;
+    for (let i=0;i<70;i++){ const x=(i*97)%W, y=(i*53)%GROUND; ctx.fillRect(x,y,2,2); } }
+
+  drawMountains(desat);
+  drawForest(desat);
+  drawStreamAndBridge(desat);
+  drawShrine();
+  drawGround(desat);
+  drawOverlook();
+  for (const b of state.birds) drawBird(b);
+
+  // the active girl's aura
+  const a = active();
+  drawAura(a, state.active === 'anya');
+
+  // girls (inactive behind)
+  drawGirl(other(), false);
+  drawGirl(a, true);
+
+  if (rift > 0) drawRift(rift);
+
+  drawHUD();
+  drawMessage();
+  if (state.intro > 0) drawIntro();
+}
+
+function drawMountains(d){
+  // Bulgarian foothills on the right — cool stone
+  for (let layer=0; layer<3; layer++){
+    const base = 300 + layer*70, col = shade(mix('#6a6f86','#2b2c3a', d), -layer*18);
+    ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(700, GROUND);
+    for (let x=700; x<=W; x+=40){
+      const y = base - Math.abs(Math.sin(x*0.008 + layer)) * (120 - layer*20);
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, GROUND); ctx.closePath(); ctx.fill();
+  }
+  // snow caps
+  ctx.fillStyle = `rgba(230,235,245,${0.7-d*0.5})`;
+  ctx.beginPath(); ctx.moveTo(1000,200); ctx.lineTo(1030,240); ctx.lineTo(970,240); ctx.closePath(); ctx.fill();
+}
+function drawForest(d){
+  // Ukrainian birch on the left
+  ctx.fillStyle = mix('#20361f','#0c130c', d);
+  ctx.beginPath(); ctx.moveTo(0,GROUND);
+  for (let x=0;x<=620;x+=30){ ctx.lineTo(x, 330 - Math.sin(x*0.02)*30); } ctx.lineTo(620,GROUND); ctx.closePath(); ctx.fill();
+  for (let i=0;i<9;i++){
+    const x = 30 + i*62, top = 300 + (i%3)*24;
+    ctx.fillStyle = mix('#e8e6df','#5a5850', d); ctx.fillRect(x, top, 10, GROUND-top);
+    ctx.fillStyle = mix('#2a2a28','#141414', d);
+    for (let m=0;m<5;m++) ctx.fillRect(x, top + 20 + m*40, 10, 4);
+    ctx.fillStyle = mix('#375a2f','#16240f', d);
+    ctx.beginPath(); ctx.ellipse(x+5, top-6, 26, 34, 0, 0, 6.28); ctx.fill();
+  }
+}
+function drawStreamAndBridge(d){
+  // the stream in the gorge
+  const g = ctx.createLinearGradient(0, GROUND-30, 0, GROUND+120);
+  g.addColorStop(0, mix('#5aa0c8','#20303e',d)); g.addColorStop(1, mix('#20567a','#0b1a26',d));
+  ctx.fillStyle = g; ctx.fillRect(GORGE.x0, GROUND, GORGE.x1-GORGE.x0, 160);
+  // shimmer
+  ctx.strokeStyle = `rgba(200,230,255,${0.25-d*0.2})`;
+  for (let i=0;i<4;i++){ ctx.beginPath(); const yy=GROUND+30+i*22;
+    ctx.moveTo(GORGE.x0, yy); ctx.lineTo(GORGE.x1, yy+Math.sin(performance.now()*0.002+i)*3); ctx.stroke(); }
+
+  // bridge planks
+  const stable = state.bridgeStable;
+  for (let i=0;i<6;i++){
+    const px = GORGE.x0 - 6 + i*((GORGE.x1-GORGE.x0+12)/6);
+    ctx.save();
+    if (!stable){ ctx.globalAlpha = 0.35; ctx.translate(0, 8 + Math.sin(i)*6); }
+    ctx.fillStyle = stable ? '#8a5a30' : '#4a3620';
+    ctx.fillRect(px, GROUND-6, (GORGE.x1-GORGE.x0+12)/6 - 3, 12);
+    ctx.restore();
+  }
+  if (stable){ ctx.strokeStyle='rgba(120,200,255,0.4)'; ctx.lineWidth=2;
+    ctx.strokeRect(GORGE.x0-8, GROUND-9, GORGE.x1-GORGE.x0+16, 18); ctx.lineWidth=1; }
+}
+function drawShrine(){
+  const x = beats.shrine, y = GROUND-96;
+  ctx.fillStyle = '#39323f'; ctx.fillRect(x-22, y, 44, 96);
+  ctx.beginPath(); ctx.moveTo(x-34,y); ctx.lineTo(x, y-30); ctx.lineTo(x+34,y); ctx.closePath();
+  ctx.fillStyle='#4a3f52'; ctx.fill();
+  // a heart-rune, warmer once read
+  ctx.fillStyle = state.shrineRead ? '#e94f6a' : '#7a6f82';
+  ctx.beginPath(); ctx.arc(x-6,y+38,7,0,6.28); ctx.arc(x+6,y+38,7,0,6.28);
+  ctx.moveTo(x-13,y+41); ctx.lineTo(x,y+58); ctx.lineTo(x+13,y+41); ctx.fill();
+  if (state.shrineRead){ ctx.fillStyle='#e8e0d8'; ctx.font='italic 15px Georgia'; ctx.textAlign='center';
+    ctx.fillText('“Two lands, one heart.”', x, y-44); ctx.textAlign='left'; }
+}
+function drawGround(d){
+  ctx.fillStyle = mix('#2b3a26','#10160e', d);
+  ctx.fillRect(0, GROUND, GORGE.x0, 160);
+  ctx.fillRect(GORGE.x1, GROUND, W-GORGE.x1, 160);
+  ctx.fillStyle = mix('#3c5a30','#18240f', d);
+  for (let x=0;x<W;x+=16){ if (x>GORGE.x0-16 && x<GORGE.x1) continue;
+    ctx.fillRect(x+(x*7%9), GROUND-3, 3, 8+(x*13%7)); }
+}
+function drawOverlook(){
+  const x=beats.overlook;
+  ctx.fillStyle='#454a5c'; ctx.fillRect(x-40, GROUND-14, 120, 14);
+  ctx.strokeStyle='#767c92'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(x-40,GROUND-14); ctx.lineTo(x+80,GROUND-14); ctx.stroke(); ctx.lineWidth=1;
+  if (state.whole){ ctx.fillStyle='rgba(255,240,200,0.10)'; ctx.beginPath();
+    ctx.arc(x+20, GROUND-120, 120, 0, 6.28); ctx.fill(); }
+}
+function drawBird(b){
+  const col = b.mood==='stirred' ? '#ffbf5a' : b.mood==='settled' ? '#8fd0f0'
+            : b.mood==='disrupted' ? '#6d6d72' : '#e8e6df';
+  ctx.strokeStyle = col; ctx.lineWidth = 2.4;
+  const w = 8 + b.flap*6, yy = b.mood==='disrupted' ? 0 : Math.sin(b.phase)*b.flap*7;
+  ctx.beginPath();
+  ctx.moveTo(b.x-w, b.y+yy); ctx.lineTo(b.x, b.y-3); ctx.lineTo(b.x+w, b.y+yy);
+  ctx.stroke(); ctx.lineWidth = 1;
+}
+function drawAura(g, warm){
+  const cx=g.x+g.w/2, cy=g.y+g.h/2, R=150;
+  const grd = ctx.createRadialGradient(cx,cy,10, cx,cy,R);
+  const c = warm ? '255,180,90' : '110,190,240';
+  grd.addColorStop(0, `rgba(${c},0.16)`); grd.addColorStop(1, `rgba(${c},0)`);
+  ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(cx,cy,R,0,6.28); ctx.fill();
+}
+function drawGirl(g, activeOne){
+  const warm = g.id==='anya';
+  const bob = Math.sin(g.bob)*2;
+  const x=g.x, y=g.y+bob, w=g.w, h=g.h;
+  ctx.globalAlpha = activeOne ? 1 : 0.55;
+  // cloak
+  ctx.fillStyle = warm ? '#d9743a' : '#3f78b0';
+  roundRect(x, y+14, w, h-14, 8); ctx.fill();
+  // embroidered sash
+  ctx.fillStyle = warm ? '#f4d27a' : '#cfe4f2'; ctx.fillRect(x, y+26, w, 5);
+  ctx.fillStyle = '#b5303f';
+  for (let i=0;i<w;i+=8) ctx.fillRect(x+i+2, y+27, 3, 3);
+  // head
+  ctx.fillStyle='#e9c9a8'; ctx.beginPath(); ctx.arc(x+w/2, y+8, 11, 0, 6.28); ctx.fill();
+  // hair — Anya wild, Donna neat bun
+  ctx.fillStyle = warm ? '#5a2f1a' : '#2c2620';
+  if (warm){ ctx.beginPath(); ctx.moveTo(x+w/2, y-8);
+    ctx.bezierCurveTo(x-8,y-2, x-4,y+14, x+6,y+8);
+    ctx.bezierCurveTo(x+w/2,y-4, x+w+4,y+14, x+w-6,y+6);
+    ctx.bezierCurveTo(x+w+6,y-4, x+w/2,y-14, x+w/2,y-8); ctx.fill();
+  } else { ctx.beginPath(); ctx.arc(x+w/2, y-3, 9, 0, 6.28); ctx.fill();
+    ctx.fillRect(x+4, y-2, w-8, 8); }
+  ctx.globalAlpha=1;
+  // active ring + name
+  if (activeOne){ ctx.strokeStyle = warm ? '#ffd27a' : '#bfe0ff'; ctx.lineWidth=2;
+    roundRect(x-4, y-16, w+8, h+20, 10); ctx.stroke(); ctx.lineWidth=1; }
+  ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText(warm?'Anya':'Donna', x+w/2, y+h+16); ctx.textAlign='left';
+}
+function drawRift(r){
+  const cx=beats.fracture-140;
+  ctx.save(); ctx.globalAlpha = Math.min(1, r);
+  ctx.strokeStyle='#cfe9ff'; ctx.lineWidth=3+r*4; ctx.shadowColor='#8fd6ff'; ctx.shadowBlur=24;
+  ctx.beginPath(); let yy=0, xx=cx;
+  ctx.moveTo(xx,0);
+  while(yy<GROUND){ yy+=24; xx=cx+Math.sin(yy*0.09)*22*r + (Math.random()-0.5)*8*r; ctx.lineTo(xx,yy); }
+  ctx.stroke(); ctx.restore(); ctx.shadowBlur=0;
+}
+
+function drawHUD(){
+  // top band with a vyshyvanka motif
+  ctx.fillStyle='rgba(8,8,16,0.55)'; ctx.fillRect(0,0,W,44);
+  ctx.fillStyle='#b5303f';
+  for (let x=0;x<W;x+=18){ ctx.fillRect(x, 38, 6, 6); ctx.fillRect(x+3, 35, 6, 3); ctx.fillRect(x+3, 44, 6, 3); }
+  ctx.fillStyle='#efe7dc'; ctx.font='bold 15px Georgia';
+  ctx.fillText('Chronicles of Slavia — Zone A: Border Path', 16, 26);
+  // active girl
+  ctx.font='13px Segoe UI'; ctx.textAlign='right';
+  ctx.fillStyle = state.active==='anya' ? '#ffbf5a' : '#8fd0f0';
+  ctx.fillText('▲ ' + (state.active==='anya'?'Anya — stirs':'Donna — settles'), W-16, 26);
+  ctx.textAlign='left';
+  // five-beat tracker
+  const labels=[['Anya stirs',state.done.stirred],['Donna settles',state.done.settled],
+    ['nature answers',state.done.stirred&&state.done.settled],
+    ['Donna steadies · Anya crosses',state.done.crossed],['the Rift interrupts',state.done.rift]];
+  let bx=16;
+  for (const [t,on] of labels){
+    ctx.fillStyle = on ? '#ffd770' : 'rgba(255,255,255,0.22)';
+    ctx.beginPath(); ctx.arc(bx+6, 60, 6, 0, 6.28); ctx.fill();
+    ctx.fillStyle = on ? '#efe7dc' : 'rgba(230,230,230,0.4)'; ctx.font='12px Segoe UI';
+    ctx.fillText(t, bx+16, 64); bx += 20 + ctx.measureText(t).width + 18;
+  }
+}
+function drawMessage(){
+  if (state.msgT<=0) return;
+  const a = Math.min(1, state.msgT);
+  ctx.fillStyle=`rgba(0,0,0,${0.45*a})`;
+  ctx.fillRect(W/2-360, GROUND+92, 720, 44);
+  ctx.fillStyle=`rgba(245,240,232,${a})`; ctx.font='italic 18px Georgia'; ctx.textAlign='center';
+  ctx.fillText(state.msg, W/2, GROUND+120); ctx.textAlign='left';
+}
+function drawIntro(){
+  const a=Math.min(1,state.intro/1.5);
+  ctx.fillStyle=`rgba(4,4,10,${0.55*a})`; ctx.fillRect(0,0,W,H);
+  ctx.textAlign='center';
+  ctx.fillStyle=`rgba(233,79,106,${a})`; ctx.font='bold 40px Georgia';
+  ctx.fillText('CHRONICLES OF SLAVIA', W/2, H/2-30);
+  ctx.fillStyle=`rgba(239,231,220,${a})`; ctx.font='20px Georgia';
+  ctx.fillText('Zone A — Border Path', W/2, H/2+6);
+  ctx.font='15px Segoe UI'; ctx.fillStyle=`rgba(200,200,210,${a})`;
+  ctx.fillText('What do you become when the world breaks?', W/2, H/2+40);
+  ctx.textAlign='left';
+}
+
+// ---- helpers ---------------------------------------------------------------
+function roundRect(x,y,w,h,r){ ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function hex(c){ return [parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)]; }
+function mix(c1,c2,t){ t=Math.max(0,Math.min(1,t)); const a=hex(c1),b=hex(c2);
+  return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')})`; }
+function shade(rgb,amt){ const m=rgb.match(/\d+/g).map(n=>Math.max(0,Math.min(255,+n+amt)));
+  return `rgb(${m.join(',')})`; }
+
+// ---- loop ------------------------------------------------------------------
+function frame(now){
+  const dt = Math.min(0.05, (now-last)/1000); last=now;
+  update(dt); draw();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
 </body>
 </html>
