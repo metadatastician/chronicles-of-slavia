@@ -3,29 +3,27 @@
 
 //! The play session — the *only* place the renderer touches the rules.
 //!
-//! `Session` owns a [`slavia_core::World`] and exposes the handful of intents
-//! Zone A needs (switch, approach the birds, settle the crossing, cross, awaken
-//! the Rift), plus the view-facing state a renderer reads back (bird mood,
-//! which beats have happened). It contains **no rendering** and no Bevy types,
-//! so it is fully testable headlessly — which is how the five-beat success
-//! condition is verified without a display.
+//! `Session` owns a [`slavia_core::World`] and models Zone A as a **spatial walk
+//! through its seven beats** (`docs/design/02-zone-a-design.md`): each girl has a
+//! position along the path, interactions are gated on being at the right beat,
+//! and beats reveal as they are reached. It holds **no rendering** and no Bevy
+//! types — the whole traversal is testable headlessly, and it survives any
+//! future engine choice (M2) because it is engine-agnostic.
 
-use slavia_core::{zone_a, CrossError, Response, World};
+use slavia_core::{zone_a, Beat, CrossError, Response, World};
+use std::collections::HashMap;
 
-/// Zone A's single animal.
+/// Zone A's single animal, and the beats that gate interactions.
 pub const GROVE_BIRDS: &str = "grove-birds";
+const BIRD_GROVE: &str = "bird-grove";
+const STREAM_BRIDGE: &str = "stream-bridge";
 
-/// The visible mood of the grove birds, derived from the last time a girl
-/// reached out to them.
+/// The visible mood of the grove birds, from the last time a girl reached them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BirdState {
-    /// Not yet reached — going about their own business.
     Neutral,
-    /// Anya raised their taxis.
     Stirred,
-    /// Donna lowered their taxis.
     Settled,
-    /// The Rift has awoken; they no longer answer normally.
     Disrupted,
 }
 
@@ -35,7 +33,6 @@ impl BirdState {
             Response::Stirred => BirdState::Stirred,
             Response::Settled => BirdState::Settled,
             Response::Disrupted => BirdState::Disrupted,
-            // Unmoved / Unnatural do not occur in Zone A's shipped data.
             _ => BirdState::Neutral,
         }
     }
@@ -52,17 +49,14 @@ pub struct Beats {
 }
 
 impl Beats {
-    /// "Nature answers them" — established once both girls have been felt.
     pub fn nature_answered(&self) -> bool {
         self.anya_stirred && self.donna_settled
     }
 
-    /// All five beats witnessed.
     pub fn all(&self) -> bool {
         self.anya_stirred && self.donna_settled && self.crossed && self.rift_disrupted
     }
 
-    /// How many of the five have happened (for the on-screen beat pips).
     pub fn count(&self) -> usize {
         [
             self.anya_stirred,
@@ -77,34 +71,60 @@ impl Beats {
     }
 }
 
-/// The most recent thing that happened, for console/screen feedback.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Event {
-    Switched,
-    Approached(Response),
+/// Outcome of trying to settle the crossing.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Settle {
+    /// Donna lowered the crossing's unsteady motion — it is now passable.
     Settled,
-    CannotSettle,
+    /// The active girl cannot settle (she raises taxis, she does not lower).
+    WrongGift,
+    /// Not standing at the crossing.
+    NotHere,
+}
+
+/// Outcome of trying to cross.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Crossing {
     Crossed,
-    CannotCross(CrossError),
-    RiftAwoke,
+    /// The crossing has not been made passable yet.
+    Unpassable,
+    /// Not standing at the crossing.
+    NotHere,
 }
 
 /// A live Zone A play session.
 pub struct Session {
-    pub world: World,
+    world: World,
+    /// Grove-bird mood (view state).
     pub birds: BirdState,
+    /// Which of the five success-condition beats have happened.
     pub beats: Beats,
-    pub last: Option<Event>,
+    /// Each girl's position along the path, in beat units (`0.0 ..= last beat`).
+    pos: HashMap<String, f32>,
+    /// Which spec beats have been reached, by index (for narration / reveals).
+    pub revealed: Vec<bool>,
 }
 
 impl Session {
-    /// Start a fresh Zone A session (Anya active first).
+    /// Start a fresh Zone A session — both girls at the forest entrance, Anya active.
     pub fn new() -> Self {
+        let world = World::new(zone_a());
+        let pos = world
+            .spec()
+            .characters
+            .iter()
+            .map(|c| (c.id.clone(), 0.0))
+            .collect();
+        let mut revealed = vec![false; world.spec().beats.len()];
+        if let Some(first) = revealed.first_mut() {
+            *first = true;
+        }
         Session {
-            world: World::new(zone_a()),
+            world,
             birds: BirdState::Neutral,
             beats: Beats::default(),
-            last: None,
+            pos,
+            revealed,
         }
     }
 
@@ -116,13 +136,8 @@ impl Session {
         self.world.active().name.as_str()
     }
 
-    /// Switch control to `id`; `false` (no change) if there is no such girl.
     pub fn switch(&mut self, id: &str) -> bool {
-        let ok = self.world.switch_to(id);
-        if ok {
-            self.last = Some(Event::Switched);
-        }
-        ok
+        self.world.switch_to(id)
     }
 
     /// Switch to the other girl (Zone A has exactly two).
@@ -139,51 +154,104 @@ impl Session {
         }
     }
 
-    /// The active girl reaches out to the grove birds.
-    pub fn approach_birds(&mut self) -> Response {
+    // --- space -------------------------------------------------------------
+
+    pub fn beats_slice(&self) -> &[Beat] {
+        &self.world.spec().beats
+    }
+
+    fn last_index(&self) -> usize {
+        self.beats_slice().len().saturating_sub(1)
+    }
+
+    /// The active girl's position along the path, in beat units.
+    pub fn active_pos(&self) -> f32 {
+        self.pos_of(self.active_id())
+    }
+
+    /// Any girl's position along the path.
+    pub fn pos_of(&self, id: &str) -> f32 {
+        *self.pos.get(id).unwrap_or(&0.0)
+    }
+
+    /// The beat the active girl is currently standing at (the nearest one).
+    pub fn nearest_beat_index(&self) -> usize {
+        (self.active_pos().round() as i32).clamp(0, self.last_index() as i32) as usize
+    }
+
+    pub fn current_beat(&self) -> &Beat {
+        &self.beats_slice()[self.nearest_beat_index()]
+    }
+
+    /// Move the active girl by `dx` beat units. Returns the index of a *newly
+    /// reached* beat, if this move stepped onto one.
+    pub fn move_active(&mut self, dx: f32) -> Option<usize> {
+        let id = self.active_id().to_string();
+        let max = self.last_index() as f32;
+        let before = self.nearest_beat_index();
+        if let Some(p) = self.pos.get_mut(&id) {
+            *p = (*p + dx).clamp(0.0, max);
+        }
+        let after = self.nearest_beat_index();
+        if after != before {
+            self.revealed[after] = true;
+            Some(after)
+        } else {
+            None
+        }
+    }
+
+    // --- interactions (gated on location) ----------------------------------
+
+    /// Reach out to the grove birds — only possible while standing at the grove.
+    /// `None` means there are no birds here.
+    pub fn approach_birds(&mut self) -> Option<Response> {
+        if self.current_beat().id != BIRD_GROVE {
+            return None;
+        }
         let r = self
             .world
             .approach(GROVE_BIRDS)
             .expect("Zone A always has the grove birds");
         self.birds = BirdState::from_response(&r);
-        match r {
+        match &r {
             Response::Stirred => self.beats.anya_stirred = true,
             Response::Settled => self.beats.donna_settled = true,
             Response::Disrupted => self.beats.rift_disrupted = true,
             _ => {}
         }
-        self.last = Some(Event::Approached(r.clone()));
-        r
+        Some(r)
     }
 
-    /// Try to settle the crossing (only a lowering gift — Donna — can).
-    pub fn settle_crossing(&mut self) -> bool {
-        let ok = self.world.stabilize_bridge();
-        self.last = Some(if ok {
-            Event::Settled
+    /// Settle the crossing — only at the bridge, and only a lowering gift (Donna).
+    pub fn settle_crossing(&mut self) -> Settle {
+        if self.current_beat().id != STREAM_BRIDGE {
+            return Settle::NotHere;
+        }
+        if self.world.stabilize_bridge() {
+            Settle::Settled
         } else {
-            Event::CannotSettle
-        });
-        ok
+            Settle::WrongGift
+        }
     }
 
-    /// Try to cross (needs the crossing to have been made passable).
-    pub fn cross(&mut self) -> Result<(), CrossError> {
-        let res = self.world.cross();
-        match &res {
+    /// Cross — only at the bridge, and only once it has been made passable.
+    pub fn cross(&mut self) -> Crossing {
+        if self.current_beat().id != STREAM_BRIDGE {
+            return Crossing::NotHere;
+        }
+        match self.world.cross() {
             Ok(()) => {
                 self.beats.crossed = true;
-                self.last = Some(Event::Crossed);
+                Crossing::Crossed
             }
-            Err(e) => self.last = Some(Event::CannotCross(e.clone())),
+            Err(CrossError::BridgeUnstable) => Crossing::Unpassable,
         }
-        res
     }
 
     /// The Fracture: awaken the Rift.
     pub fn awaken_rift(&mut self) {
         self.world.awaken_rift();
-        self.last = Some(Event::RiftAwoke);
     }
 
     pub fn crossing_passable(&self) -> bool {
@@ -205,59 +273,80 @@ impl Default for Session {
 mod tests {
     use super::*;
 
-    /// The whole Zone A arc, driven through the exact intents the renderer
-    /// calls — the headless proof that the input wiring is correct.
+    /// The whole Zone A arc as a spatial walk — driven through the exact intents
+    /// the renderer calls. The headless proof that both the rules *and* the
+    /// traversal wiring are correct.
     #[test]
-    fn walks_the_five_beats() {
+    fn walks_zone_a_in_space() {
         let mut s = Session::new();
-
-        // 1. Anya stirs.
         assert_eq!(s.active_name(), "Anya");
-        assert_eq!(s.approach_birds(), Response::Stirred);
-        assert_eq!(s.birds, BirdState::Stirred);
-        assert!(s.beats.anya_stirred);
 
-        // 2. Donna settles.
+        // Away from the grove, there are no birds to reach.
+        assert_eq!(s.approach_birds(), None);
+
+        // 1. Anya walks to the grove and stirs the birds.
+        s.move_active(1.0);
+        assert_eq!(s.current_beat().id, "bird-grove");
+        assert_eq!(s.approach_birds(), Some(Response::Stirred));
+        assert_eq!(s.birds, BirdState::Stirred);
+
+        // 2. Donna walks to the grove and settles them.
         s.toggle_character();
         assert_eq!(s.active_name(), "Donna");
-        assert_eq!(s.approach_birds(), Response::Settled);
-        assert_eq!(s.birds, BirdState::Settled);
-        assert!(s.beats.donna_settled);
+        s.move_active(1.0);
+        assert_eq!(s.approach_birds(), Some(Response::Settled));
+        assert!(s.beats.nature_answered()); // 4. Nature answered.
 
-        // 4. Nature answered them (established by 1 & 2).
-        assert!(s.beats.nature_answered());
-
-        // 3. Donna steadies what Anya crosses.
-        assert!(s.settle_crossing());
-        assert!(s.crossing_passable());
-        s.toggle_character();
-        assert!(s.cross().is_ok());
+        // 3. Donna steadies the crossing; Anya crosses it.
+        s.move_active(2.0); // Donna: grove(1) -> bridge(3)
+        assert_eq!(s.current_beat().id, "stream-bridge");
+        assert_eq!(s.settle_crossing(), Settle::Settled);
+        s.toggle_character(); // Anya, still at the grove
+        s.move_active(2.0); // Anya: grove(1) -> bridge(3)
+        assert_eq!(s.cross(), Crossing::Crossed);
         assert!(s.beats.crossed);
 
         // 5. The Rift interrupts the answer.
         s.awaken_rift();
-        assert!(s.rift_active());
-        assert_eq!(s.approach_birds(), Response::Disrupted);
+        s.move_active(-2.0); // Anya back to the grove
+        assert_eq!(s.approach_birds(), Some(Response::Disrupted));
         assert_eq!(s.birds, BirdState::Disrupted);
-        assert!(s.beats.rift_disrupted);
 
         assert!(s.beats.all());
         assert_eq!(s.beats.count(), 5);
     }
 
     #[test]
-    fn anya_cannot_settle_the_crossing() {
+    fn cannot_settle_away_from_the_bridge() {
         let mut s = Session::new();
-        assert_eq!(s.active_name(), "Anya");
-        assert!(!s.settle_crossing());
-        assert!(!s.crossing_passable());
-        assert_eq!(s.last, Some(Event::CannotSettle));
+        assert_eq!(s.settle_crossing(), Settle::NotHere);
+    }
+
+    #[test]
+    fn anya_at_the_bridge_cannot_settle_it() {
+        let mut s = Session::new();
+        s.move_active(3.0); // Anya to the bridge
+        assert_eq!(s.current_beat().id, "stream-bridge");
+        assert_eq!(s.settle_crossing(), Settle::WrongGift);
     }
 
     #[test]
     fn cannot_cross_an_unsteadied_crossing() {
         let mut s = Session::new();
-        assert!(s.cross().is_err());
-        assert!(!s.beats.crossed);
+        s.move_active(3.0);
+        assert_eq!(s.cross(), Crossing::Unpassable);
+    }
+
+    #[test]
+    fn reaching_the_shrine_reveals_its_words() {
+        let mut s = Session::new();
+        assert!(!s.revealed[2]);
+        s.move_active(2.0); // to the shrine
+        assert_eq!(s.current_beat().id, "shrine");
+        assert!(s.revealed[2]);
+        assert_eq!(
+            s.current_beat().text.as_deref(),
+            Some("Two lands, one heart.")
+        );
     }
 }
