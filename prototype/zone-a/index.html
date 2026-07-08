@@ -22,7 +22,7 @@
 </head>
 <body>
 <div id="wrap"><canvas id="game" width="1280" height="720"></canvas></div>
-<div id="hint">A / D move &nbsp;·&nbsp; Space jump &nbsp;·&nbsp; Tab switch girl &nbsp;·&nbsp; E reach out / read &nbsp;·&nbsp; R restart</div>
+<div id="hint">A / D move &nbsp;·&nbsp; Shift run &nbsp;·&nbsp; Space jump &nbsp;·&nbsp; ↓ duck &nbsp;·&nbsp; Tab switch girl &nbsp;·&nbsp; E reach / read &nbsp;·&nbsp; R restart</div>
 <script>
 "use strict";
 const canvas = document.getElementById('game');
@@ -62,8 +62,8 @@ let state;
 function reset(introTime = 5.5) {
   state = {
     active: 'anya',
-    anya:  girl('anya',  160, null, 6.4),
-    donna: girl('donna', 210, null, 4.8),
+    anya:  girl('anya',  160, 1.00, 6.6),   // verve 1.0 — energy: springy, flowing
+    donna: girl('donna', 210, 0.42, 4.6),   // verve 0.42 — stability: planted, damped
     _natureMsg: false,
     birds: Array.from({length: 7}, (_, i) => ({
       x: beats.grove - 40 + (i * 16), baseY: 360 + (i % 3) * 22,
@@ -80,8 +80,11 @@ function reset(introTime = 5.5) {
     done: { stirred:false, settled:false, crossed:false, whole:false, rift:false }
   };
 }
-function girl(id, x, _c, speed) {
-  return { id, x, y: GROUND, w: 34, h: 62, speed, vy: 0, onGround: true, bob: Math.random()*6 };
+function girl(id, x, verve, speed) {
+  // verve scales how energetically the body reacts (Anya high, Donna low).
+  return { id, x, y: GROUND - 92, w: 44, h: 92, speed, verve,
+           vy: 0, onGround: true, vx: 0, facing: 1,
+           walk: Math.random()*6, duck: 0, hairX: 0, hairY: 0 };
 }
 reset();
 
@@ -105,11 +108,14 @@ function update(dt) {
   if (tap('KeyR')) { reset(0.8); tapped.clear(); return; }
 
   const a = active();
-  // horizontal move
+  const running = held('ShiftLeft') || held('ShiftRight');
+  const ducking = (held('ArrowDown') || held('ControlLeft')) && a.onGround;
   let dx = 0;
   if (held('KeyA') || held('ArrowLeft'))  dx -= 1;
   if (held('KeyD') || held('ArrowRight')) dx += 1;
-  a.x += dx * a.speed * dt * 60;
+  const spd = a.speed * (running ? 1.7 : 1) * (ducking ? 0.4 : 1);
+  a.x += dx * spd * dt * 60;
+  if (dx !== 0) a.facing = dx > 0 ? 1 : -1;
 
   // the gorge is impassable until Donna steadies the bridge
   if (!state.bridgeStable) {
@@ -118,16 +124,27 @@ function update(dt) {
   }
   a.x = Math.max(40, Math.min(W - 40 - a.w, a.x));
 
-  // jump + gravity
-  if ((tap('Space') || tap('ArrowUp')) && a.onGround) { a.vy = -13.5; a.onGround = false; }
+  // jump + gravity — Anya springs higher, Donna is planted (verve)
+  if ((tap('Space') || tap('ArrowUp')) && a.onGround && !ducking) {
+    a.vy = -12 - a.verve * 4.5; a.onGround = false;
+  }
   a.vy += 34 * dt; a.y += a.vy * dt * 60;
-  let floor = GROUND - a.h;
-  // stand on the bridge planks when stable
-  if (state.bridgeStable && a.x + a.w > GORGE.x0 - 6 && a.x < GORGE.x1 + 6) floor = GROUND - a.h;
+  const floor = GROUND - a.h;
   if (a.y >= floor) { a.y = floor; a.vy = 0; a.onGround = true; }
 
-  // idle bob
-  for (const g of [state.anya, state.donna]) g.bob += dt * 3;
+  // per-girl reactive animation state (active is input-driven; the other rests)
+  for (const g of [state.anya, state.donna]) {
+    const isA = g === a;
+    const tvx = isA ? dx * spd : 0;
+    const ease = 0.10 + g.verve * 0.06;             // energetic girls react faster
+    g.vx += (tvx - g.vx) * Math.min(1, dt * 60 * ease);
+    g.duck += (((isA && ducking) ? 1 : 0) - g.duck) * Math.min(1, dt * 12);
+    if (g.onGround && Math.abs(g.vx) > 0.15) g.walk += dt * (7 + Math.abs(g.vx) * 1.3);
+    else g.walk += dt * (1 + g.verve);              // idle sway; Anya fidgets more
+    const flow = 1.4 + g.verve * 1.8;               // Anya's hair/ribbons stream far more
+    g.hairX += ((-g.vx * flow) - g.hairX) * Math.min(1, dt * 8);
+    g.hairY += (((g.onGround ? 0 : g.vy) * (0.7 + g.verve)) - g.hairY) * Math.min(1, dt * 8);
+  }
 
   // --- the living taxis: the active girl's aura moves the grove birds ---
   const auraR = 150;
@@ -331,34 +348,166 @@ function drawAura(g, warm){
   grd.addColorStop(0, `rgba(${c},0.16)`); grd.addColorStop(1, `rgba(${c},0)`);
   ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(cx,cy,R,0,6.28); ctx.fill();
 }
+// ---- folk-costume palette + embroidery stamps ----
+const LINEN='#f2ede0', EMRED='#b5202a', EMBLK='#241a1a', GOLD='#d7a63f', SKIN='#e9c4a0',
+      HUTSUL_SKIRT='#5e1d2a', KEPTAR='#8a5a2c', CORAL='#d8402e', ANYA_HAIR='#6b3a1e',
+      RHODOPE_SUKMAN='#221d2c', RIZA='#efe8da', RHODOPE_APRON='#7a2130',
+      RHODOPE_STRIPE='#c98a3a', SCARF='#6f2030';
+function rhomb(x,y,s,col){ ctx.fillStyle=col; ctx.beginPath();
+  ctx.moveTo(x,y-s); ctx.lineTo(x+s,y); ctx.lineTo(x,y+s); ctx.lineTo(x-s,y); ctx.closePath(); ctx.fill(); }
+function crossX(x,y,s,col){ ctx.strokeStyle=col; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x-s,y-s); ctx.lineTo(x+s,y+s); ctx.moveTo(x+s,y-s); ctx.lineTo(x-s,y+s); ctx.stroke(); }
+// horizontal embroidered band, alternating red rhomb / black cross
+function emBand(x0,x1,y,s){ let i=0;
+  for (let x=x0+s; x<=x1-s; x+=s*2, i++){ if (i%2===0) rhomb(x,y,s*0.8,EMRED); else crossX(x,y,s*0.65,EMBLK); } }
+
 function drawGirl(g, activeOne){
-  const warm = g.id==='anya';
-  const bob = Math.sin(g.bob)*2;
-  const x=g.x, y=g.y+bob, w=g.w, h=g.h;
-  ctx.globalAlpha = activeOne ? 1 : 0.55;
-  // cloak
-  ctx.fillStyle = warm ? '#d9743a' : '#3f78b0';
-  roundRect(x, y+14, w, h-14, 8); ctx.fill();
-  // embroidered sash
-  ctx.fillStyle = warm ? '#f4d27a' : '#cfe4f2'; ctx.fillRect(x, y+26, w, 5);
-  ctx.fillStyle = '#b5303f';
-  for (let i=0;i<w;i+=8) ctx.fillRect(x+i+2, y+27, 3, 3);
-  // head
-  ctx.fillStyle='#e9c9a8'; ctx.beginPath(); ctx.arc(x+w/2, y+8, 11, 0, 6.28); ctx.fill();
-  // hair — Anya wild, Donna neat bun
-  ctx.fillStyle = warm ? '#5a2f1a' : '#2c2620';
-  if (warm){ ctx.beginPath(); ctx.moveTo(x+w/2, y-8);
-    ctx.bezierCurveTo(x-8,y-2, x-4,y+14, x+6,y+8);
-    ctx.bezierCurveTo(x+w/2,y-4, x+w+4,y+14, x+w-6,y+6);
-    ctx.bezierCurveTo(x+w+6,y-4, x+w/2,y-14, x+w/2,y-8); ctx.fill();
-  } else { ctx.beginPath(); ctx.arc(x+w/2, y-3, 9, 0, 6.28); ctx.fill();
-    ctx.fillRect(x+4, y-2, w-8, 8); }
+  const anya = g.id === 'anya';
+  const v = g.verve;
+  const cx = g.x + g.w/2, footY = g.y + g.h;
+  const duck = g.duck || 0;
+  const H = g.h * (1 - duck*0.24);
+  const lean = Math.max(-0.34, Math.min(0.34, (g.vx||0) * 0.045 * (0.6 + v)));
+  const air = !g.onGround;
+  const stride = air ? 0 : Math.sin(g.walk) * Math.min(1, 0.35 + Math.abs(g.vx)*0.11);
+  const bounce = air ? 0 : Math.abs(Math.sin(g.walk)) * (0.5 + v*1.6) * (Math.abs(g.vx)>0.2 ? 1 : 0.3);
+  const armSw = air ? -0.5 : -stride*0.9;
+  // skirt: billows wide as she falls, narrows as she rises — heavier dress billows less
+  const billow = (air ? (g.vy||0) : 0) * 0.03 * (1.1 - v*0.4);
+  const bw = Math.max(0.82, Math.min(1.35, 1 + billow));
+  const sway = (g.vx||0) * 1.2 * (0.6+v) + Math.sin(g.walk) * (1.5 + v*2.5);
+  const hairX = (g.hairX||0), hairLift = -(g.hairY||0) * 0.6;
+
+  ctx.save();
+  ctx.globalAlpha = activeOne ? 1 : 0.5;
+  ctx.translate(cx, footY - bounce);
+  ctx.scale(g.facing || 1, 1);
+  ctx.rotate(lean * 0.3);
+
+  const yWaist=-H*0.52, yChest=-H*0.64, yShoulder=-H*0.72, yNeck=-H*0.76,
+        yHead=-H*0.86, rHead=H*0.095, yHemTop=-H*0.16;
+  const hipW=g.w*0.5, shW=g.w*0.44, hemW=g.w*0.6*bw;
+
+  // boots peeking below the hem, swinging with the walk
+  ctx.fillStyle = '#3a2617';
+  ctx.fillRect(-hipW*0.5 + stride*8 - 5, -7, 11, 9);
+  ctx.fillRect( hipW*0.2 - stride*8 - 5, -7, 11, 9);
+
+  // skirt / sukman
+  ctx.fillStyle = anya ? HUTSUL_SKIRT : RHODOPE_SUKMAN;
+  ctx.beginPath();
+  ctx.moveTo(-hipW, yWaist); ctx.lineTo(hipW, yWaist);
+  ctx.lineTo(hemW + sway, yHemTop); ctx.lineTo(-hemW + sway, yHemTop);
+  ctx.closePath(); ctx.fill();
+
+  if (anya){
+    ctx.strokeStyle = GOLD; ctx.lineWidth = 1.2;
+    for (let kk=1;kk<4;kk++){ const yy=yWaist+(yHemTop-yWaist)*kk/4, wl=hipW+(hemW-hipW)*kk/4;
+      ctx.beginPath(); ctx.moveTo(-wl+sway*kk/4, yy); ctx.lineTo(wl+sway*kk/4, yy); ctx.stroke(); }
+    emBand(-hemW+sway, hemW+sway, yHemTop-3, 3);
+  } else {
+    // Rhodope woven apron over the sukman — sober earthy stripes
+    ctx.fillStyle = RHODOPE_APRON;
+    ctx.beginPath();
+    ctx.moveTo(-hipW*0.6, yWaist); ctx.lineTo(hipW*0.6, yWaist);
+    ctx.lineTo(hemW*0.6+sway, yHemTop); ctx.lineTo(-hemW*0.6+sway, yHemTop);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = RHODOPE_STRIPE; ctx.lineWidth = 1.4;
+    for (let kk=1;kk<5;kk++){ const yy=yWaist+(yHemTop-yWaist)*kk/5;
+      ctx.beginPath(); ctx.moveTo(-hemW*0.55+sway*kk/5, yy); ctx.lineTo(hemW*0.55+sway*kk/5, yy); ctx.stroke(); }
+    emBand(-hemW*0.5+sway, hemW*0.5+sway, yHemTop-3, 3);
+  }
+
+  // white blouse / riza torso
+  ctx.fillStyle = anya ? LINEN : RIZA;
+  ctx.beginPath();
+  ctx.moveTo(-hipW*0.9, yWaist); ctx.lineTo(hipW*0.9, yWaist);
+  ctx.lineTo(shW, yShoulder); ctx.lineTo(-shW, yShoulder); ctx.closePath(); ctx.fill();
+
+  // sleeves + arms (swing opposite the legs; raised in the air)
+  for (const side of [-1, 1]){
+    ctx.save();
+    ctx.translate(side*shW*0.85, yShoulder+2);
+    ctx.rotate(side*(0.2 + armSw*side));
+    ctx.fillStyle = anya ? LINEN : RIZA;
+    ctx.beginPath(); ctx.ellipse(0, H*0.05, g.w*0.15, H*0.10, 0, 0, 6.28); ctx.fill();
+    ctx.fillStyle = EMRED; ctx.fillRect(-g.w*0.11, H*0.015, g.w*0.22, 2);
+    ctx.fillStyle = EMBLK; ctx.fillRect(-g.w*0.11, H*0.045, g.w*0.22, 1.4);
+    ctx.fillStyle = anya ? LINEN : RIZA; ctx.fillRect(-g.w*0.045, H*0.11, g.w*0.09, H*0.09);
+    ctx.fillStyle = SKIN; ctx.beginPath(); ctx.arc(0, H*0.21, g.w*0.06, 0, 6.28); ctx.fill();
+    ctx.restore();
+  }
+
+  if (anya){
+    // keptar vest
+    ctx.fillStyle = KEPTAR;
+    for (const side of [-1,1]){
+      ctx.beginPath();
+      ctx.moveTo(side*hipW*0.85, yWaist); ctx.lineTo(side*shW*0.9, yShoulder);
+      ctx.lineTo(side*shW*0.25, yShoulder); ctx.lineTo(side*hipW*0.28, yWaist); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle=EMRED; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(side*shW*0.25,yShoulder); ctx.lineTo(side*hipW*0.28,yWaist); ctx.stroke();
+    }
+    for (let r=0;r<4;r++){ const yy=yChest+r*3;
+      if (r%2===0){ rhomb(-3,yy,2.1,EMRED); rhomb(3,yy,2.1,EMRED); }
+      else { crossX(-3,yy,1.7,EMBLK); crossX(3,yy,1.7,EMBLK); } }
+  } else {
+    // Rhodope dark bodice straps over the riza — sober
+    ctx.fillStyle = RHODOPE_SUKMAN;
+    ctx.fillRect(-shW, yShoulder, shW*0.5, yWaist-yShoulder);
+    ctx.fillRect(shW*0.5, yShoulder, shW*0.5, yWaist-yShoulder);
+    for (let r=0;r<2;r++) crossX(0, yChest+r*3, 1.7, EMRED);
+  }
+  emBand(-shW*0.7, shW*0.7, yShoulder+1, 2.4);   // collar
+
+  // woven belt
+  ctx.fillStyle = anya ? EMRED : RHODOPE_STRIPE;
+  ctx.fillRect(-hipW, yWaist-2, hipW*2, 4);
+
+  // coral namysto (Anya only)
+  if (anya){ ctx.fillStyle=CORAL;
+    for (let b=-3;b<=3;b++){ ctx.beginPath(); ctx.arc(b*2.2, yNeck, 1.4, 0, 6.28); ctx.fill(); } }
+
+  // neck + head
+  ctx.fillStyle=SKIN; ctx.fillRect(-2.5, yNeck-2, 5, 5);
+  ctx.beginPath(); ctx.arc(0, yHead, rHead, 0, 6.28); ctx.fill();
+
+  if (anya){
+    // flowing auburn hair (trails with hairX, lifts with hairLift)
+    ctx.fillStyle=ANYA_HAIR;
+    ctx.beginPath();
+    ctx.moveTo(-rHead, yHead-1);
+    ctx.quadraticCurveTo(-rHead*1.5+hairX*0.5, yHead+rHead*1.8+hairLift, -rHead*0.5+hairX, yHead+rHead*3.2+hairLift*1.4);
+    ctx.quadraticCurveTo(hairX*0.7, yHead+rHead*1.4, rHead*0.3, yHead-rHead*0.6);
+    ctx.quadraticCurveTo(rHead*1.3+hairX*0.3, yHead-rHead*0.3, rHead, yHead-1);
+    ctx.arc(0, yHead, rHead+1, 0, Math.PI, true);
+    ctx.fill();
+    // vinok wreath
+    const fl=['#e04a5a','#e8b53a','#5aa0d8','#e8e0d0'];
+    for (let f=0;f<7;f++){ const a2=Math.PI*(0.12+0.76*f/6); ctx.fillStyle=fl[f%fl.length];
+      ctx.beginPath(); ctx.arc(-Math.cos(a2)*rHead, yHead-Math.sin(a2)*rHead-1, 1.6, 0, 6.28); ctx.fill(); }
+    // trailing ribbons
+    for (const rb of [[-1,'#c02a3a'],[1,'#2f6fb0']]){ ctx.strokeStyle=rb[1]; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(rb[0]*rHead*0.5, yHead+rHead*0.5);
+      ctx.quadraticCurveTo(rb[0]*rHead*0.6+hairX*0.9, yHead+rHead*2.2+hairLift, rb[0]*rHead*0.3+hairX*1.4, yHead+rHead*3.6+hairLift*1.3);
+      ctx.stroke(); }
+  } else {
+    // Rhodope headscarf — neat, covered, barely moves (stability)
+    ctx.fillStyle=SCARF;
+    ctx.beginPath(); ctx.arc(0, yHead-1, rHead+1.5, Math.PI, 0);
+    ctx.lineTo(rHead+1, yHead+rHead*0.6); ctx.lineTo(-rHead-1, yHead+rHead*0.6); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.arc(-rHead*0.9 + hairX*0.15, yHead+rHead*0.4, 2.2, 0, 6.28); ctx.fill();
+    emBand(-rHead, rHead, yHead-rHead*0.6, 1.8);
+  }
+  ctx.lineWidth=1;
+  ctx.restore();
+
+  // active ring + name (world coords)
   ctx.globalAlpha=1;
-  // active ring + name
-  if (activeOne){ ctx.strokeStyle = warm ? '#ffd27a' : '#bfe0ff'; ctx.lineWidth=2;
-    roundRect(x-4, y-16, w+8, h+20, 10); ctx.stroke(); ctx.lineWidth=1; }
-  ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
-  ctx.fillText(warm?'Anya':'Donna', x+w/2, y+h+16); ctx.textAlign='left';
+  if (activeOne){ ctx.strokeStyle = anya ? '#ffd27a' : '#bfe0ff'; ctx.lineWidth=2;
+    roundRect(g.x-4, g.y-10, g.w+8, g.h+16, 10); ctx.stroke(); ctx.lineWidth=1; }
+  ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText(anya?'Anya':'Donna', cx, footY+16); ctx.textAlign='left';
 }
 function drawRift(r){
   const cx=beats.fracture-140;
