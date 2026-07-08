@@ -93,14 +93,33 @@ class leanings** (`04`: Runner/Flicker/Wildheart · Pillar/Architect/Guardian)
 and of the core question — *what do you become when the world breaks?* You wear
 the answer.
 
-## Cloth-state colours three things (subtle, not stats-heavy)
+## The three-dimensional model of fashion (the foundation)
 
-Condition gently shades: **physical** protection, **psychological** steadiness
-(morale/focus), and **social** harmony (how nature and spirits read her — ties
-to living-taxis, `03`/`06`). Tatters weakens all three subtly; it should read as
-*vulnerability*, not a stat cliff. The loop: take a bad hit → cloth tatters →
-patterns go dormant and the world reads her as exposed → repair the fabric
-(craft fibres) → patterns wake again.
+The whole clothing system rests on the owner's own three-dimensional model of
+what dress is *for*. Each dimension is a **dialectic** — a two-way choice, not a
+one-way damage bar:
+
+- **Biological** — the body's *interface* with the environment: **protect ↔
+  expose**. Keep out cold / thorn / weather; *or* open it — feel the breeze,
+  cool off in the water.
+- **Psychological** — *identity*: **reveal ↔ conceal**. Show more of who you
+  are, or hide it.
+- **Social** — belonging among others: **include ↔ exclude**. A pattern that
+  marks you as one of a group, or sets you apart.
+
+So "Pristine → Tatters" is only *one pole* of the **biological** axis (forced
+exposure / vulnerability) — exposure can equally be *chosen* (bare arms for the
+breeze; wade in to cool off — this is why the water "cool off" reads as a
+biological choice, not just a hazard). Psychological and social are navigated by
+choice too: reveal or hide a pattern; wear or withhold a faction's motif (the
+recognition layer above). The game reads **intent and state together**, subtly —
+never a stat cliff.
+
+Philosophical roots (as read; owner corrects): a **dialectical** frame (each
+dimension a polarity to negotiate); a phenomenological **body–self–other** triad
+(Merleau-Ponty's lived body as world-interface; Sartre's for-itself and
+for-others); the social axis classically **Simmelian** (fashion as belonging vs
+distinction).
 
 ## Discipline + scope
 
