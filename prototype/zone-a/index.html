@@ -180,7 +180,9 @@ function update(dt) {
     if (moving) g.walk += dt * (6 + Math.abs(g.vx) * 1.2);          // only step when moving
     g.idle += dt * 1.6;                                             // slow breathing, always
     const flow = 1.2 + g.verve * 1.6;
-    g.hairX += ((-g.vx * flow) - g.hairX) * Math.min(1, dt * 8);
+    // trail hair BACKWARD relative to facing (drawn in the facing-flipped frame,
+    // so a signed -vx would invert when she faces left — use -|vx|)
+    g.hairX += ((-Math.abs(g.vx) * flow) - g.hairX) * Math.min(1, dt * 8);
     g.hairY += (((g.onGround ? 0 : g.vy) * (0.6 + g.verve)) - g.hairY) * Math.min(1, dt * 8);
   }
 

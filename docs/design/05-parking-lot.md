@@ -95,6 +95,14 @@ is a hazard:
 Prototype now: gorge is tiered wet(0) → waist(-1, head-if-ducking) → neck(-2) →
 abyss(-3, black/menacing, refused). Only Donna's bridge crosses.
 
+**Rendering vision (later):** show the depth as a true **side-on cross-section** —
+the streambed **slopes down** from the banks, and the water fills it as
+**horizontal strata** (light layer near the surface → darker → darkest with
+depth), the layers following the bed's slope. Like *Terraria* but with the
+depth layers made **visibly banded**. Current prototype approximates this with
+vertical light→dark bands; the real thing is horizontal strata over a sloped
+bed.
+
 ## Full Chronicle I
 
 Not yet. First make Zone A work.
