@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# Slavia engine workspace.
+#
+# Layered, renderer-agnostic architecture (see docs/decisions/0002):
+#   L1  Slavia Game Spec (SGS)  — declarative data (data/*.sgs.toml)
+#   L2  slavia-core             — the pure rules core (this crate)
+#   L3  renderer                — a swappable skin (browser / Godot / native), later
+#
+# Only L2 lives here for now. L1 is the data it reads; L3 is deliberately absent
+# until Zone A's rules are proven (milestone M0, "lock the sacred logic first").
+
+[workspace]
+resolver = "2"
+members = ["slavia-core", "slavia-zone-a"]

@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+[package]
+name = "slavia-zone-a"
+version = "0.0.0"
+edition = "2021"
+license = "MPL-2.0"
+description = "Playable Zone A — a Bevy renderer (L3) over slavia-core. Milestone M1."
+publish = false
+
+# The Bevy renderer sits behind the default `render` feature, so the pure
+# `Session` controller (and its tests) can be built and checked WITHOUT
+# compiling Bevy: `cargo test -p slavia-zone-a --no-default-features`.
+[features]
+default = ["render"]
+render = ["dep:bevy"]
+
+[dependencies]
+slavia-core = { path = "../slavia-core" }
+# x11 only (no `wayland`): wayland-sys needs libwayland-dev at build time, which
+# isn't guaranteed present. x11 loads at runtime (no build-time system lib) and
+# runs fine under WSLg via XWayland. Add "wayland" back if libwayland-dev is
+# installed and a native Wayland backend is wanted.
+bevy = { version = "0.15", default-features = false, features = [
+    "bevy_winit",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_sprite",
+    "x11",
+    "multi_threaded",
+], optional = true }
