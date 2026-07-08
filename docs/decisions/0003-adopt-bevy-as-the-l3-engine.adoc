@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Architecture Decision Record: 0003-adopt-bevy-as-the-l3-engine
+
+# 3. Adopt Bevy as the L3 renderer/engine
+
+Date: 2026-07-08
+
+## Status
+
+Accepted (resolves the M2 engine decision deferred in ADR-0002).
+
+## Context
+
+ADR-0002 built the game as data (L1 SGS) + a pure rules core (L2 `slavia-core`)
++ a swappable renderer (L3), and deliberately deferred the engine choice to M2,
+to be made "on evidence from a working Zone A". We now have that evidence:
+
+* `slavia-core` is proven (rules + spatial Zone A traversal, tests green).
+* A **Bevy** renderer spike (`slavia-zone-a`) compiled cleanly first-real-try and
+  plugs straight into the core with no FFI seam.
+* A throwaway **vanilla-web** sketch (`prototype/zone-a/index.html`) validated
+  the *design* end-to-end (characters, water, bridge, Rift, feel).
+
+The choice was Bevy vs. staying vanilla-web.
+
+## Decision
+
+Adopt **Bevy** (pure-Rust ECS engine) as the L3 engine.
+
+* Pure Rust → zero seam to `slavia-core`; the rules stay verifiable.
+* Scales to the whole trilogy (ECS, plugin ecosystem, native + wasm export)
+  where a hand-rolled web canvas would not.
+* Estate-clean (no Node/npm/TypeScript).
+
+The **vanilla-web sketch is retained**, not discarded — it becomes the fast
+*visual whiteboard* (instant reload) for trying design/art ideas before they are
+committed to Bevy, and a shareable demo. Bevy is the production foundation.
+
+## Consequences
+
+### Positive
+
+- One language end to end; the sacred logic remains provable.
+- A foundation that carries Chronicles I–III without re-platforming.
+
+### Negative
+
+- Slower iteration loop than the web sketch: build + run, no hot reload; and in
+  the headless build environment the agent can compile/verify but cannot *see*
+  the window — the owner is the eyes, so visual work moves in larger increments.
+- Bevy's retained sprite/ECS model does not 1:1 port the web sketch's
+  immediate-mode canvas drawing; the procedural art is re-expressed with sprites
+  (and, later, real art assets), not copied.
+
+### Neutral
+
+- Keeps `slavia-core` and the SGS untouched (engine-agnostic by design).
+- The web sketch and Bevy build may diverge; the sketch is the whiteboard, Bevy
+  is canonical.

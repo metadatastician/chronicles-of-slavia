@@ -33,3 +33,23 @@ being split. Their backstories (`09-anya-and-donna-backstories.md`) are not
 decoration — they are the game's emotional engine, and the guardian spirit
 itself is glimpsed later (Zone E, `08-level1-five-zone-map.md`) and gathered
 piece by piece (Guardian Spirit Fragment collectibles) before that.
+
+## Identity — you wear the answer to who you become
+
+Slavia's core question is *"what do you become when the world breaks?"*
+(`00-start-here.md`). The answer is not spoken — it is **worn**. Three designs
+that began apart are one system seen three ways:
+
+- the **path** each girl leans into (her class — `04`);
+- the **patterns** she weaves into her dress (the facilities she chooses — `17`);
+- and how the **world reads her** for it (welcome, trust, how nature and spirits
+  respond — `06`, `16`, `17`).
+
+> The path you choose is what you weave; what you weave is what you wear; what
+> you wear is what the world reads. **You wear the answer to who you have become.**
+
+This rests on a three-dimensional model of dress — **biological** (protect ↔
+expose), **psychological** (reveal ↔ conceal), **social** (include ↔ exclude) —
+detailed in `17`. Its philosophical frame is dialectical, a phenomenological
+body–self–other triad, with the social axis Simmelian (belonging vs
+distinction).
