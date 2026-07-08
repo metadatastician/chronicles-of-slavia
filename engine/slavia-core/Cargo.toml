@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+[package]
+name = "slavia-core"
+version = "0.0.0"
+edition = "2021"
+license = "MPL-2.0"
+description = "Slavia rules core (Layer 2) — the emotional-grammar engine, renderer-agnostic."
+publish = false
+
+# Kept intentionally tiny and wasm-friendly: this crate must compile to
+# wasm32-unknown-unknown unchanged when the first renderer (L3) arrives.
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
