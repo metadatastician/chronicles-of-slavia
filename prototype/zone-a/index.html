@@ -52,8 +52,8 @@ const tap  = c => tapped.has(c);
 
 // ---- world layout ---------------------------------------------------------
 const GROUND = 560;
-const GORGE = { x0: 575, x1: 745 };            // the stream gap (wide: unjumpable open water)
-const WADE = { wet: 12, waist: 30, neck: 48 };  // px from each bank: wet(0)->waist(-1)->neck(-2); beyond = abyss(-3)
+const GORGE = { x0: 550, x1: 770 };            // the stream gap (wide open water; unjumpable)
+const WADE = { wet: 16, waist: 44, neck: 74 };  // px from each bank: wet(0)->waist(-1)->neck(-2); beyond = abyss(-3)
 const beats = {
   entrance: 140, grove: 340, shrine: 500, bridge: 660,
   ridge: 860, overlook: 1050, fracture: 1210
@@ -134,7 +134,12 @@ function update(dt) {
     if (edge > WADE.neck) {                                    // the abyss — she won't chance it
       a.x = (cxg < mid ? GORGE.x0 + WADE.neck : GORGE.x1 - WADE.neck) - a.w/2;
       edge = WADE.neck;
-      if (!a.swamMsg) { say('That water is black and bottomless — she won’t take her chances. Only Donna can steady the crossing.', 4); a.swamMsg = true; }
+      if (!a.swamMsg) {
+        say(a.id === 'anya'
+          ? 'Anya: “I don’t like my chances!”'
+          : 'Donna: “Why didn’t I just stabilise the bridge, Anya?”', 4.5);
+        a.swamMsg = true;
+      }
     }
     if (edge <= WADE.wet)        depth = 0.08;                 // level 0: wet feet, splashes
     else if (edge <= WADE.waist) depth = ducking ? 0.78 : 0.40;  // level -1: waist (HEAD if ducking)
@@ -325,20 +330,24 @@ function drawForest(d){
   }
 }
 function drawStreamAndBridge(d){
-  // the stream — tiered depth, visible side-on: wet/waist (light) -> neck (mid)
-  //   -> abyss (near-black, menacing) in the middle
+  // the stream — depth STRATA seen side-on: light shallow at the banks, each
+  //   inner band a darker BLUE (a stratum), the deepest fading down off-screen —
+  //   deep water with an unseen bottom, NOT a black chasm
   const gw = GORGE.x1 - GORGE.x0;
-  ctx.fillStyle = mix('#4f97ba','#1b3a4a', d); ctx.fillRect(GORGE.x0, GROUND, gw, 160);
-  ctx.fillStyle = mix('#79b8d6','#244652', d);
-  ctx.fillRect(GORGE.x0, GROUND, WADE.waist, 160);
-  ctx.fillRect(GORGE.x1 - WADE.waist, GROUND, WADE.waist, 160);
-  ctx.fillStyle = mix('#06192a','#020a12', d);
-  ctx.fillRect(GORGE.x0 + WADE.neck, GROUND, gw - 2*WADE.neck, 160);
-  // menacing shimmer over the abyss
-  ctx.strokeStyle = 'rgba(90,140,180,0.18)';
-  for (let i=0;i<4;i++){ const yy=GROUND+14+i*20;
-    ctx.beginPath(); ctx.moveTo(GORGE.x0+WADE.neck, yy);
-    ctx.lineTo(GORGE.x1-WADE.neck, yy+Math.sin(performance.now()*0.0015+i)*4); ctx.stroke(); }
+  const band = (inset, w, top, bot) => {
+    const bg = ctx.createLinearGradient(0, GROUND, 0, GROUND+160);
+    bg.addColorStop(0, top); bg.addColorStop(1, bot);
+    ctx.fillStyle = bg; ctx.fillRect(GORGE.x0 + inset, GROUND, w, 160);
+  };
+  band(0,           gw,               mix('#82c2dd','#2c4e5e', d), mix('#3f83a0','#123240', d)); // shallow
+  band(WADE.waist,  gw-2*WADE.waist,  mix('#4f9dc0','#20465a', d), mix('#26647e','#0c2836', d)); // mid
+  band(WADE.neck,   gw-2*WADE.neck,   mix('#2d7196','#123a4e', d), mix('#103a58','#06141f', d)); // deep, fades down
+  // stratum boundaries (contour edges) + a slow deep shimmer
+  ctx.strokeStyle = 'rgba(160,205,230,0.22)'; ctx.lineWidth = 1;
+  for (const bx of [WADE.waist, WADE.neck]){
+    ctx.beginPath(); ctx.moveTo(GORGE.x0+bx, GROUND); ctx.lineTo(GORGE.x0+bx, GROUND+150); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(GORGE.x1-bx, GROUND); ctx.lineTo(GORGE.x1-bx, GROUND+150); ctx.stroke();
+  }
 
   // bridge planks
   const stable = state.bridgeStable;
@@ -357,14 +366,12 @@ function drawStreamAndBridge(d){
 }
 function drawWaterOverlay(){
   if (state.bridgeStable) return;                     // the bridge covers the water
-  const gw = GORGE.x1 - GORGE.x0;
-  const surf = (x,w,a1,a2)=>{ const g=ctx.createLinearGradient(0,GROUND,0,GROUND+55);
-    g.addColorStop(0,a1); g.addColorStop(1,a2); ctx.fillStyle=g; ctx.fillRect(x,GROUND,w,110); };
-  // wade bands (light, translucent — you can see her in it) then the abyss (dark, near-opaque)
-  surf(GORGE.x0, WADE.neck, 'rgba(130,185,215,0.40)', 'rgba(45,95,125,0.65)');
-  surf(GORGE.x1-WADE.neck, WADE.neck, 'rgba(130,185,215,0.40)', 'rgba(45,95,125,0.65)');
-  surf(GORGE.x0+WADE.neck, gw-2*WADE.neck, 'rgba(14,40,60,0.82)', 'rgba(2,10,20,0.95)');
-  ctx.strokeStyle='rgba(210,235,255,0.4)'; ctx.lineWidth=1;
+  // a LIGHT translucent surface film — occludes submerged legs but never reads
+  //   as a void; the depth colour comes from the stream strata behind
+  const surfG = ctx.createLinearGradient(0, GROUND, 0, GROUND+50);
+  surfG.addColorStop(0, 'rgba(150,200,225,0.26)'); surfG.addColorStop(1, 'rgba(72,130,160,0.40)');
+  ctx.fillStyle = surfG; ctx.fillRect(GORGE.x0, GROUND, GORGE.x1-GORGE.x0, 90);
+  ctx.strokeStyle='rgba(225,240,255,0.5)'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(GORGE.x0,GROUND); ctx.lineTo(GORGE.x1,GROUND); ctx.stroke();
   for (const g of [state.anya, state.donna]){
     const d = g.depth || 0; if (d <= 0.02) continue;
