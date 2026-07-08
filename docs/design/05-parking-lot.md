@@ -66,12 +66,34 @@ Full mechanic (later): position each girl tactically while held, then a
 Road to Eden*. A natural home for set-piece puzzle/encounter beats; pairs with
 the combined-ability system (`11`).
 
-## Deep water / reeds (later)
+## Water has NATURES — the swimming problem, solved (design note)
 
-The gorge is swimmable now (wade → skirt-deep with the skirt fanning on the
-surface → head above; slowed; the far bank an unclimbable cliff; linger to cool
-off, tread deep too long and the current returns you). Later: **reeds** to grab
-and go deeper, currents, hazards — the water as a real traversal space.
+The tension: it's out of character for two capable girls to "not swim," but a
+game where they swim everything loses water as a barrier. Resolution — **don't
+make a blanket no-swimming rule; give water *natures*, exactly like animals have
+natures** (`03`, `07`). They swim ordinary water freely; only *specific* water
+is a hazard:
+
+- **Shallow / ordinary water = free traversal** — wade, cool off, splash. This
+  is where the girls visibly ARE competent swimmers, so the character holds.
+  (Ducking in waist-deep submerges to the head — a natural **stealth/hide**
+  move, e.g. from the marauder.)
+- **Deep "abyss" water = a specific lethal hazard, refused by *judgment* not
+  incompetence.** Framings (pick/mix): (1) **Rift-charged** — the deep channels
+  are where the world's tear runs; that water is "between", and to enter is to
+  be *taken* by the Rift (not drowned — worse/mythic). Ties straight to the core
+  theme, and makes **Donna's stilling** the answer (she calms the fracture into
+  a crossing). (2) **Cold, fast Carpathian/Rhodope snowmelt torrent** — genuinely
+  lethal to anyone; refusing is smart. So the tiered gorge already tells the
+  story: they wade and cool off happily; they simply won't dive a black,
+  bottomless Rift-torrent.
+- **Means open deep water later** (so it's a gated puzzle space, never a flat
+  wall): **reeds** to grab, a raft/log or buoyant object, a calm stretch, Donna
+  *stilling* a span, currents, hazards. Deep water becomes traversable with the
+  right tool — never "you can't swim", always "not THIS, not without means".
+
+Prototype now: gorge is tiered wet(0) → waist(-1, head-if-ducking) → neck(-2) →
+abyss(-3, black/menacing, refused). Only Donna's bridge crosses.
 
 ## Full Chronicle I
 

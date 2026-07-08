@@ -53,6 +53,7 @@ const tap  = c => tapped.has(c);
 // ---- world layout ---------------------------------------------------------
 const GROUND = 560;
 const GORGE = { x0: 575, x1: 745 };            // the stream gap (wide: unjumpable open water)
+const WADE = { wet: 12, waist: 30, neck: 48 };  // px from each bank: wet(0)->waist(-1)->neck(-2); beyond = abyss(-3)
 const beats = {
   entrance: 140, grove: 340, shrine: 500, bridge: 660,
   ridge: 860, overlook: 1050, fracture: 1210
@@ -117,45 +118,44 @@ function update(dt) {
   if (held('KeyA') || held('ArrowLeft'))  dx -= 1;
   if (held('KeyD') || held('ArrowRight')) dx += 1;
 
-  // water depth across the gorge: 0 at the banks, deepest in the middle (open
-  // water until Donna steadies the bridge). She can wade in, cool off, and swim,
-  // but the far bank is an unclimbable cliff — only the bridge lets her cross.
-  const cx0 = a.x + a.w/2;
-  const t = (cx0 - GORGE.x0) / (GORGE.x1 - GORGE.x0);
-  const depth = (t > 0 && t < 1 && !state.bridgeStable)
-    ? Math.sin(Math.max(0, Math.min(1, t)) * Math.PI) : 0;
-  const inWater = depth > 0.02;
-
+  // --- water: tiered, visible side-on. wet(0) -> waist(-1, HEAD if ducking)
+  //     -> neck(-2) -> abyss(-3): black, bottomless, uncrossable. The girls swim
+  //     fine — they just won't dive a lethal Rift-torrent. Only the bridge crosses.
   let spd = a.speed * (running ? 1.7 : 1) * (ducking ? 0.4 : 1);
-  spd *= 1 - depth * 0.6;                            // wading slows with depth
+  spd *= 1 - (a.depth || 0) * 0.7;                   // wading slows (last frame's depth)
   a.x += dx * spd * dt * 60;
   if (dx !== 0) a.facing = dx > 0 ? 1 : -1;
 
-  // jump — from solid, near-dry ground only (you can't leap out of deep water)
-  if ((tap('Space') || tap('ArrowUp')) && a.onGround && !ducking && depth < 0.15) {
+  let depth = 0;
+  const cxg = a.x + a.w/2;
+  if (cxg > GORGE.x0 && cxg < GORGE.x1 && !state.bridgeStable) {
+    const mid = (GORGE.x0 + GORGE.x1) / 2;
+    let edge = Math.min(cxg - GORGE.x0, GORGE.x1 - cxg);      // px from the nearest bank
+    if (edge > WADE.neck) {                                    // the abyss — she won't chance it
+      a.x = (cxg < mid ? GORGE.x0 + WADE.neck : GORGE.x1 - WADE.neck) - a.w/2;
+      edge = WADE.neck;
+      if (!a.swamMsg) { say('That water is black and bottomless — she won’t take her chances. Only Donna can steady the crossing.', 4); a.swamMsg = true; }
+    }
+    if (edge <= WADE.wet)        depth = 0.08;                 // level 0: wet feet, splashes
+    else if (edge <= WADE.waist) depth = ducking ? 0.78 : 0.40;  // level -1: waist (HEAD if ducking)
+    else                         depth = 0.60;                 // level -2: neck
+  } else {
+    a.swamMsg = false;
+  }
+  const inWater = depth > 0.02;
+
+  // jump — from near-dry ground only
+  if ((tap('Space') || tap('ArrowUp')) && a.onGround && !ducking && depth < 0.2) {
     a.vy = -12 - a.verve * 4.5; a.onGround = false;
   }
 
   if (inWater) {
     a.onGround = false; a.depth = depth;
-    // submerge by depth: wet feet -> skirts -> just head above; gentle bob
-    const targetY = GROUND - a.h + depth * a.h * 0.80 + Math.sin(a.idle * 2) * 1.2;
+    const targetY = GROUND - a.h + depth * a.h * 0.85 + Math.sin(a.idle * 2) * 1.0;
     a.y += (targetY - a.y) * Math.min(1, dt * 7); a.vy = 0;
-    a.x = Math.min(a.x, GORGE.x1 - a.w * 0.5 - 2);   // reach the far bank, can't climb it
-    // treading DEEP water tires; the shallows are fine to linger in (cooling off)
-    a.swimT = depth > 0.55 ? a.swimT + dt : Math.max(0, a.swimT - dt * 1.5);
-    if (!a.swamMsg && depth > 0.4) {
-      say('Deep water — she can wade and cool off, but the far bank is too high. Only Donna can steady the crossing.', 4);
-      a.swamMsg = true;
-    }
-    if (a.swimT > 6) {                                // the current takes her back
-      a.x = Math.max(40, a.lastSafeX - 25); a.y = GROUND - a.h; a.vy = 0;
-      a.onGround = true; a.swimT = 0; a.swamMsg = false; a.depth = 0;
-      say('The current pulls her back to the bank.', 3);
-    }
   } else {
     if (a.onGround) a.lastSafeX = a.x;
-    a.depth = 0; a.swimT = 0; a.swamMsg = false;
+    a.depth = 0;
     a.vy += 34 * dt; a.y += a.vy * dt * 60;
     const floor = GROUND - a.h;
     if (a.y >= floor) { a.y = floor; a.vy = 0; a.onGround = true; }
@@ -325,14 +325,20 @@ function drawForest(d){
   }
 }
 function drawStreamAndBridge(d){
-  // the stream in the gorge
-  const g = ctx.createLinearGradient(0, GROUND-30, 0, GROUND+120);
-  g.addColorStop(0, mix('#5aa0c8','#20303e',d)); g.addColorStop(1, mix('#20567a','#0b1a26',d));
-  ctx.fillStyle = g; ctx.fillRect(GORGE.x0, GROUND, GORGE.x1-GORGE.x0, 160);
-  // shimmer
-  ctx.strokeStyle = `rgba(200,230,255,${0.25-d*0.2})`;
-  for (let i=0;i<4;i++){ ctx.beginPath(); const yy=GROUND+30+i*22;
-    ctx.moveTo(GORGE.x0, yy); ctx.lineTo(GORGE.x1, yy+Math.sin(performance.now()*0.002+i)*3); ctx.stroke(); }
+  // the stream — tiered depth, visible side-on: wet/waist (light) -> neck (mid)
+  //   -> abyss (near-black, menacing) in the middle
+  const gw = GORGE.x1 - GORGE.x0;
+  ctx.fillStyle = mix('#4f97ba','#1b3a4a', d); ctx.fillRect(GORGE.x0, GROUND, gw, 160);
+  ctx.fillStyle = mix('#79b8d6','#244652', d);
+  ctx.fillRect(GORGE.x0, GROUND, WADE.waist, 160);
+  ctx.fillRect(GORGE.x1 - WADE.waist, GROUND, WADE.waist, 160);
+  ctx.fillStyle = mix('#06192a','#020a12', d);
+  ctx.fillRect(GORGE.x0 + WADE.neck, GROUND, gw - 2*WADE.neck, 160);
+  // menacing shimmer over the abyss
+  ctx.strokeStyle = 'rgba(90,140,180,0.18)';
+  for (let i=0;i<4;i++){ const yy=GROUND+14+i*20;
+    ctx.beginPath(); ctx.moveTo(GORGE.x0+WADE.neck, yy);
+    ctx.lineTo(GORGE.x1-WADE.neck, yy+Math.sin(performance.now()*0.0015+i)*4); ctx.stroke(); }
 
   // bridge planks
   const stable = state.bridgeStable;
@@ -351,10 +357,14 @@ function drawStreamAndBridge(d){
 }
 function drawWaterOverlay(){
   if (state.bridgeStable) return;                     // the bridge covers the water
-  const wg = ctx.createLinearGradient(0, GROUND, 0, GROUND+70);
-  wg.addColorStop(0, 'rgba(74,150,190,0.5)'); wg.addColorStop(1, 'rgba(28,74,112,0.85)');
-  ctx.fillStyle = wg; ctx.fillRect(GORGE.x0, GROUND, GORGE.x1-GORGE.x0, 130);
-  ctx.strokeStyle='rgba(210,235,255,0.45)'; ctx.lineWidth=1;
+  const gw = GORGE.x1 - GORGE.x0;
+  const surf = (x,w,a1,a2)=>{ const g=ctx.createLinearGradient(0,GROUND,0,GROUND+55);
+    g.addColorStop(0,a1); g.addColorStop(1,a2); ctx.fillStyle=g; ctx.fillRect(x,GROUND,w,110); };
+  // wade bands (light, translucent — you can see her in it) then the abyss (dark, near-opaque)
+  surf(GORGE.x0, WADE.neck, 'rgba(130,185,215,0.40)', 'rgba(45,95,125,0.65)');
+  surf(GORGE.x1-WADE.neck, WADE.neck, 'rgba(130,185,215,0.40)', 'rgba(45,95,125,0.65)');
+  surf(GORGE.x0+WADE.neck, gw-2*WADE.neck, 'rgba(14,40,60,0.82)', 'rgba(2,10,20,0.95)');
+  ctx.strokeStyle='rgba(210,235,255,0.4)'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(GORGE.x0,GROUND); ctx.lineTo(GORGE.x1,GROUND); ctx.stroke();
   for (const g of [state.anya, state.donna]){
     const d = g.depth || 0; if (d <= 0.02) continue;
@@ -364,9 +374,9 @@ function drawWaterOverlay(){
       ctx.fillStyle = (g.id==='anya') ? 'rgba(94,29,42,0.5)' : 'rgba(34,29,44,0.5)';
       ctx.beginPath(); ctx.ellipse(gx, GROUND, g.w*0.7*(0.6+d), 5+d*4, 0, 0, 6.28); ctx.fill();
     }
-    // splash ripples at the waterline
+    // splash ripples at the waterline (level 0 wet / moving)
     if (Math.abs(g.vx) > 0.3 || d < 0.2){
-      ctx.strokeStyle='rgba(230,245,255,0.55)';
+      ctx.strokeStyle='rgba(230,245,255,0.6)';
       for (let r=0;r<3;r++){ const rr=6+r*7+Math.sin(g.idle*4+r)*2;
         ctx.beginPath(); ctx.arc(gx, GROUND, rr, Math.PI*1.05, Math.PI*1.95); ctx.stroke(); }
     }
