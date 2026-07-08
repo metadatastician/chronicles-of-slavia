@@ -52,6 +52,27 @@ Deferred subsystems of the animal ability:
 
 Zone A ships the base case only.
 
+## Tactical freeze / bullet-time (seeded in the prototype)
+
+Only the active girl is simulated, so an inactive girl **holds her pose and
+position** — mid-jump she hangs in the air; mid-duck she stays crouched. The
+prototype keeps this deliberately (duck now persists across a switch, matching
+the jump-hold). With jump→switch→jump you can even stage both girls suspended
+in the air together (bounded — you can't infinite-jump, since a jump needs solid
+ground).
+
+Full mechanic (later): position each girl tactically while held, then a
+**trigger event** springs them all into action at once — cf. *Mutant Year Zero:
+Road to Eden*. A natural home for set-piece puzzle/encounter beats; pairs with
+the combined-ability system (`11`).
+
+## Deep water / reeds (later)
+
+The gorge is swimmable now (wade → skirt-deep with the skirt fanning on the
+surface → head above; slowed; the far bank an unclimbable cliff; linger to cool
+off, tread deep too long and the current returns you). Later: **reeds** to grab
+and go deeper, currents, hazards — the water as a real traversal space.
+
 ## Full Chronicle I
 
 Not yet. First make Zone A work.

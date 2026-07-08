@@ -52,7 +52,7 @@ const tap  = c => tapped.has(c);
 
 // ---- world layout ---------------------------------------------------------
 const GROUND = 560;
-const GORGE = { x0: 596, x1: 724 };            // the stream gap the bridge spans
+const GORGE = { x0: 575, x1: 745 };            // the stream gap (wide: unjumpable open water)
 const beats = {
   entrance: 140, grove: 340, shrine: 500, bridge: 660,
   ridge: 860, overlook: 1050, fracture: 1210
@@ -70,6 +70,7 @@ function reset(introTime = 5.5) {
       y: 360, phase: Math.random() * 6.28, mood: 'neutral', flap: 0
     })),
     bridgeStable: false,
+    bridgeShake: 0,
     shrineRead: false,
     whole: false,
     rift: 0,                 // 0 = dormant, else rising 0..1
@@ -84,7 +85,8 @@ function girl(id, x, verve, speed) {
   // verve scales how energetically the body reacts (Anya high, Donna low).
   return { id, x, y: GROUND - 94, w: 36, h: 94, speed, verve,
            vy: 0, onGround: true, vx: 0, facing: 1, gait: 0, idle: 0,
-           walk: Math.random()*6, duck: 0, hairX: 0, hairY: 0 };
+           walk: Math.random()*6, duck: 0, hairX: 0, hairY: 0,
+           depth: 0, inWater: false, swimT: 0, swamMsg: false, lastSafeX: x };
 }
 reset();
 
@@ -97,6 +99,7 @@ let last = performance.now();
 function update(dt) {
   if (state.intro > 0) { state.intro -= dt; }
   if (state.msgT > 0) state.msgT -= dt;
+  if (state.bridgeShake > 0) state.bridgeShake -= dt;
 
   // switch girl
   if (tap('Tab')) {
@@ -113,24 +116,52 @@ function update(dt) {
   let dx = 0;
   if (held('KeyA') || held('ArrowLeft'))  dx -= 1;
   if (held('KeyD') || held('ArrowRight')) dx += 1;
-  const spd = a.speed * (running ? 1.7 : 1) * (ducking ? 0.4 : 1);
+
+  // water depth across the gorge: 0 at the banks, deepest in the middle (open
+  // water until Donna steadies the bridge). She can wade in, cool off, and swim,
+  // but the far bank is an unclimbable cliff — only the bridge lets her cross.
+  const cx0 = a.x + a.w/2;
+  const t = (cx0 - GORGE.x0) / (GORGE.x1 - GORGE.x0);
+  const depth = (t > 0 && t < 1 && !state.bridgeStable)
+    ? Math.sin(Math.max(0, Math.min(1, t)) * Math.PI) : 0;
+  const inWater = depth > 0.02;
+
+  let spd = a.speed * (running ? 1.7 : 1) * (ducking ? 0.4 : 1);
+  spd *= 1 - depth * 0.6;                            // wading slows with depth
   a.x += dx * spd * dt * 60;
   if (dx !== 0) a.facing = dx > 0 ? 1 : -1;
 
-  // the gorge is impassable until Donna steadies the bridge
-  if (!state.bridgeStable) {
-    if (dx > 0 && a.x + a.w > GORGE.x0 && a.x < GORGE.x0) a.x = GORGE.x0 - a.w;
-    if (dx < 0 && a.x < GORGE.x1 && a.x + a.w > GORGE.x1) a.x = GORGE.x1;
-  }
-  a.x = Math.max(40, Math.min(W - 40 - a.w, a.x));
-
-  // jump + gravity — Anya springs higher, Donna is planted (verve)
-  if ((tap('Space') || tap('ArrowUp')) && a.onGround && !ducking) {
+  // jump — from solid, near-dry ground only (you can't leap out of deep water)
+  if ((tap('Space') || tap('ArrowUp')) && a.onGround && !ducking && depth < 0.15) {
     a.vy = -12 - a.verve * 4.5; a.onGround = false;
   }
-  a.vy += 34 * dt; a.y += a.vy * dt * 60;
-  const floor = GROUND - a.h;
-  if (a.y >= floor) { a.y = floor; a.vy = 0; a.onGround = true; }
+
+  if (inWater) {
+    a.onGround = false; a.depth = depth;
+    // submerge by depth: wet feet -> skirts -> just head above; gentle bob
+    const targetY = GROUND - a.h + depth * a.h * 0.80 + Math.sin(a.idle * 2) * 1.2;
+    a.y += (targetY - a.y) * Math.min(1, dt * 7); a.vy = 0;
+    a.x = Math.min(a.x, GORGE.x1 - a.w * 0.5 - 2);   // reach the far bank, can't climb it
+    // treading DEEP water tires; the shallows are fine to linger in (cooling off)
+    a.swimT = depth > 0.55 ? a.swimT + dt : Math.max(0, a.swimT - dt * 1.5);
+    if (!a.swamMsg && depth > 0.4) {
+      say('Deep water — she can wade and cool off, but the far bank is too high. Only Donna can steady the crossing.', 4);
+      a.swamMsg = true;
+    }
+    if (a.swimT > 6) {                                // the current takes her back
+      a.x = Math.max(40, a.lastSafeX - 25); a.y = GROUND - a.h; a.vy = 0;
+      a.onGround = true; a.swimT = 0; a.swamMsg = false; a.depth = 0;
+      say('The current pulls her back to the bank.', 3);
+    }
+  } else {
+    if (a.onGround) a.lastSafeX = a.x;
+    a.depth = 0; a.swimT = 0; a.swamMsg = false;
+    a.vy += 34 * dt; a.y += a.vy * dt * 60;
+    const floor = GROUND - a.h;
+    if (a.y >= floor) { a.y = floor; a.vy = 0; a.onGround = true; }
+  }
+  a.inWater = inWater;
+  a.x = Math.max(40, Math.min(W - 40 - a.w, a.x));
 
   // per-girl reactive animation state (active is input-driven; the other rests)
   for (const g of [state.anya, state.donna]) {
@@ -138,7 +169,7 @@ function update(dt) {
     const tvx = isA ? dx * spd : 0;
     const ease = 0.12 + g.verve * 0.05;
     g.vx += (tvx - g.vx) * Math.min(1, dt * 60 * ease);
-    g.duck += (((isA && ducking) ? 1 : 0) - g.duck) * Math.min(1, dt * 12);
+    if (isA) g.duck += ((ducking ? 1 : 0) - g.duck) * Math.min(1, dt * 12);  // inactive: pose HOLDS (tactical freeze)
     const moving = g.onGround && Math.abs(g.vx) > 0.25;
     g.gait += ((moving ? 1 : 0) - g.gait) * Math.min(1, dt * 10);   // gait fades in/out
     if (moving) g.walk += dt * (6 + Math.abs(g.vx) * 1.2);          // only step when moving
@@ -183,13 +214,15 @@ function update(dt) {
     }
   }
 
-  // --- bridge: Donna steadies what Anya crosses ---
-  if (!state.bridgeStable && Math.abs(a.x + a.w/2 - beats.bridge) < 110) {
-    if (state.active === 'donna') {        // Donna's calm settles the crossing on approach
-      state.bridgeStable = true;
-      say('Donna steadies the crossing. Now Anya can cross.', 4);
-    } else if (tap('KeyE')) {
-      say('The crossing is unsteady — only Donna can settle it.', 3);
+  // --- bridge: only DONNA stills it; ANYA can only agitate it. Either may TRY
+  //     (press E); the opposition of their effects is itself the mechanic. ---
+  if (!state.bridgeStable && Math.abs(a.x + a.w/2 - beats.bridge) < 130 && tap('KeyE')) {
+    if (state.active === 'donna') {
+      state.bridgeStable = true; state.bridgeShake = 0;
+      say('Donna stills the crossing. Now it can be crossed.', 4);
+    } else {
+      state.bridgeShake = 1.6;   // Anya's stir sets it bucking — useless for crossing
+      say('Anya only sets the crossing bucking and bullwhipping — no use for crossing.', 3.5);
     }
   }
   // record the crossing
@@ -253,6 +286,8 @@ function draw() {
   drawGirl(other(), false);
   drawGirl(a, true);
 
+  drawWaterOverlay();   // over the girls, so submerged bodies read as underwater
+
   if (rift > 0) drawRift(rift);
 
   drawHUD();
@@ -301,16 +336,42 @@ function drawStreamAndBridge(d){
 
   // bridge planks
   const stable = state.bridgeStable;
+  const shake = (!stable && state.bridgeShake > 0) ? state.bridgeShake : 0;
   for (let i=0;i<6;i++){
     const px = GORGE.x0 - 6 + i*((GORGE.x1-GORGE.x0+12)/6);
     ctx.save();
-    if (!stable){ ctx.globalAlpha = 0.35; ctx.translate(0, 8 + Math.sin(i)*6); }
-    ctx.fillStyle = stable ? '#8a5a30' : '#4a3620';
+    const wobble = shake ? Math.sin(performance.now()*0.03 + i*1.7) * 11 * shake : 0;
+    if (!stable){ ctx.globalAlpha = 0.35 + shake*0.45; ctx.translate(0, 8 + Math.sin(i)*6 + wobble); }
+    ctx.fillStyle = stable ? '#8a5a30' : (shake ? '#7a4a26' : '#4a3620');
     ctx.fillRect(px, GROUND-6, (GORGE.x1-GORGE.x0+12)/6 - 3, 12);
     ctx.restore();
   }
   if (stable){ ctx.strokeStyle='rgba(120,200,255,0.4)'; ctx.lineWidth=2;
     ctx.strokeRect(GORGE.x0-8, GROUND-9, GORGE.x1-GORGE.x0+16, 18); ctx.lineWidth=1; }
+}
+function drawWaterOverlay(){
+  if (state.bridgeStable) return;                     // the bridge covers the water
+  const wg = ctx.createLinearGradient(0, GROUND, 0, GROUND+70);
+  wg.addColorStop(0, 'rgba(74,150,190,0.5)'); wg.addColorStop(1, 'rgba(28,74,112,0.85)');
+  ctx.fillStyle = wg; ctx.fillRect(GORGE.x0, GROUND, GORGE.x1-GORGE.x0, 130);
+  ctx.strokeStyle='rgba(210,235,255,0.45)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(GORGE.x0,GROUND); ctx.lineTo(GORGE.x1,GROUND); ctx.stroke();
+  for (const g of [state.anya, state.donna]){
+    const d = g.depth || 0; if (d <= 0.02) continue;
+    const gx = g.x + g.w/2;
+    // skirt fanning on the surface (skirt-deep)
+    if (d > 0.12 && d < 0.72){
+      ctx.fillStyle = (g.id==='anya') ? 'rgba(94,29,42,0.5)' : 'rgba(34,29,44,0.5)';
+      ctx.beginPath(); ctx.ellipse(gx, GROUND, g.w*0.7*(0.6+d), 5+d*4, 0, 0, 6.28); ctx.fill();
+    }
+    // splash ripples at the waterline
+    if (Math.abs(g.vx) > 0.3 || d < 0.2){
+      ctx.strokeStyle='rgba(230,245,255,0.55)';
+      for (let r=0;r<3;r++){ const rr=6+r*7+Math.sin(g.idle*4+r)*2;
+        ctx.beginPath(); ctx.arc(gx, GROUND, rr, Math.PI*1.05, Math.PI*1.95); ctx.stroke(); }
+    }
+  }
+  ctx.lineWidth=1;
 }
 function drawShrine(){
   const x = beats.shrine, y = GROUND-96;
@@ -487,9 +548,17 @@ function drawGirl(g, activeOne){
   if (anya){ ctx.fillStyle=CORAL;
     for (let b=-3;b<=3;b++){ ctx.beginPath(); ctx.arc(b*2.2, yNeck, 1.4, 0, 6.28); ctx.fill(); } }
 
-  // neck + head
+  // neck (fixed to the torso)
   ctx.fillStyle=SKIN; ctx.fillRect(-2.5, yNeck-2, 5, 5);
-  ctx.beginPath(); ctx.arc(0, yHead, rHead, 0, 6.28); ctx.fill();
+
+  // head assembly — shifts toward the way she's walking so she faces a direction
+  ctx.save();
+  ctx.translate(gait * 3, 0);
+  ctx.fillStyle=SKIN; ctx.beginPath(); ctx.arc(0, yHead, rHead, 0, 6.28); ctx.fill();
+  // nose: a clear facing cue — flips with `facing`, so left/right reads instantly
+  ctx.beginPath();
+  ctx.moveTo(rHead*0.75, yHead-1); ctx.lineTo(rHead*1.3, yHead+1.5); ctx.lineTo(rHead*0.7, yHead+3.5);
+  ctx.closePath(); ctx.fill();
 
   if (anya){
     // flowing auburn hair (trails with hairX, lifts with hairLift)
@@ -530,6 +599,7 @@ function drawGirl(g, activeOne){
     ctx.strokeStyle = RHODOPE_STRIPE; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(-rHead-1, yHead-1); ctx.quadraticCurveTo(0, yHead - rHead*1.5, rHead+1, yHead-1); ctx.stroke();
   }
+  ctx.restore();   // end head assembly (facing shift)
   ctx.lineWidth=1;
   ctx.restore();
 

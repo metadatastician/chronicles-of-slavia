@@ -219,6 +219,35 @@ girls have the *gift*; the *goal* is open to other means. Crossing itself is not
 a power — anyone crosses what is passable; the puzzle is that *something* must
 first make it so.
 
+## Opposition as a mechanic — stir vs still, on the world (not just animals)
+
+The taxis duality applies to **things**, not only creatures. For anything Donna
+can *still* (settle / stabilise / calm / steady), Anya can do the **opposite**
+(stir / loosen / destabilise / agitate) — and *that opposition is itself the
+mechanic* the player wields on the world.
+
+- **Only Donna can stabilise; only Anya can agitate.** Neither can do the
+  other's act. Either girl may *try* on a given object; the result depends on
+  which of them it is.
+- **The bridge is the first example.** Donna stills the crossing → it can be
+  crossed. Anya can only set it **bucking and bullwhipping** — useless for
+  *crossing*, but not useless: an agitated span could later **deter enemies**
+  from following.
+- **The "useless" half is the point.** A destabilise that helps nothing *here*
+  is the exact tool that helps *elsewhere* — the design should keep finding
+  those inversions.
+
+### Zone A climax idea (deferred): the marauder
+
+A candidate ending for Level 1's approach: after Donna stills the bridge and the
+Rift opens, a **marauder** hunting the girls appears from the far side. The
+level resolves not by fighting but by **Anya agitating the crossing** — setting
+it bucking to throw off / bar the marauder — the moment her *destabilising*
+becomes the answer. This pays off the opposition mechanic and gives Anya an
+active climax. **Scope note:** past the current prototype (Zone A is the calm
+prelude); it belongs at the Zone A → Zone B (Fracture) hinge — see
+`08-level1-five-zone-map.md`, `05-parking-lot.md`.
+
 ## Zone A scope — base only
 
 None of the above is active in Zone A. Zone A ships **only** the base case:
