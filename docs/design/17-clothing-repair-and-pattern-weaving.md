@@ -73,6 +73,26 @@ In-scale examples (owner defines the real set — these only calibrate scale):
 So the tree deepens the *existing* relationship with the living world; it does
 not hand out ultimates.
 
+### The tree = facilities & chosen paths (Civ-like), not power spikes
+
+Picture the weave-tree like a **Civilization** tech tree in *shape only*: you
+"took this and chose this way", so now you have the **facility** to do certain
+things and branches to grow toward — you did *not* "become the Terminator". Its
+payoffs are grounded **facilities and consequences of the pattern's meaning**,
+often *incidental*:
+
+- a **facility that helps problem-solving** (reading a place, sensing a herb,
+  steadier hands);
+- **different reactions from some people** (the social/recognition layer above);
+- a **coincidental** practical benefit — e.g. a woodland motif that simply
+  *blends*, so she's better camouflaged: not a "stealth power", just what the
+  pattern *is*.
+
+Because it is choice-and-path, the weave-tree is the **worn expression of the
+class leanings** (`04`: Runner/Flicker/Wildheart · Pillar/Architect/Guardian)
+and of the core question — *what do you become when the world breaks?* You wear
+the answer.
+
 ## Cloth-state colours three things (subtle, not stats-heavy)
 
 Condition gently shades: **physical** protection, **psychological** steadiness
