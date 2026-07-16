@@ -130,25 +130,32 @@ clean-all: clean
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Run all tests
+#
+# This recipe IS the golden path named in ANCHOR: Zone A's five-beat spec
+# holds, the ESM testbed passes, L2 stays deterministic. Nothing here may
+# announce a pass — the runner's exit code is the evidence, and `just` aborts
+# the recipe on any non-zero. Doctrine 3: no silent green.
 test *args:
     @echo "Running tests..."
-    # TODO: Replace with your test command
-    # Examples:
-    #   cargo test {{args}}
-    #   mix test {{args}}
-    #   zig build test {{args}}
-    #   deno test {{args}}
-    @echo "Tests passed!"
+    # L2 — the sacred logic. tests/zone_a.rs is the executable statement of the
+    # five-beat spec; tests/esm_testbed.rs proves belief stays local, that
+    # confidence is the solver's solution count, and that the Guilty Conscience
+    # trap stays emergent rather than coded.
+    cd engine && cargo test -p slavia-core {{ args }}
+    # L3 — the play controller. --no-default-features drops Bevy so this runs
+    # headless (no display, no libwayland). See engine/README.adoc.
+    cd engine && cargo test -p slavia-zone-a --no-default-features {{ args }}
 
 # Run tests with verbose output
 test-verbose:
     @echo "Running tests (verbose)..."
-    # TODO: Replace with verbose test command
+    cd engine && cargo test -p slavia-core -- --nocapture
+    cd engine && cargo test -p slavia-zone-a --no-default-features -- --nocapture
 
-# Smoke test
+# Smoke test — the five beats alone; the fastest proof the core still holds
 test-smoke:
     @echo "Smoke test..."
-    # TODO: Add basic sanity checks
+    cd engine && cargo test -p slavia-core --test zone_a
 
 # Run end-to-end tests (full pipeline: build → run → verify)
 e2e:
@@ -232,30 +239,29 @@ fix: fmt
 # Format all source files [reversible: git checkout]
 fmt:
     @echo "Formatting source files..."
-    # TODO: Replace with your formatter
-    # Examples:
-    #   cargo fmt
-    #   mix format
-    #   gleam format
-    #   deno fmt
+    cd engine && cargo fmt --all
 
 # Check formatting without changes
 fmt-check:
     @echo "Checking formatting..."
-    # TODO: Replace with your format check
-    # Examples:
-    #   cargo fmt --check
-    #   mix format --check-formatted
-    #   gleam format --check
+    cd engine && cargo fmt --all --check
 
 # Run linter
+#
+# Scoped to match `test`: the core strictly, the renderer without Bevy. Linting
+# the full Bevy tree would cost ~70s and need the system X11 dev libs — and an
+# unrunnable gate becomes a skipped gate.
+#
+# `-A dead_code` on the renderer is a scoping fix, not a suppression. Under
+# --no-default-features the Bevy layer is cfg'd out, so everything it calls
+# looks unused; the items are live in the real build. Verified: `cargo check
+# -p slavia-zone-a` (Bevy on) reports none of them. Linting dead_code in a
+# config that structurally cannot see the callers would be gate theatre.
+# L2 gets no such exemption — it has no cfg'd-out callers and is held strict.
 lint:
     @echo "Linting source files..."
-    # TODO: Replace with your linter
-    # Examples:
-    #   cargo clippy -- -D warnings
-    #   mix credo --strict
-    #   gleam check
+    cd engine && cargo clippy -p slavia-core --all-targets -- -D warnings
+    cd engine && cargo clippy -p slavia-zone-a --no-default-features --all-targets -- -D warnings -A dead_code
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # RUN & EXECUTE
