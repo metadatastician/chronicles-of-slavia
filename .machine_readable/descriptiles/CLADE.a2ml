@@ -1,26 +1,63 @@
 # SPDX-License-Identifier: MPL-2.0
 # Clade declaration — part of the gv-clade-index registry
 # See: https://github.com/hyperpolymath/gv-clade-index
+#
+# THE UUID IS DERIVED, NOT ALLOCATED. The registry spec
+# (gv-clade-index: docs/SPEC-clade-verisim-portal.adoc §Identity Model) defines it as:
+#
+#     uuid = UUIDv5(namespace = URL, name = "github.com/hyperpolymath/<canonical-name>")
+#
+# So it is a fact anyone can recompute and check, not a choice. The value below was
+# derived that way, and the method was verified first by reproducing the registry's
+# own worked example (januskey → e216170e-ff47-5a5c-bbdd-15e61c8190c8) byte-for-byte.
+#
+# CORRECTED 2026-07-16. This file previously declared uuid
+# a5ea1382-a34c-5334-8a46-a2ebe904c810 with canonical-name `rsr-template-repo` —
+# inherited verbatim from the template this repo was instantiated from, and never
+# re-derived. That UUID is rsr-template-repo's own genuine identity, so this repo
+# was wearing another repo's name and telling every arriving agent it was the
+# template. (paint-type and scaffoldia carry the same inherited UUID and have the
+# same bug; fixing them is out of scope here — reported to the owner instead.)
 
 [identity]
-uuid = "a5ea1382-a34c-5334-8a46-a2ebe904c810"
+uuid = "b1507e91-78ca-5d30-a66c-dc675ad678f0"
 primary-forge = "github"
 primary-owner = "hyperpolymath"
-canonical-name = "rsr-template-repo"
-prefixed-name = "rm-rsr-template-repo"
+canonical-name = "chronicles-of-slavia"
+prefixed-name = "gm-chronicles-of-slavia"
 
 [clade]
-primary = "rm"
-secondary = ["gv"]
-assigned = "2026-03-16"
-rationale = ""
+primary = "gm"
+secondary = []
+assigned = "2026-07-16"
+rationale = "Games & Interactive (`gm`): the core value proposition is a playable narrative game. The rules core, the authoring schema, and the engine all exist to serve it. `fv` is deliberately NOT claimed as a secondary — the Idris2 and Zig present here are inherited RSR ABI/FFI scaffolding, not this project's value proposition. Per the registry spec, the primary clade reflects the core value proposition, not implementation details."
 
 [forges]
-github = "hyperpolymath/rsr-template-repo"
-gitlab = "hyperpolymath/rsr-template-repo"
-bitbucket = "hyperpolymath/rsr-template-repo"
+github = "hyperpolymath/chronicles-of-slavia"
+gitlab = ""       # populated if/when mirrored
+bitbucket = ""    # populated if/when mirrored
 
 [lineage]
 type = "standalone"
-parent = "RSR template — scaffold for new repos"
-born = "2026-03-16"
+parent = ""                             # no monorepo parent; `standalone` per spec
+born = "2026-07-06"                     # first commit
+previous-names = []
+instantiated-from = "rsr-template-repo"
+
+# ---------------------------------------------------------------------------
+# REGISTRATION STATUS: NOT REGISTERED.
+#
+# `chronicles-of-slavia` does not appear anywhere in gv-clade-index. The UUID above
+# is correctly derived and self-checking, but DERIVING an identity is not the same
+# as REGISTERING one. Registration is outward-facing, so it is the owner's to do
+# (doctrine 11, stop-first); an agent must not.
+#
+# Deliberately NOT pre-empted here — the owner has flagged both as wanted but not
+# yet a priority:
+#   * the intended move to the `metadatastician` org
+#   * internal (organisation-visible) rather than public visibility
+#
+# Either would change `primary-owner`, and the UUID is derived FROM the owner path,
+# so the UUID changes with it. This file records what is TRUE TODAY, which is
+# `hyperpolymath/chronicles-of-slavia` (confirmed against `git remote -v`).
+# ---------------------------------------------------------------------------

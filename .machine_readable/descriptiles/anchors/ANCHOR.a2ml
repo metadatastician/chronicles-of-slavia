@@ -1,15 +1,22 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright (c) {{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}}) <{{AUTHOR_EMAIL}}>
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # ANCHOR.a2ml - authoritative anchor for this repository
+#
+# FILLED IN 2026-07-16. Every field below was previously an unsubstituted
+# {{PLACEHOLDER}} token — `just init` was never run, or never finished. The
+# attribution line above was `{{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}})
+# <{{AUTHOR_EMAIL}}>`; it is filled from the identical string used by every
+# sibling descriptile in this repo (a copy, not an invention). The
+# SPDX-License-Identifier is untouched.
 
 [metadata]
 version = "1.0.0"
-last-updated = "{{CURRENT_DATE}}"
+last-updated = "2026-07-16"
 
 [anchor]
 schema = "hyperpolymath.anchor/1"
-repo = "{{OWNER}}/{{REPO}}"
+repo = "hyperpolymath/chronicles-of-slavia"
 authority = "upstream-canonical"
 
 purpose = [
@@ -19,23 +26,36 @@ purpose = [
 ]
 
 [identity]
-project = "{{PROJECT_NAME}}"
-kind = "{{PROJECT_KIND}}"                # language | library | service | tool
-one-sentence = "{{PROJECT_PURPOSE}}"
-domain = "{{PROJECT_DOMAIN}}"
+project = "chronicles-of-slavia"
+kind = "game"                            # language | library | service | tool | game
+one-sentence = "A two-character Slavic-folkloric narrative game whose world answers the player through an emotional grammar — Anya stirs, Donna settles — expressed as data over a pure rules core."
+domain = "interactive narrative game"
+
+# NOTE: the `kind` enum inherited from the template offers only
+# language|library|service|tool — none of which is a game. `game` is used here
+# because the estate demonstrably recognises the category (gv-clade-index defines
+# clade `gm`, Games & Interactive). The enum needs extending at source, in the
+# template/standards, rather than this repo mislabelling itself to fit. Reported.
 
 [semantic-authority]
 policy = "canonical"
 
 owns = [
-  "Project semantics and specification",
-  "Invariant definitions and contractiles",
-  "Reference implementation behavior",
+  "The Slavia Game Spec (SGS) — the public authoring schema (ADR-0006).",
+  "The emotional grammar: Anya stirs / Donna settles, and the rule that the animal's own nature decides the result.",
+  "The Chronicle canon and its terminology (Chronicles, not Acts) — docs/design/13.",
+  "Layer boundaries: L1 data / L2 pure rules / L3 renderer (ADR-0002).",
+  "Determinism of L2: no ambient RNG or clock; randomness is injected (ADR-0004).",
 ]
 
 [implementation-policy]
-allowed = ["Rust", "Idris2", "Zig", "Scheme", "Shell", "Just", "AsciiDoc", "Markdown"]
-forbidden = ["Node.js", "npm"]
+allowed = ["Rust", "TOML", "Idris2", "Zig", "Scheme", "Nickel", "Shell", "Just", "AsciiDoc", "Markdown"]
+forbidden = ["Nix", "Node.js", "npm", "TypeScript", "Python", "Go", "AGPL"]
+
+# `forbidden` was ["Node.js", "npm"] — narrower than the estate policy this repo is
+# bound by. Widened to match the policy stated in the arrival pack and AGENTIC.
+# Note V (vlang.io) is banned estate-wide and Zig is its ALLOWED replacement — see
+# scripts/check-no-vlang.sh, which deliberately does not match Zig.
 
 [golden-path]
 smoke-test-command = [
@@ -44,9 +64,11 @@ smoke-test-command = [
 ]
 
 success-criteria = [
-  "Core tests pass",
-  "Quality gates pass",
-  "No unresolved critical security findings",
+  "Zone A's five-beat spec holds — tests/zone_a.rs is the executable statement of it.",
+  "The ESM testbed passes — belief stays local, confidence is the solution count, the Guilty Conscience trap stays emergent.",
+  "L2 remains deterministic: same seed + same inputs = same result.",
+  "Core tests pass; quality gates pass.",
+  "No unresolved critical security findings.",
 ]
 
 [satellite-policy]
@@ -56,7 +78,12 @@ must-have-anchor = true
 must-have-golden-path = true
 
 [semantic-authority-files]
-language-spec = "SPECIFICATION.md"
-formal-proofs = "docs/proofs/PROOFS.adoc"
-type-theory = "docs/theory/THEORY.adoc"
-algorithms = "docs/theory/ALGORITHMS.adoc"
+# Retargeted 2026-07-16. The inherited values pointed at SPECIFICATION.md,
+# docs/proofs/PROOFS.adoc, docs/theory/THEORY.adoc and docs/theory/ALGORITHMS.adoc
+# — the shape of a *language* project. None exist here. These do.
+game-spec = "engine/slavia-core/data/zone-a.sgs.toml"
+rules-core = "engine/slavia-core/src/lib.rs"
+decisions = "docs/decisions/"
+design-canon = "docs/design/"
+start-here = "docs/design/00-start-here.md"
+chronicle-structure = "docs/design/13-chronicles-trilogy-structure.md"
