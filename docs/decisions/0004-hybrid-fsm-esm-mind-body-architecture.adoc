@@ -1,0 +1,118 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Architecture Decision Record: 0004-hybrid-fsm-esm-mind-body-architecture
+
+# 4. Split NPC minds from NPC bodies (FSM + ESM + relational solver)
+
+Date: 2026-07-16
+
+## Status
+
+Accepted. Extends ADR-0002 (layered game-as-data) and ADR-0003 (Bevy as L3).
+
+## Context
+
+`03-living-taxis.md` already calls animals *"living indicators, participants,
+**witnesses**"*, and states the diagnostic rule: **if an animal does not respond
+naturally, this is meaningful**. `07-species-essence-and-control.md` defines what
+that nature *is*. Both imply something the engine does not yet have: an entity
+whose response is a function of *its own local state*, not of global truth.
+
+We want NPCs (and, later, animals as witnesses) to act on **local, imperfect,
+persistent belief** — a Theory of Mind — so that ignorance, error, and being
+tricked are *systemic*, not scripted. A guard should not know where the player
+is because the engine knows; he should know because he saw.
+
+Constraints in play:
+
+* ADR-0002 puts the *sacred logic* in L2 (`slavia-core`) — pure, renderer-free,
+  proven by tests before any renderer exists. Beliefs are rules, so they are L2.
+* ADR-0003 committed to Bevy/Rust end-to-end, explicitly valuing "zero seam to
+  `slavia-core`; the rules stay verifiable".
+* Estate language policy denies TypeScript/ReScript, Python, Node/npm.
+* Relational (miniKanren-style) logic is the natural fit for "who might the
+  player be going to?" — it returns *0, 1, or many* answers, which is exactly the
+  confidence signal we want.
+
+## Decision
+
+Adopt a **mind-body split** across the existing layers.
+
+### Body — FSM, at frame rate, in L3
+
+Physics, pathfinding, animation, and baseline actions (patrol, chase, cry) run
+as a state machine at 60 Hz in the Bevy layer. The body never reasons.
+
+### Mind — ESM, in L2
+
+An **Epistemic State Machine** in `slavia-core`: one **Global Baseline** of facts
+plus, per entity, a set of **Deltas** — the deviations that entity has actually
+acquired by seeing, hearing, or being told. An entity's belief is
+`baseline + its own deltas`, and nothing else. Two NPCs in the same room may hold
+contradictory beliefs; that is the point, not a bug.
+
+### Solver — microKanren, native Rust, in L2
+
+Implement microKanren **directly in `slavia-core`** (`esm/kanren.rs`). It is
+~100 lines of well-trodden design (unify / fresh / conj / disj / run).
+
+It is **event-gated, not per-frame**: the solver runs only on *epistemic events*
+(a visual or acoustic change), never in the 60 Hz loop. The FSM is what ticks;
+the ESM is what *notices*.
+
+### Determinism is mandatory
+
+Memory decay is specified with a `decay-chance`. Randomness inside L2 would
+destroy the property that makes L2 worth having — that it is **provable by
+tests**. Therefore **all randomness is injected explicitly** as a seeded
+generator parameter. Same seed + same inputs = same beliefs, always. L2 never
+reaches for an ambient RNG or a clock.
+
+### Where each piece lives
+
+[cols="1,3a"]
+|===
+| Layer | Gets
+
+| *L1 — SGS data*
+| Baseline facts; which entities have minds; what they start believing.
+
+| *L2 — `slavia-core`*
+| `esm/` — the kanren, belief/deltas, decay, intent classification. Pure,
+  deterministic, headless-testable.
+
+| *L3 — Bevy*
+| The FSM body; manpu overlays (`21-manpu-legibility.md`) as a pure *read* of L2
+  belief state.
+|===
+
+## Consequences
+
+### Positive
+
+- No FFI seam; one language end to end. ADR-0003's central win is preserved.
+- The mind is provable headlessly — `cargo test -p slavia-core`, no window.
+- Manpu legibility falls out as a trivial L3 skin over L2 state, which is
+  independent evidence that the layer boundary is drawn in the right place.
+- Makes the existing living-taxis diagnostic rule *executable*: "does not respond
+  naturally" becomes "its beliefs are not what its nature would predict".
+
+### Negative
+
+- We write and maintain the kanren ourselves (small, but ours).
+- Event-gating is a real constraint on design: any feature wanting continuous
+  reasoning must be re-expressed as discrete epistemic events.
+- Vec-backed (eager) streams, not lazy ones — fine for the finite candidate sets
+  the game poses, but it forbids the unbounded/recursive relations idiomatic
+  miniKanren permits. Revisit if a relation ever needs to be productively
+  infinite.
+
+### Neutral
+
+- Zone A's five beats and the SGS are untouched; the ESM lands beside them
+  against a synthetic cast (`tests/esm_testbed.rs`) until it earns a place
+  in a real zone.
+- Factional reputation and the rotating sentry are **not** built here:
+  `00-start-here.md` parks "all NPC factions", and asymmetric memory across
+  outposts structurally needs a second location. Recorded in
+  `20-cognitive-npcs-and-theory-of-mind.md`, not implemented.
