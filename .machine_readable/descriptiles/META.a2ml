@@ -3,26 +3,67 @@
 #
 # META.a2ml — Project meta-level information
 # Architecture decisions, design rationale, governance.
+#
+# FILLED IN 2026-07-16. [architecture-decisions] was empty while six real ADRs sat
+# in docs/decisions/; [design-rationale] was empty; `languages` was []; `type` still
+# carried its own TODO. The `license` field is untouched (doctrine 6).
 
 [metadata]
 version = "0.1.0"
-last-updated = "2026-04-11"
+last-updated = "2026-07-16"
 
 [project-info]
-type = "library"  # TODO: update type (library|binary|service|website|monorepo)  # library | binary | monorepo | service | website
-languages = []             # e.g. ["rust", "zig", "idris2"]
+type = "game"              # library | binary | monorepo | service | website | game
+languages = ["rust", "toml", "nickel", "shell"]
 license = "MPL-2.0"
 author = "Jonathan D.A. Jewell (hyperpolymath)"
 
+# On `type`: the inherited enum offers library|binary|service|website|monorepo, none
+# of which is a game. `game` is used for the same reason as in ANCHOR.a2ml — the
+# estate recognises the category (gv-clade-index clade `gm`). The enum should be
+# extended at source rather than this repo mislabelling itself to fit.
+#
+# On `languages`: these are the languages the GAME is built in. Idris2 (10 files) and
+# Zig (3) are also on disk under src/interface/, but they are inherited RSR ABI/FFI
+# scaffolding — no game code uses them, and slavia-core has no FFI seam by design
+# (ADR-0003 chose Bevy precisely to avoid one). Listing them would overstate.
+
 [architecture-decisions]
-# ADR format: status = proposed | accepted | deprecated | superseded | rejected
-# - { id = "ADR-001", title = "Use Zig for FFI", status = "accepted", date = "2026-02-14" }
+# status is omitted below because NO ADR in docs/decisions/ carries a Status line —
+# see [known-gaps]. Dates are each ADR's own stated Date, reported as written.
+adrs = [
+  { id = "ADR-0001", title = "Adopt the RSR standard", date = "2026-02-14", file = "docs/decisions/0001-adopt-rsr-standard.adoc" },
+  { id = "ADR-0002", title = "Layered game-as-data architecture (L1 data / L2 rules / L3 renderer)", date = "2026-07-07", file = "docs/decisions/0002-layered-game-as-data-architecture.adoc" },
+  { id = "ADR-0003", title = "Adopt Bevy as the L3 engine", date = "2026-07-08", file = "docs/decisions/0003-adopt-bevy-as-the-l3-engine.adoc" },
+  { id = "ADR-0004", title = "Hybrid FSM/ESM mind-body architecture", date = "2026-07-16", file = "docs/decisions/0004-hybrid-fsm-esm-mind-body-architecture.adoc" },
+  { id = "ADR-0005", title = "Fail forward — no temporal rollback", date = "2026-07-16", file = "docs/decisions/0005-fail-forward-no-temporal-rollback.adoc" },
+  { id = "ADR-0006", title = "The SGS is the public authoring schema", date = "2026-07-16", file = "docs/decisions/0006-sgs-is-the-public-authoring-schema.adoc" },
+]
+
+[known-gaps]
+gaps = [
+  { id = "adr-status-missing", notes = "No ADR carries a Status line (proposed|accepted|deprecated|superseded|rejected), so nothing records whether a decision still stands. docs/decisions/0000-template.adoc is the place to fix it, then backfill all six." },
+  { id = "adr-0001-date", notes = "ADR-0001 states Date: 2026-02-14, but this repo's first commit is 2026-07-06 and the ADR file first appears in git that day. 2026-02-14 is also the date in this file's own inherited example line — it is rsr-template-repo's date, carried in. The decision to adopt RSR *here* was made 2026-07-06. Reported, not silently rewritten." },
+]
 
 [development-practices]
 build-tool = "just"
 container-runtime = "podman"
 ci-platform = "github-actions"
-package-manager = "guix"  # guix | cargo | mix
+package-manager = "cargo"   # was "guix" — inherited default; this is a cargo workspace
+
+[design-rationale]
+# The through-lines. Each is load-bearing: breaking one breaks the design's claim.
+rationale = [
+  { id = "game-as-data", notes = "The game is data (L1 SGS TOML) interpreted by a pure rules core (L2), rendered by a skin (L3). A renderer swap must not be an identity change. ADR-0002." },
+  { id = "l2-is-provable", notes = "slavia-core takes serde + toml and nothing else, renders nothing, and holds no ambient RNG or clock. Randomness is injected (SplitMix64, seeded). That is what makes L2 testable headlessly and deterministic — and determinism is the property multiplayer would need, so ADR-0004 is already paying for it." },
+  { id = "the-animals-nature-decides", notes = "Anya stirs, Donna settles — but the ANIMAL's own nature determines the result. A non-natural animal fails to answer naturally, and that failure is itself the diagnostic signal. The grammar is the game." },
+  { id = "confidence-is-a-solution-count", notes = "No suspicion float, no tuned heuristic. The number of answers the solver returns IS the confidence: many = Ambiguous, one = Unified, zero = Contradiction (`failo`). The zero case is the good one — it is the NPC discovering deception the player actually committed." },
+  { id = "belief-is-local", notes = "belief(entity) = baseline + that entity's own deltas, and nothing else. Asymmetric memory needed no code — it simply IS per-entity deltas. Two guards in one room may hold contradictory beliefs; that is the design working." },
+  { id = "emergence-must-not-be-special-cased", notes = "The Guilty Conscience trap is proven in tests/esm_testbed.rs, NOT built in esm/. If it ever needs a dedicated engine feature, it is not emergent and the central claim in docs/design/20 §D is false. Keeping it out of the engine is the test." },
+  { id = "fail-forward", notes = "No temporal rollback. Reset is diegetic (the bonfire); session persistence is not rollback. ADR-0005." },
+  { id = "chronicles-not-acts", notes = "The canon unit is the Chronicle (docs/design/13). 'Acts' is imported vocabulary and is not canon; docs/design/19 records the provenance and the mapping rather than enshrining it." },
+]
 
 [maintenance-axes]
 scoping-first = true
@@ -48,6 +89,3 @@ audit-focus = "systems in place, documentation explains actual state, safety/sec
 compliance-focus = "seams/compromises/exception register, bounded exceptions, anti-drift checks"
 drift-risk-example = "single exception broadening into policy violation (e.g. ReScript->TypeScript spread)"
 effects-evidence = "benchmark execution/results and maintainer status dialogue/review"
-
-[design-rationale]
-# Key design decisions and their reasoning

@@ -1,0 +1,96 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Architecture Decision Record: 0005-fail-forward-no-temporal-rollback
+
+# 5. Fail forward — no temporal rollback
+
+Date: 2026-07-16
+
+## Status
+
+Accepted. Constrains the save/load system parked in `README.adoc`.
+
+## Context
+
+The game explicitly banishes quick-saving, quick-loading, undo, and instant death
+loops. Failure does not rewind the world; it **moves the story somewhere else**:
+
+* Ruin a puzzle or fall off a cliff → Anya lands in a lower cave network and
+  claws her way back up.
+* Caught by guards → wake up locked in a local wood-shed.
+* Fail an optional puzzle (tip off the greedy woodcarver) → the artifact is
+  *permanently* in his locked cabin, and that is a new branch of gameplay.
+* Critical paths reset **diegetically**: walk back to a bonfire with Donna, and a
+  weary, warm conversation resets the room's puzzle *through their relationship*.
+
+This is not a menu preference. It decides whether the engine may ever treat
+"snapshot the world and restore it" as a gameplay primitive — and that question
+must be settled *before* save/load is designed, because retrofitting the absence
+of rollback into an engine that assumed it is far more expensive than honouring
+it from the start.
+
+It also lands well with ADR-0004: an NPC's beliefs are persistent and local. If
+the player could reload, being seen would be a nuisance to undo rather than a
+fact to live with. Fail-forward is what makes the Epistemic State Machine *mean*
+anything.
+
+## Decision
+
+**Temporal rollback is not a primitive of this game.** The world only ever moves
+forward.
+
+### What is forbidden
+
+* Quick-save / quick-load, "Replay", "Undo", "Retry" affordances.
+* Death loops that restore a prior world state.
+* Any gameplay mechanic implemented as *restore a previous snapshot*.
+
+### What is not forbidden (an important distinction)
+
+**Session persistence is not rollback.** Quitting and resuming later is a
+*persistence* concern and remains allowed: it must restore the player to the
+**same forward timeline** they left, never branch or rewind it. One live
+timeline, saved and resumed — not a savepoint to retry from.
+
+**Diegetic reset is not rollback.** The bonfire does not rewind time; it moves
+the world *forward* into a re-armed state, at the cost of the walk back and by
+way of a conversation. Puzzle state returning to solvable is a physical event
+with a cause inside the fiction.
+
+### What this obliges
+
+Every failure must have an authored, physical destination. "You fail → you are
+somewhere, in some condition, and play continues" is a **level-design deliverable**,
+not an error path. A failure with nowhere to go is a design bug.
+
+## Consequences
+
+### Positive
+
+- Consequence becomes the game's material. The ESM's persistent, asymmetric
+  memory (ADR-0004) can't be laundered by reloading.
+- "What do you become when the world breaks?" is answerable only if the break is
+  allowed to stand. The strapline and the engine now agree.
+- Irreversible branches (the woodcarver's locked cabin) are *content*, generated
+  by play, rather than states to be prevented.
+
+### Negative
+
+- Costly for level design: every fail state needs a real place and a real way
+  back. This multiplies authored space, and it is the main reason to keep the
+  built scope small.
+- Removes the standard escape hatch for unfair or broken puzzles — playtesting
+  carries more weight, because a bad puzzle cannot be brute-forced past by
+  reloading.
+- Accessibility tension: rollback is, for some players, an accessibility
+  affordance. The diegetic-reset path (bonfire) must be *reachable and
+  forgiving enough* to serve that need. This is an open obligation against the
+  **Adjust** contractile, not a solved problem.
+
+### Neutral
+
+- ADR-0004's determinism (seeded, injected RNG) still permits *developer* replay
+  from seed + input log for debugging. That is a tooling capability and must not
+  surface to the player as rollback.
+- Save/load stays parked; this ADR narrows what it is permitted to be when it is
+  eventually built.

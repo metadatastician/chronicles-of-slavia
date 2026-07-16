@@ -23,9 +23,22 @@
 //! Zone A's five-beat success condition is encoded as executable assertions in
 //! `tests/zone_a.rs`.
 
+//! ## Beside the grammar: the mind (`esm`)
+//!
+//! [`esm`] is the Epistemic State Machine — NPCs that act on *local, imperfect,
+//! persistent belief* rather than global truth. It is the same principle as the
+//! grammar above, turned inward: `03-living-taxis.md` already calls animals
+//! **witnesses**, and a witness is an entity with a private, partial record of
+//! what happened.
+//!
+//! It is deliberately **not wired to a zone yet** (ADR-0004): it is proven
+//! headlessly against a synthetic cast in `tests/esm_testbed.rs`, leaving Zone A's
+//! five beats untouched until it earns a place in a real scene.
+
 pub mod animal;
 pub mod character;
 pub mod error;
+pub mod esm;
 pub mod spec;
 pub mod world;
 

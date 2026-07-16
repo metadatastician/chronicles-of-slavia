@@ -1,45 +1,70 @@
 # SPDX-License-Identifier: MPL-2.0
-# ECOSYSTEM.a2ml — Ecosystem position (META-TEMPLATE)
+# ECOSYSTEM.a2ml — Ecosystem position
 #
-# This is the ECOSYSTEM file for rsr-template-repo itself. It records the
-# TEMPLATE's own position in the estate. When consumed by a new project,
-# replace these fields with the target project's ecosystem position and
-# related projects (see the NOTE FOR CONSUMERS at the bottom).
+# REWRITTEN 2026-07-16. This file was the rsr-template-repo META-TEMPLATE, carried
+# in unchanged. It described the TEMPLATE's position, the TEMPLATE's dependencies,
+# and — worst — the TEMPLATE's IS-NOT. Because the arrival pack projects this file
+# into CLAUDE.md, every agent arriving here was told, in the repo's own voice, that
+# Chronicles of Slavia "is not a project in its own right". The boundary-erosion
+# guard was pointed backwards at the thing it exists to protect.
 
 [metadata]
-project = "rsr-template-repo"
+project = "chronicles-of-slavia"
 ecosystem = "hyperpolymath"
 
 [position]
-type = "repository-template"
-purpose = "Canonical RSR-compliant repository template: scaffolding (CI/CD, AI manifests, ABI/FFI standards, container ecosystem, governance) that new hyperpolymath projects are instantiated from."
+type = "game"
+purpose = "A two-character Slavic-folkloric narrative game. The world answers the player through an emotional grammar — Anya stirs, Donna settles — and the animal's own nature decides the result. The game is authored as data (the SGS) over a pure, deterministic rules core; the renderer is a skin."
 # IS-NOT — anti-identity (the boundary-erosion guard; each line is a real past confusion)
+#
+# Keep these SHORT. The arrival pack projects them into CLAUDE.md joined by " · ",
+# so they must read as phrases, not paragraphs. The reasoning belongs in the
+# annotations below, which are not projected.
 what-this-is-not = [
-  "a project in its own right",
-  "Scaffoldia (the full-featured repo designer)",
-  "standards (the canon source this template operationalises)",
+  "rsr-template-repo (the template it was instantiated from)",
+  "IDApTIK (the estate's other game project)",
+  "idaptik-ums (the modding studio — IDApTIK's, not this)",
+  "a Bevy project (Bevy is a replaceable L3 skin)",
+  "a multiplayer game (parked)",
+  "an AI or neurosymbolic research project",
 ]
 
+# Why each line is there — the real confusion it guards against:
+#
+#   rsr-template-repo   Not hypothetical. This repo declared itself to BE the
+#                       template — identity, UUID, state, and IS-NOT — from its
+#                       first commit until 2026-07-16, and told every arriving
+#                       agent so via CLAUDE.md. This line exists so it cannot
+#                       recur silently.
+#   IDApTIK             meta-repos/IDApTIK. A sibling game, not this one. The
+#                       near-identical layering (Rust owns gameplay truth, Elixir
+#                       owns session) is convergent design, not shared code.
+#   idaptik-ums         The UMS would author against this repo's SGS (ADR-0006).
+#                       That schema commitment is the ENTIRE binding. This repo
+#                       does not own, host, or vendor the studio.
+#   a Bevy project      Bevy is L3 and replaceable (ADR-0003) — chosen for a
+#                       zero-FFI seam, not for its own sake. The value is L2 and
+#                       the data. A renderer swap must not be an identity change.
+#   multiplayer         README parks it. The co-op-vs-switch-only control model is
+#                       undecided and touches the engine (see STATE blockers).
+#   AI / neurosymbolic  The miniKanren in esm/ is a solver, not a neural system.
+#                       NEUROSYM.a2ml here is a Hypatia CODE-SCANNER config and
+#                       has never been about game AI. The name collision is a
+#                       known trap that has caught readers before.
+
 [pipeline]
-position = "foundation"
-chain = "standards → rsr-template-repo → (every estate repo)"
-notes = "rsr-template-repo turns the RSR standard into runnable scaffolding. New repos are created from it via `just init`, which substitutes the {{PLACEHOLDER}} tokens."
-coordination = "standards"
+position = "endpoint"
+chain = "standards → rsr-template-repo → chronicles-of-slavia"
+notes = "A leaf. Nothing downstream depends on this repo; it consumes estate scaffolding rather than providing it. The one outward-facing surface is the SGS (ADR-0006), which is a public authoring schema by intent."
+coordination = "self"
 
 [related-projects]
 projects = [
-  { name = "standards", relationship = "standard-source", notes = "Defines the RSR standard, contractile canon, and policies that this template operationalises." },
-  { name = "stapeln", relationship = "build-tooling", notes = "Layer-based container build system; the template ships stapeln.toml scaffolding." },
-  { name = "selur-compose", relationship = "build-tooling", notes = "Service composition; the template ships selur-compose.toml scaffolding." },
-  { name = "k9-svc", relationship = "validation-tooling", notes = "Runs the self-validating k9.ncl checks (.machine_readable/self-validating/)." },
-  { name = "cerro-torre", relationship = "signing-tooling", notes = "Container/image signing provider referenced by the container scaffolding." },
-  { name = "svalinn", relationship = "verification-tooling", notes = "Supply-chain verification referenced by the container scaffolding." },
-  { name = "vordr", relationship = "verification-tooling", notes = "Build/artifact verification referenced by the container scaffolding." },
+  { name = "rsr-template-repo", relationship = "instantiated-from", notes = "Source of the scaffolding, the .machine_readable pillar, and (until corrected) this repo's mistaken identity. Template drift should be fixed at source there, not patched here." },
+  { name = "gv-clade-index", relationship = "identity-registry", notes = "The estate map. This repo is NOT yet registered in it; the derived UUID in CLADE.a2ml is correct but unregistered — owner's action." },
+  { name = "standards", relationship = "standard-source", notes = "Defines RSR, the contractile canon, and the A2ML format family this pillar implements." },
+  { name = "metadatastician-governance", relationship = "governance-source", notes = "Organisation-level standards, deliberately sitting above (and not conflicting with) per-estate/per-repo conventions." },
+  { name = "IDApTIK", relationship = "sibling-project", notes = "Distinct game. Its Rust-owns-gameplay / Elixir-owns-session split is a useful precedent if multiplayer is ever unparked — precedent only, no dependency." },
+  { name = "idaptik-ums", relationship = "prospective-consumer", notes = "The modding studio that would author against the SGS. Currently IDApTIK-specific; its procedural generator is deleted-but-recoverable (git f4a404cf). No binding exists today beyond ADR-0006's schema commitment." },
+  { name = "bevy", relationship = "external-dependency", notes = "Pure-Rust ECS engine adopted as L3 (ADR-0003). Chosen for a zero-FFI seam to slavia-core." },
 ]
-
-# ---------------------------------------------------------------------------
-# NOTE FOR CONSUMERS: When using this template to create a new repo, replace
-# the project/purpose above and rewrite [related-projects] to describe YOUR
-# project's actual ecosystem. The entries above describe the TEMPLATE's own
-# position, not yours.
-# ---------------------------------------------------------------------------

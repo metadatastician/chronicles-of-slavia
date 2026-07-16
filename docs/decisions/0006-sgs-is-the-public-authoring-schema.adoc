@@ -1,0 +1,133 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Architecture Decision Record: 0006-sgs-is-the-public-authoring-schema
+
+# 6. The SGS is a public authoring schema, not an internal format
+
+Date: 2026-07-16
+
+## Status
+
+Accepted. Tightens ADR-0002 (layered game-as-data). Bounded against ADR-0004
+(FSM/ESM) — see "Minds are mechanism", below.
+
+## Context
+
+Chronicles of Slavia is intended to be moddable through **UMS — the Universal
+Modding Studio** (started for IDApTIK at `metadatastician/idaptik-ums`, currently
+IDApTIK-shaped and requiring generalisation). The ambition is that authors can
+build **objects, skills, NPCs, plants, animals, levels, and maps** — so the game
+outlives its main story and a community can extend it.
+
+This is described by the owner as **critically bound**: designed in from the
+start, not bolted on. That judgement is correct, and the reason is worth stating
+precisely, because it is easy to draw the wrong conclusion from it.
+
+**Moddability is a discipline, not a component.** The usual failure mode is a mod
+SDK added late, which reaches only the small fraction of a game that happened to
+be data-driven, because everything else was hardcoded. That fraction is decided on
+the *first* day, not the last. Retrofitting it means rewriting every system that
+violated it.
+
+But the converse does not follow. *Building the studio now* would mean designing
+it against IDApTIK's requirements plus a game with exactly one zone — the wrong
+studio, built early, while `00-start-here.md` says Zone A must hold first.
+
+Crucially, **ADR-0002 already made this choice**: the game *is* data (L1 SGS) +
+a pure rules core (L2) + a swappable renderer (L3). UMS does not introduce new
+architecture. UMS is *the reason ADR-0002 was right*, and the cost of honouring it
+today is therefore close to zero.
+
+## Decision
+
+### 1. The SGS is public
+
+`slavia-core/data/*.sgs.toml` is treated as a **published, authorable,
+validatable schema** — a contract with third-party authors — not an internal
+convenience format we may reshape at will. It gets the care an API gets.
+
+### 2. Never write a system UMS could not drive
+
+The binding rule, and the whole of the discipline:
+
+> **If a concept is content, it is data. If a system cannot be driven from the
+> SGS, it is not finished.**
+
+Concretely, every canon concept that is *content* must be expressible, not
+hardcoded:
+
+* taxis and attunement (`03`, `06`) — raise/lower, per-actor
+* species essence, domestication, corruption (`07`)
+* flora and non-animal NPCs (`16`)
+* objects, skills, and class paths (`04`, `11`) — when built
+* levels and maps
+
+Rust may implement *mechanisms*. Rust may not enumerate *content*. A new animal,
+a new plant, a new object, or a new NPC must never require a recompile.
+
+### 3. Minds are mechanism, not content — AI authoring is explicitly out of scope
+
+**UMS will not offer "build your own AI" for this game.** Decided by the owner:
+not essential here, and the cost is real (authoring belief logic declaratively
+means building a logic-authoring surface, which is the expensive corner of the
+whole idea). It may matter for IDApTIK; it does not matter here.
+
+Therefore the boundary is drawn as:
+
+* The **ESM and its relations are mechanism** — implemented in Rust in `esm/`,
+  not authored. Modders do not write new relations, new solvers, or new
+  reasoning.
+* **Which entities have minds, and what they initially believe, is content** —
+  the Global Baseline and an entity's starting deltas are ordinary SGS data,
+  because that is just *facts about a scene*, and a modder placing a suspicious
+  miller needs him to start out believing something.
+
+That line is the cheap 90%: authors get NPCs whose knowledge they control, using
+reasoning the engine supplies. They do not get to invent new kinds of thinking.
+
+If AI authoring is ever wanted, it is a *later* ADR and a later component, and
+this decision does not block it — data-seeded beliefs are the natural first half
+of it anyway.
+
+### 4. Determinism is part of the contract
+
+Per ADR-0004 all randomness is injected and seeded. This is not only for
+testability: authored content must behave **the same way for every player**, and
+be reproducible when an author reports a bug in their own mod.
+
+### 5. Not built now
+
+**No UMS work in this repo yet.** This ADR adopts the *discipline*; it does not
+schedule the *component*. UMS is generalised from IDApTIK when Zone A holds and
+there is a second consumer to generalise *against* — which is precisely what this
+game becomes.
+
+## Consequences
+
+### Positive
+
+- Near-zero cost today; the architecture already pointed here.
+- Forces early honesty about what is content vs. mechanism — a distinction that
+  is cheap to keep and expensive to recover.
+- Gives UMS a real second consumer to generalise against, which is the only way
+  a *universal* studio stops being a single-game studio wearing a bigger name.
+- Scoping AI authoring out keeps `esm/` free to be ordinary, fast, well-typed
+  Rust, and keeps L2 provable, rather than contorting it into an interpreter for
+  author-supplied logic.
+
+### Negative
+
+- Slower than hardcoding. Every "just put it in Rust for now" is now a decision
+  to argue, not a shortcut to take.
+- The SGS becomes a compatibility surface: reshaping it later has a cost, and
+  that cost is the point.
+- Some mechanisms are genuinely awkward as data. Where the line falls (mechanism
+  vs. content) will need judgement, and will occasionally be got wrong.
+- Mods will all reason alike. Community NPCs will differ in *what they know*, not
+  in *how they think* — accepted, deliberately.
+
+### Neutral
+
+- Says nothing about UMS's own architecture, language, or timing.
+- The IDApTIK ↔ Slavia bridge (per the estate's `dlc-manifest.json` /
+  `contracts.a2ml` pattern) is out of scope here and remains undecided.
