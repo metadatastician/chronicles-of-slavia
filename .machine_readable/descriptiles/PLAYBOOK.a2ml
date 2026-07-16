@@ -6,25 +6,38 @@
 
 [metadata]
 version = "0.1.0"
-last-updated = "2026-04-11"
+last-updated = "2026-07-16"
 
 [deployment]
-# method = "gitops"  # gitops | manual | ci-triggered
-# target = "container"  # container | binary | library | wasm
+method = "none"
+target = "none"
+notes = "Nothing deploys. Both crates are 0.0.0 and the README declares this private working material with publication undecided. There is no L3 renderer yet (ADR-0003 is adopted on paper only), so there is nothing to ship even if a decision were made. Revisit when a renderer exists AND publication is settled."
 
 [incident-response]
-# 1. Check .machine_readable/descriptiles/STATE.a2ml for current status
-# 2. Review recent commits and CI results
-# 3. Run `just validate` to check compliance
-# 4. Run `just security` to audit for vulnerabilities
+# The golden path is the whole incident-response story for a headless rules core:
+# 1. `cd engine && cargo test` — 51 pass, 2 ignored, 0 fail as of 2026-07-16.
+#    Zone A's five beats live in engine/slavia-core/tests/zone_a.rs. If they break,
+#    the emotional grammar broke, and that is the only real incident this repo has.
+# 2. Check .machine_readable/descriptiles/STATE.a2ml for current phase and blockers.
+# 3. Review recent commits and CI results.
+# 4. `just validate` for compliance; `just security` to audit vulnerabilities.
+#
+# The determinism check is the one to watch: if the same seed stops replaying the
+# same result, L2 has stopped being provable and ADR-0004's rule is broken. See
+# `the_same_seed_remembers_the_same_things` in engine/slavia-core/src/esm/decay.rs.
 
 [release-process]
-# 1. Update version in STATE.a2ml, META.a2ml, Justfile
+# Not applicable yet — nothing has been released and versions are 0.0.0.
+# Kept as the inherited estate procedure, to be made real at first release:
+# 1. Update version in STATE.a2ml, META.a2ml, Justfile, and both Cargo.toml files
 # 2. Run `just release-preflight` (validate + quality + security + maint-hard-pass)
 # 3. Optional local permission hardening: `just perms-snapshot && just perms-lock`
 # 4. Tag and push
 # 5. Restore local permissions if needed: `just perms-restore`
 # 6. Run `just container-push` if applicable
+#
+# Publication is an owner decision and outward-facing (doctrine 11): the README says
+# to treat this repo as private "unless and until it is explicitly published".
 
 [maintenance-operations]
 # Baseline audit:
@@ -35,6 +48,22 @@ last-updated = "2026-04-11"
 #   just perms-audit
 
 [rsr-repo-skeleton]
+# ---------------------------------------------------------------------------
+# INHERITED COPY OF TEMPLATE CANON — NOT THIS REPO'S TO OWN.
+#
+# Everything below was copied in from rsr-template-repo. It claims (next
+# paragraph) to be "the single source of truth for what does an RSR repo look
+# like?" — but chronicles-of-slavia is a game, not the RSR authority, so that
+# claim is false HERE. This is a downstream copy of upstream canon, and copies
+# drift: the V/Zig ban section below had already drifted into saying the exact
+# opposite of the rule (corrected 2026-07-16).
+#
+# RECOMMENDED: replace this whole section with a pointer to the canonical source
+# once rsr-template-repo is reachable — canon should be referenced, not copied
+# (doctrine 14, solutions at source). Left in place for now rather than deleted
+# unilaterally, because deciding where canon lives is the owner's call.
+# ---------------------------------------------------------------------------
+#
 # Canonical organisation of any RSR-derived repository.
 # Used by tooling, human onboarding, and the scheduled downstream sweep agent.
 # The 5-PR cleanup pattern (below) brings a non-conforming repository into
@@ -80,12 +109,25 @@ enforcement-workflow = ".github/workflows/estate-rules.yml"
 #
 # Enforcement: `scripts/check-no-md-in-docs.sh` (fails if any *.md under docs/).
 
-# === Banned: ziguage ===
+# === Banned: V (vlang) — NOT Zig ===
 # V (vlang.io) is banned estate-wide. Replaced by `zig-unified-api-adapter`
 # (16 endpoints + transaction-based firewall gating). Do not introduce
-# zig code, scaffolders, or references. Note that Coq theorem files use
+# V code, scaffolders, or references. Note that Coq theorem files use
 # the same `.v` extension and are unaffected — the rule looks at content
 # patterns, not the extension.
+#
+# ZIG IS ALLOWED — it is V's REPLACEMENT, not a banned language.
+#
+# CORRECTED 2026-07-16. This section read "=== Banned: ziguage ===" and "Do not
+# introduce zig code, scaffolders, or references" — a botched find/replace of
+# vlang→zig that inverted the rule and left the repo instructing every arriving
+# agent to refuse the language it actually uses. Ground truth, in order:
+#   * scripts/check-no-vlang.sh:9 — "Zig is ALLOWED and is deliberately NOT matched"
+#     by the ban patterns (gen-v-connector, V-TRIPLE, v-triple, vlang).
+#   * ANCHOR.a2ml [implementation-policy] — Zig is in `allowed`.
+#   * src/interface/ffi/src/main.zig exists and IS the FFI scaffolding.
+# The same corruption probably exists upstream in rsr-template-repo, which is where
+# this whole section was copied from — fix it at source there too (doctrine 14).
 #
 # Enforcement: `scripts/check-no-vlang.sh`.
 
@@ -100,7 +142,7 @@ enforcement-workflow = ".github/workflows/estate-rules.yml"
 #   build/just/validate.just   validate-rsr/state/ai-install + aggregate
 #   build/just/proofs.just     proof-check-{all,idris2,lean4,agda,coq},
 #                              proof-scan-dangerous, proof-status
-#   build/just/groove.just     Groove protocol setup (after zig removed)
+#   build/just/groove.just     Groove protocol setup (after V removed)
 #
 # Daily-use recipes (BUILD, TEST, LINT, RUN, DEPS, DOCS, CONTAINER, CI,
 # SECURITY, STATE, GUIX, MATRIX, VERSION CONTROL, UTILITIES, SESSION)
@@ -113,7 +155,7 @@ enforcement-workflow = ".github/workflows/estate-rules.yml"
 # 1. chore/root-cleanup       Relocate root sprawl per root-allow.txt; add
 #                             scripts/check-root-shape.sh; remove stub
 #                             health files shadowed by .github/ versions.
-# 2. chore/remove-zig      Purge zig remnants (gen-v-connector recipe,
+# 2. chore/remove-vlang       Purge V remnants (gen-v-connector recipe,
 #                             "V-TRIPLE" section header, "V-triple
 #                             connectors" comment in groove.a2ml).
 # 3. chore/md-to-adoc         Port general docs in docs/ from .md to .adoc;
@@ -127,11 +169,11 @@ enforcement-workflow = ".github/workflows/estate-rules.yml"
 # === Reference scripts ===
 # scripts/check-root-shape.sh      Root allowlist validator
 # scripts/check-no-md-in-docs.sh   AsciiDoc-by-default validator
-# scripts/check-no-vlang.sh        zig ban validator
+# scripts/check-no-vlang.sh        V (vlang) ban validator
 # scripts/validate-template.sh     Aggregate RSR compliance (workflows, SPDX, etc.)
 
 # === Reference memory entries (for AI agents) ===
 # feedback_adoc_default_md_for_githealth   AsciiDoc-by-default rule
-# feedback_v_lang_banned                   zig ban
-# project_zig_unified_api                  Replacement for v-triple/zig
+# feedback_v_lang_banned                   V (vlang) ban
+# project_zig_unified_api                  Replacement for v-triple/V
 # feedback_gh_workflow_scope               OAuth scope for workflow files

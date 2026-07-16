@@ -16,14 +16,41 @@ ecosystem = "hyperpolymath"
 type = "game"
 purpose = "A two-character Slavic-folkloric narrative game. The world answers the player through an emotional grammar — Anya stirs, Donna settles — and the animal's own nature decides the result. The game is authored as data (the SGS) over a pure, deterministic rules core; the renderer is a skin."
 # IS-NOT — anti-identity (the boundary-erosion guard; each line is a real past confusion)
+#
+# Keep these SHORT. The arrival pack projects them into CLAUDE.md joined by " · ",
+# so they must read as phrases, not paragraphs. The reasoning belongs in the
+# annotations below, which are not projected.
 what-this-is-not = [
-  "rsr-template-repo — the template this repo was instantiated from. This repo carried the template's identity, UUID, state, and IS-NOT until 2026-07-16; that is the confusion this line exists to stop recurring.",
-  "IDApTIK — the estate's other Rust/Elixir game project (meta-repos/IDApTIK). A sibling, not this. Shared layering is convergent design, not shared code.",
-  "idaptik-ums — the modding studio. It is IDApTIK's, and would need adapting. This repo owns the SGS schema it would author against (ADR-0006), and nothing more.",
-  "a Bevy project — Bevy is the L3 renderer and a replaceable skin (ADR-0003). The value is L2 and the data. A renderer swap must not be an identity change.",
-  "a multiplayer game — README parks it; the co-op-vs-switch-only control model is undecided and touches the engine.",
-  "an AI or neurosymbolic research project — the miniKanren in esm/ is a solver, not a neural system. NEUROSYM.a2ml here is a Hypatia code-scanner config and has never been about game AI; the name collision is a known trap.",
+  "rsr-template-repo (the template it was instantiated from)",
+  "IDApTIK (the estate's other game project)",
+  "idaptik-ums (the modding studio — IDApTIK's, not this)",
+  "a Bevy project (Bevy is a replaceable L3 skin)",
+  "a multiplayer game (parked)",
+  "an AI or neurosymbolic research project",
 ]
+
+# Why each line is there — the real confusion it guards against:
+#
+#   rsr-template-repo   Not hypothetical. This repo declared itself to BE the
+#                       template — identity, UUID, state, and IS-NOT — from its
+#                       first commit until 2026-07-16, and told every arriving
+#                       agent so via CLAUDE.md. This line exists so it cannot
+#                       recur silently.
+#   IDApTIK             meta-repos/IDApTIK. A sibling game, not this one. The
+#                       near-identical layering (Rust owns gameplay truth, Elixir
+#                       owns session) is convergent design, not shared code.
+#   idaptik-ums         The UMS would author against this repo's SGS (ADR-0006).
+#                       That schema commitment is the ENTIRE binding. This repo
+#                       does not own, host, or vendor the studio.
+#   a Bevy project      Bevy is L3 and replaceable (ADR-0003) — chosen for a
+#                       zero-FFI seam, not for its own sake. The value is L2 and
+#                       the data. A renderer swap must not be an identity change.
+#   multiplayer         README parks it. The co-op-vs-switch-only control model is
+#                       undecided and touches the engine (see STATE blockers).
+#   AI / neurosymbolic  The miniKanren in esm/ is a solver, not a neural system.
+#                       NEUROSYM.a2ml here is a Hypatia CODE-SCANNER config and
+#                       has never been about game AI. The name collision is a
+#                       known trap that has caught readers before.
 
 [pipeline]
 position = "endpoint"

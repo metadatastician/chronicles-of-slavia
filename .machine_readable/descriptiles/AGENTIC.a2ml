@@ -3,10 +3,15 @@
 #
 # AGENTIC.a2ml — AI agent constraints and capabilities
 # Defines what AI agents can and cannot do in this repository.
+#
+# UPDATED 2026-07-16. The permissions and integrity gating were already sound and
+# are unchanged. What was missing: [agent-constraints] listed only generic estate
+# rules and none of THIS repo's — including the scope gates that canon states in
+# plain language and that an agent will otherwise walk straight through.
 
 [metadata]
 version = "0.1.0"
-last-updated = "2026-04-11"
+last-updated = "2026-07-16"
 
 [agent-permissions]
 can-edit-source = true
@@ -16,12 +21,26 @@ can-edit-config = true
 can-create-files = true
 
 [agent-constraints]
-# What AI agents must NOT do:
+# Estate-wide (see the arrival pack's language policy):
 # - Never use banned language patterns (believe_me, unsafeCoerce, etc.)
 # - Never commit secrets or credentials
-# - Never use banned languages (TypeScript, Python, Go, etc.)
+# - Never use banned languages: Nix, Node/npm, TypeScript, Python, Go
 # - Never place state files in repository root (must be in .machine_readable/)
-# - Never use AGPL license (use MPL-2.0)
+# - Never use AGPL. No automated licence edits at all — manual, owner-only.
+# - Note Zig is ALLOWED (it is V's replacement). V/vlang is the banned one.
+
+# Repo-specific. These are scope gates, not style preferences — canon states each
+# one, and each has been walked through before.
+constraints = [
+  { id = "zone-a-is-sacred", rule = "Do not disturb Zone A's five beats. engine/slavia-core/tests/zone_a.rs is the executable statement of the prototype success condition in docs/design/00-start-here.md. New work proves itself elsewhere and leaves those seven tests alone." },
+  { id = "zones-b-to-e-are-gated", rule = "Do not build Zones B–E until Zone A holds. docs/design/08-level1-five-zone-map.md says so in those words. Zone B is already designed as the Fracture Line (separation) — it is NOT a spare sandbox for environment or NPC experiments." },
+  { id = "parked-scope", rule = "Do not add: multiplayer, save/load, Level 2, or full NPC factions. README's 'Do not add yet' list and 00-start-here.md's 'Do not expand yet' park each explicitly. Parked means parked — unpark by owner decision, not by an agent judging it convenient." },
+  { id = "emergence-must-stay-emergent", rule = "Never special-case the Guilty Conscience trap into engine/slavia-core/src/esm/. It is proven in tests/esm_testbed.rs precisely because needing an engine feature would prove it is NOT emergent, falsifying docs/design/20 §D. If it seems to need engine support, that is the finding — report it, do not build it." },
+  { id = "l2-determinism", rule = "slavia-core must hold no ambient RNG and no clock. Randomness is injected and seeded (ADR-0004). Same seed + same inputs = same result, always. Adding rand/chrono/getrandom to slavia-core breaks the one property that makes L2 worth having." },
+  { id = "l2-stays-tiny", rule = "slavia-core takes serde + toml and nothing else, and must keep compiling to wasm32-unknown-unknown unchanged. Adding a dependency needs a reason that survives ADR review." },
+  { id = "chronicles-not-acts", rule = "The canon unit is the Chronicle (docs/design/13). 'Acts' is imported vocabulary. Do not enshrine it; docs/design/19 records the provenance and mapping." },
+  { id = "canon-before-invention", rule = "Before inventing, renaming, or consolidating anything: STOP and check the map + IS-NOT (ECOSYSTEM.what-this-is-not). This repo spent its whole life until 2026-07-16 declaring itself to be rsr-template-repo because nobody checked." },
+]
 
 [maintenance-integrity]
 fail-closed = true
@@ -31,8 +50,14 @@ require-rerun-after-fix = true
 release-claim-requires-hard-pass = true
 
 # ============================================================================
-# METHODOLOGY (ADR-002)
+# METHODOLOGY
 # ============================================================================
+# NOTE: this header previously read "METHODOLOGY (ADR-002)". That cross-reference
+# is template residue — it points at rsr-template-repo's ADR-002, whereas THIS
+# repo's ADR-0002 is the layered game-as-data architecture and says nothing about
+# methodology. The reference is dropped rather than repointed, because no ADR here
+# covers methodology. Reported 2026-07-16.
+#
 # Detailed methodology configuration lives in:
 #   .machine_readable/bot_directives/methodology.a2ml
 #   .machine_readable/bot_directives/coverage.a2ml

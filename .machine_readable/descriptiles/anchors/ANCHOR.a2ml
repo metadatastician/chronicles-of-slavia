@@ -63,12 +63,14 @@ smoke-test-command = [
   "just quality",
 ]
 
+# No trailing full stops: the arrival pack joins these with "; " when it projects
+# them into CLAUDE.md, and a trailing stop renders as ".;".
 success-criteria = [
-  "Zone A's five-beat spec holds — tests/zone_a.rs is the executable statement of it.",
-  "The ESM testbed passes — belief stays local, confidence is the solution count, the Guilty Conscience trap stays emergent.",
-  "L2 remains deterministic: same seed + same inputs = same result.",
-  "Core tests pass; quality gates pass.",
-  "No unresolved critical security findings.",
+  "Zone A's five-beat spec holds (engine/slavia-core/tests/zone_a.rs)",
+  "The ESM testbed passes — belief stays local, confidence is the solution count, the Guilty Conscience trap stays emergent",
+  "L2 stays deterministic — same seed and same inputs give the same result",
+  "Core tests pass and quality gates pass",
+  "No unresolved critical security findings",
 ]
 
 [satellite-policy]

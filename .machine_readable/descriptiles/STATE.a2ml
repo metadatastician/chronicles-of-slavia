@@ -1,64 +1,86 @@
 # SPDX-License-Identifier: MPL-2.0
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
-# STATE.a2ml — Project state checkpoint (META-TEMPLATE)
+# STATE.a2ml — Project state checkpoint
 #
-# This is the STATE file for rsr-template-repo itself.
-# When consumed by a new project, replace {{PLACEHOLDER}} tokens
-# and customize sections below for the target project.
+# REWRITTEN 2026-07-16. This was rsr-template-repo's own STATE, carried in
+# unchanged: it declared this repo to be the template, 95% complete, phase
+# `maintenance`, maturity `production`, with milestones describing the TEMPLATE's
+# evolution (container scaffolding, multi-forge sync). None of it was true here.
+# Test counts below are from a live `cargo test`, not from a status doc.
 
 [metadata]
-project = "rsr-template-repo"
-version = "0.2.0"
-last-updated = "2026-02-28"
-status = "active"  # active | paused | archived
+project = "chronicles-of-slavia"
+version = "0.0.0"          # both crates are 0.0.0 — pre-release, deliberately
+last-updated = "2026-07-16"
+status = "active"          # active | paused | archived
 
 [project-context]
-name = "rsr-template-repo"
-purpose = "Canonical RSR-compliant repository template providing scaffolding for all hyperpolymath projects — including CI/CD, AI manifests, ABI/FFI standards, container ecosystem, and governance infrastructure."
-completion-percentage = 95
+name = "chronicles-of-slavia"
+purpose = "A two-character Slavic-folkloric narrative game. The world answers the player through an emotional grammar — Anya stirs, Donna settles — and the animal's own nature decides the result. Authored as data (the SGS) over a pure, deterministic rules core, with the renderer as a replaceable skin."
+completion-percentage = 5
+
+# On that number: it is close to meaningless for a project this shape, and the
+# milestones below carry the real signal. Zone A holds — and Zone A is the ONLY
+# thing docs/design/00-start-here.md authorises building. So against the currently
+# declared scope this is nearly done; against the trilogy in docs/design/13 it is a
+# rounding error. Read both, not the percentage.
 
 [position]
-phase = "maintenance"      # design | implementation | testing | maintenance | archived
-maturity = "production"    # experimental | alpha | beta | production | lts
+phase = "implementation"   # design | implementation | testing | maintenance | archived
+maturity = "experimental"  # experimental | alpha | beta | production | lts
+visibility = "private working material — see README; publication not decided"
 
 [route-to-mvp]
 milestones = [
-  { name = "Phase 0: Core scaffolding (justfile, CI/CD, .machine_readable)", completion = 100 },
-  { name = "Phase 1: ABI/FFI standard (Idris2/Zig templates)", completion = 100 },
-  { name = "Phase 1b: AI Gatekeeper Protocol (0-AI-MANIFEST.a2ml)", completion = 100 },
-  { name = "Phase 1c: TOPOLOGY.md standard and guide", completion = 100 },
-  { name = "Phase 1d: Maintenance gate (axes, checklist, approach)", completion = 100 },
-  { name = "Phase 1e: Trustfile / contractiles", completion = 100 },
-  { name = "Phase 2: Container ecosystem templates (stapeln)", completion = 100 },
-  { name = "Phase 3: Multi-forge sync hardening", completion = 0 },
-  { name = "Phase 4: Guix reproducible shells", completion = 50 },
+  { name = "Zone A five-beat prototype — the success condition in 00-start-here.md", completion = 100, evidence = "engine/slavia-core/tests/zone_a.rs, 7 tests green" },
+  { name = "L2 rules core (slavia-core) — emotional grammar, living taxis, spec parsing", completion = 100, evidence = "29 unit tests green; deps are serde + toml only" },
+  { name = "M3.1 ESM — belief, kanren, intent, decay (ADR-0004)", completion = 100, evidence = "10 testbed tests green; headless, deliberately not wired to a zone" },
+  { name = "L3 renderer (Bevy, ADR-0003)", completion = 0, notes = "Adopted on paper; nothing built. The zero-FFI seam is the point of the choice." },
+  { name = "Zones B–E of Chronicle I", completion = 0, notes = "GATED. 08-level1-five-zone-map.md: 'Do not build Zones B–E until Zone A holds.' Zone B is already designed as the Fracture Line (separation) — it is not an environment sandbox." },
+  { name = "Chronicle II (The Echo Engine)", completion = 0 },
+  { name = "Chronicle III (The Two Who Were Needed)", completion = 0 },
 ]
 
 [blockers-and-issues]
-# No active blockers
+# Not code blockers — open design questions recorded in docs/design/19 and 22.
+# The first is load-bearing for the engine and should be settled before Chronicle II.
+issues = [
+  { id = "co-op-vs-switch-only", severity = "high", notes = "CANON SELF-CONTRADICTION. docs/design/13 lists Chronicle II as 'Dual-Character Simultaneous'; 08-level1-five-zone-map.md confirms switch-only single-active-character and says it 'matches the built engine'. Pre-dates the imported material. Touches the engine — settle before Chronicle II work." },
+  { id = "chronicle-i-tone", severity = "low", notes = "docs/design/13 calls Chronicle I 'surreal, dangerous, fast-paced'; the built Zone A is 'calm, folkloric' with 'a foreshadowing tremor, not the rupture itself', and Kishōtenketsu wants grounding. 13's tone line may be out of step." },
+  { id = "open-design-questions", severity = "low", notes = "Recorded in docs/design/19 and 22, awaiting owner: Chronicle I geography; the per-Chronicle trial spine; ghost platforms; Chronicle III's centre; birch or pine; Mirror Levels vs chiasmus vocabulary; manpu vs Slavic embroidery symbols." },
+]
 
 [critical-next-actions]
 actions = [
-  "Container templates complete — test with `just container-init`",
-  "Validate container templates across wolfi-base and static Chainguard images",
-  "Harden multi-forge sync for GitLab/Bitbucket mirroring edge cases",
-  "Expand Guix development shell templates",
+  "Settle co-op vs switch-only — it constrains the engine and is currently self-contradictory in canon.",
+  "Register chronicles-of-slavia in gv-clade-index. CLADE.a2ml now carries a correctly derived UUID (b1507e91-78ca-5d30-a66c-dc675ad678f0) but the repo is absent from the registry. Owner's action — registration is outward-facing.",
+  "Decide whether the ESM earns a place in a real scene, or stays headless. ADR-0004 deliberately left it unwired.",
+  "Resolve the 2 ignored tests in the workspace (see [technical-debt]).",
+]
+
+[test-status]
+# Live `cargo test` at the engine workspace root, 2026-07-16.
+passing = 51               # 29 slavia-core unit + 10 esm_testbed + 7 zone_a + 5 slavia-zone-a
+ignored = 2
+failing = 0
+command = "cd engine && cargo test"
+
+[technical-debt]
+items = [
+  { id = "ignored-tests", notes = "2 tests are #[ignore]d somewhere in the workspace. Ignored tests are debt: they are green by not running. Identify and either fix or delete." },
+  { id = "esm-unwired", notes = "Deliberate, not accidental (ADR-0004) — but 'unwired is not done' (doctrine 8). The ESM is proven headless against a synthetic cast and has never touched a real scene." },
+  { id = "template-residue", notes = "~150 files still carry rsr-template-repo strings or unsubstituted {{PLACEHOLDER}} tokens. The descriptiles and the arrival pack were corrected 2026-07-16; the wider residue is not yet swept." },
 ]
 
 [maintenance-status]
 last-run-utc = "never"
 last-report = "docs/reports/maintenance/latest.json"
-last-result = "unknown"  # unknown | pass | warn | fail
+last-result = "unknown"    # unknown | pass | warn | fail
 open-warnings = 0
 open-failures = 0
 
 [ecosystem]
-part-of = ["RSR Framework", "stapeln ecosystem"]
-depends-on = ["stapeln", "selur-compose", "cerro-torre", "svalinn", "vordr", "k9-svc"]
-
-# ---------------------------------------------------------------------------
-# NOTE FOR CONSUMERS: When using this template to create a new repo, reset
-# the fields above to your project's values and replace all {{PLACEHOLDER}}
-# tokens. The milestones above describe the TEMPLATE's evolution, not yours.
-# ---------------------------------------------------------------------------
+part-of = ["RSR Framework"]
+depends-on = ["serde", "toml"]   # slavia-core, deliberately tiny and wasm-friendly
+planned-depends-on = ["bevy"]    # L3 only, per ADR-0003; not yet a dependency
