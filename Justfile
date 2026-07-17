@@ -159,17 +159,17 @@ test-smoke:
 
 # Run end-to-end tests (full pipeline: build → run → verify)
 e2e:
-    @echo "Running E2E tests..."
+    @echo "⚠ E2E gate NOT IMPLEMENTED — it runs no tests; this is not a pass." >&2
     # TODO: Replace with your E2E test command. Examples:
     #   bash tests/e2e.sh                    # Shell-based E2E
     #   npx playwright test                  # Browser E2E
     #   mix test test/integration/e2e_test.exs  # Elixir E2E
     #   cargo test --test end_to_end         # Rust E2E
-    @echo "E2E tests passed!"
+    @echo "  Wire one of the above and this gate seals; until then it declines to certify." >&2
 
 # Run aspect tests (cross-cutting concern validation)
 aspect:
-    @echo "Running aspect tests..."
+    @echo "⚠ Aspect gate NOT IMPLEMENTED — it validates no invariant; this is not a pass." >&2
     # TODO: Replace with your aspect test command. Examples:
     #   bash tests/aspect_tests.sh           # Shell-based aspect tests
     #   cargo test --test aspects             # Rust aspect tests
@@ -178,24 +178,24 @@ aspect:
     #   - ABI/FFI contract (declarations match exports)
     #   - SPDX compliance (all files have license headers)
     #   - No dangerous patterns (believe_me, assert_total, etc.)
-    @echo "Aspect tests passed!"
+    @echo "  SPDX + no-dangerous-patterns are the cheap first checks to seal it." >&2
 
 # Run benchmarks (performance regression detection)
 bench:
-    @echo "Running benchmarks..."
+    @echo "⚠ Bench gate NOT IMPLEMENTED — it runs no benchmarks; this is not a pass (and perf is not soundness)." >&2
     # TODO: Replace with your benchmark command. Examples:
     #   cargo bench                           # Rust criterion
     #   zig build bench                       # Zig benchmarks
     #   mix run bench/benchmarks.exs          # Elixir benchee
     #   deno bench                            # Deno bench
-    @echo "Benchmarks complete!"
+    @echo "  Wire e.g. cargo bench to seal it." >&2
 
 # Run readiness tests (Component Readiness Grade: D/C/B)
 readiness:
-    @echo "Running readiness tests..."
+    @echo "⚠ Readiness gate NOT IMPLEMENTED — it grades nothing; this is not a pass." >&2
     # TODO: Replace with your readiness test command. Examples:
     #   cargo test --test readiness -- --nocapture
-    @echo "Readiness tests complete!"
+    @echo "  crg-grade still reads the stated grade from READINESS.md." >&2
 
 # Print the current CRG grade (reads from READINESS.md '**Current Grade:** X' line)
 crg-grade:
@@ -222,7 +222,9 @@ crg-badge:
 # Run the full merge-requirement test suite (ALL categories)
 # Per STANDING rule: P2P + E2E + aspect + execution + lifecycle + bench
 test-all: test e2e aspect bench readiness
-    @echo "All test categories passed — safe to merge!"
+    @echo "test-all: the L2 core suite ('just test') PASSED."
+    @echo "test-all: e2e / aspect / bench / readiness are NOT IMPLEMENTED (banners above) — they verified nothing."
+    @echo "test-all: this is NOT a merge certification; a green exit here does not mean 'safe to merge'."
 
 # Run all quality checks
 quality: fmt-check lint test
