@@ -1,15 +1,41 @@
 # SPDX-License-Identifier: MPL-2.0
-# Mustfile — Physical state contract for rsr-template-repo
+# Mustfile — Physical state contract for chronicles-of-slavia
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # What MUST be true about this repository. Hard requirements.
 # Run with: must check
 # Fix with: must fix (where a deterministic fix exists)
+#
+# CORRECTED 2026-07-17. This file previously declared itself the contract for
+# `rsr-template-repo` — inherited verbatim from the template this repo was
+# instantiated from. Four of its sixteen probes failed when actually run, two of
+# them because they were unpassable by construction rather than merely stale:
+#
+#   * contractiles-files-present — checked the pre-trident flat paths
+#     (contractiles/Mustfile.a2ml) that INDEX.a2ml v2.0.0 moved into per-verb
+#     directories (contractiles/must/Mustfile.a2ml) on 2026-04-18.
+#   * self-validating-structure  — required a k9-svc/ directory that has never
+#     existed here; the three k9 tier templates live in self-validating/.
+#   * no-placeholder-values      — grepped for `{{` across contractiles/ and so
+#     matched its own `- run:` line. Unpassable in ANY repo, including the
+#     template. See the Identity section for why it is gone rather than fixed.
+#   * template-readonly          — grepped for an RSR_TEMPLATE_DO_NOT_EDIT
+#     marker present nowhere in this repo except inside the probe looking for
+#     it. It also asserts template integrity, which is rsr-template-repo's
+#     business, not an instantiated game's.
+#
+# NOTE (2026-07-17): nothing executes this file. There is no `must` binary in
+# this repo or on PATH, and the coaptation receipt records all sixteen probes as
+# `probe-deferred` — deferred to a Hunt-tier runner that does not exist yet
+# (estate-wide; the runners are unbuilt). Until one lands, these probes are
+# claims, not gates. They are written to be run, and were each run by hand on
+# 2026-07-17, but do not mistake this file for enforcement.
 
 @abstract:
-Physical-state invariants for rsr-template-repo. This is the canonical
-RSR template repository. These are hard requirements — CI and pre-commit
-hooks fail if any check fails.
+Physical-state invariants for chronicles-of-slavia — a two-character Slavic-
+folkloric narrative game, instantiated from rsr-template-repo but NOT that
+template (see ECOSYSTEM.a2ml `what-this-is-not`). These are hard requirements:
+a single failure is intended to block release once a runner exists.
 @end
 
 ## File Presence
@@ -52,9 +78,10 @@ hooks fail if any check fails.
 - severity: critical
 
 ### contractiles-files-present
-- description: All four primary contractile files exist
-- run: test -f .machine_readable/contractiles/Intentfile.a2ml && test -f .machine_readable/contractiles/Mustfile.a2ml && test -f .machine_readable/contractiles/Trustfile.a2ml && test -f .machine_readable/contractiles/Adjustfile.a2ml
+- description: All four primary contractile files exist, on the trident shape
+- run: test -f .machine_readable/contractiles/intend/Intentfile.a2ml && test -f .machine_readable/contractiles/must/Mustfile.a2ml && test -f .machine_readable/contractiles/trust/Trustfile.a2ml && test -f .machine_readable/contractiles/adjust/Adjustfile.a2ml
 - severity: critical
+- notes: Paths follow INDEX.a2ml v2.0.0 (2026-04-18), which moved every verb into its own directory. The flat contractiles/Mustfile.a2ml layout this probe used to assert has not existed since.
 
 ### bust-dust-files-present
 - description: Bustfile and Dustfile exist in their directories
@@ -72,22 +99,45 @@ hooks fail if any check fails.
 - severity: warning
 
 ### self-validating-structure
-- description: self-validating directory has k9-svc and examples
-- run: test -d .machine_readable/self-validating && test -d .machine_readable/self-validating/k9-svc && test -d .machine_readable/self-validating/examples
+- description: self-validating directory has the three k9 tier templates and examples
+- run: test -d .machine_readable/self-validating && test -d .machine_readable/self-validating/examples && test -f .machine_readable/self-validating/template-kennel.k9.ncl && test -f .machine_readable/self-validating/template-yard.k9.ncl && test -f .machine_readable/self-validating/template-hunt.k9.ncl
 - severity: warning
+- notes: Asserts the Kennel/Yard/Hunt tiers by name rather than a k9-svc/ directory, which has never existed here. INDEX.a2ml still lists the k9 templates under contractiles/k9/ — also wrong; they live in self-validating/. Reported upstream, not patched here.
 
-## Template Integrity
+## Identity
 
-### no-placeholder-values
-- description: No placeholder values remain in template files
-- run: test -z "$(grep -r '{{' .machine_readable/contractiles/ 2>/dev/null)"
+# Replaces the old `no-placeholder-values` and `template-readonly` probes.
+#
+# `no-placeholder-values` grepped for `{{` and is not merely stale but
+# unfixable as posed: a regex cannot tell a placeholder from the word
+# "placeholder". STATE.a2ml and ANCHOR.a2ml both legitimately DOCUMENT the
+# residue problem, and every mention trips the detector — as does the probe's
+# own source line. Any repo honest enough to write down that it has placeholder
+# residue would fail a check for placeholder residue.
+#
+# Placeholder residue is real (STATE.a2ml puts it at ~150 files) but it is
+# `dust`'s remit, not `must`'s: dust.no-example-placeholders and
+# dust.no-stale-template-references already track it as planned exnovation,
+# where an advisory grade fits work that is expected to take time. A blocking
+# must-probe duplicating them bought nothing.
+#
+# What `must` can assert precisely is the invariant whose breach was the actual
+# bug: that this repo declares its own identity. Anchored to the value lines, so
+# the historical notes in CLADE's header do not match.
+
+### identity-substituted
+- description: CLADE declares this repo's own derived identity, not the template's
+- run: test "$(grep -E '^uuid = ' .machine_readable/descriptiles/CLADE.a2ml)" = 'uuid = "b1507e91-78ca-5d30-a66c-dc675ad678f0"' && test "$(grep -E '^canonical-name = ' .machine_readable/descriptiles/CLADE.a2ml)" = 'canonical-name = "chronicles-of-slavia"'
 - severity: critical
-- notes: All placeholders must be substituted when copying this template
+- notes: Until 2026-07-16 this repo declared uuid a5ea1382-a34c-5334-8a46-a2ebe904c810 / rsr-template-repo — the template's own genuine identity — so it told every arriving agent it was the template. The uuid is UUIDv5(URL, "github.com/hyperpolymath/chronicles-of-slavia"); see CLADE.a2ml for the derivation. Verified to fail when canonical-name is reverted.
 
-### template-readonly
-- description: Template marker files are not modified
-- run: grep -q 'RSR_TEMPLATE_DO_NOT_EDIT' .machine_readable/0.1-AI-MANIFEST.a2ml
-- severity: warning
+## Golden Path
+
+### golden-path-executes
+- description: `just test` runs the real suite rather than echoing success
+- run: grep -q 'cargo test -p slavia-core' Justfile
+- severity: critical
+- notes: Guards the fix in PR #7. Until 2026-07-17 the test/lint/fmt/fmt-check recipes were stubs that printed "Tests passed!" and ran nothing, so `just quality` was three no-ops reporting success while ANCHOR.a2ml declared that same path verifies Zone A's five beats, the ESM testbed and L2 determinism. A grep is a weak assertion — it catches reversion to a stub, not a suite that has rotted — but it is honest about what it checks, which the recipe it guards was not.
 
 ## Git State
 
