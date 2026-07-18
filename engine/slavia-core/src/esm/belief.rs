@@ -87,7 +87,9 @@ pub struct Baseline {
 
 impl Baseline {
     pub fn new(facts: impl IntoIterator<Item = Fact>) -> Baseline {
-        Baseline { facts: facts.into_iter().collect() }
+        Baseline {
+            facts: facts.into_iter().collect(),
+        }
     }
 
     pub fn contains(&self, f: &Fact) -> bool {
@@ -123,7 +125,10 @@ pub struct Mind {
 
 impl Mind {
     pub fn new(id: impl Into<String>) -> Mind {
-        Mind { id: id.into(), deltas: Vec::new() }
+        Mind {
+            id: id.into(),
+            deltas: Vec::new(),
+        }
     }
 
     /// Record an epistemic event. This is the *only* way belief changes.

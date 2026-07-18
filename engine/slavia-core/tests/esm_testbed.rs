@@ -22,13 +22,13 @@
 //!    being coded. This is the design's central claim, and if it ever has to be
 //!    special-cased into a function, the claim is false.
 
+use slavia_core::esm::decay::retained_instructions;
+use slavia_core::esm::intent::read_intent;
 use slavia_core::esm::{
     belief::holds,
     kanren::{conj_all, eq, fresh, run, Term},
     Baseline, Fact, Mind, Read, Rng,
 };
-use slavia_core::esm::intent::read_intent;
-use slavia_core::esm::decay::retained_instructions;
 
 fn fact(pred: &str, args: &[&str]) -> Fact {
     Fact::new(pred, args.iter().copied())
@@ -97,21 +97,39 @@ fn what_one_guard_witnesses_leaves_the_other_wrong_indefinitely() {
 
 #[test]
 fn heading_north_is_ambiguous_because_two_things_lie_north() {
-    let read = read_intent(&boris(), &manor(), "north", &["cellar", "storeroom", "chapel"]);
+    let read = read_intent(
+        &boris(),
+        &manor(),
+        "north",
+        &["cellar", "storeroom", "chapel"],
+    );
     // He covers the bottleneck; he cannot know which.
-    assert_eq!(read, Read::Ambiguous(vec!["cellar".into(), "storeroom".into()]));
+    assert_eq!(
+        read,
+        Read::Ambiguous(vec!["cellar".into(), "storeroom".into()])
+    );
 }
 
 #[test]
 fn heading_east_is_unified_because_only_the_chapel_lies_east() {
-    let read = read_intent(&boris(), &manor(), "east", &["cellar", "storeroom", "chapel"]);
+    let read = read_intent(
+        &boris(),
+        &manor(),
+        "east",
+        &["cellar", "storeroom", "chapel"],
+    );
     assert_eq!(read, Read::Unified("chapel".into()));
 }
 
 #[test]
 fn a_guard_who_never_learned_the_geography_can_deduce_nothing() {
     // Same manor, same heading — but this mind starts from an empty world.
-    let read = read_intent(&Mind::new("newcomer"), &Baseline::new([]), "north", &["cellar"]);
+    let read = read_intent(
+        &Mind::new("newcomer"),
+        &Baseline::new([]),
+        "north",
+        &["cellar"],
+    );
     assert_eq!(read, Read::Contradiction);
 }
 
@@ -162,7 +180,10 @@ fn reads_passerby_as(guard: &Mind, base: &Baseline, corridor: &str) -> Vec<Strin
         fresh(move |secret| {
             conj_all(vec![
                 // "I am hiding something…"
-                holds(&beliefs, Term::list([atom("is-hiding-secret"), secret.clone()])),
+                holds(
+                    &beliefs,
+                    Term::list([atom("is-hiding-secret"), secret.clone()]),
+                ),
                 // "…and it is down there…"
                 holds(
                     &beliefs,
@@ -179,7 +200,10 @@ fn reads_passerby_as(guard: &Mind, base: &Baseline, corridor: &str) -> Vec<Strin
         })
     });
 
-    answers.iter().filter_map(|t| t.as_atom().map(str::to_string)).collect()
+    answers
+        .iter()
+        .filter_map(|t| t.as_atom().map(str::to_string))
+        .collect()
 }
 
 #[test]
@@ -237,16 +261,24 @@ fn the_guards_panic_is_the_only_clue_and_nobody_authored_it() {
 
 #[test]
 fn a_companion_sent_far_forgets_the_tail_but_not_the_first_errand() {
-    let errands: Vec<String> = ["fetch water", "mind the goat", "bar the gate", "wait for me"]
-        .iter()
-        .map(|s| s.to_string())
-        .collect();
+    let errands: Vec<String> = [
+        "fetch water",
+        "mind the goat",
+        "bar the gate",
+        "wait for me",
+    ]
+    .iter()
+    .map(|s| s.to_string())
+    .collect();
 
     let mut rng = Rng::seeded(20260716);
     let kept = retained_instructions(40, &errands, &mut rng);
 
     assert_eq!(kept.first().map(String::as_str), Some("fetch water"));
-    assert!(kept.len() < errands.len(), "a long walk must cost something");
+    assert!(
+        kept.len() < errands.len(),
+        "a long walk must cost something"
+    );
 
     // And the same errand, the same walk, the same seed — the same memory.
     let mut rng = Rng::seeded(20260716);

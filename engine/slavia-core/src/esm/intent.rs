@@ -76,12 +76,7 @@ pub fn classify(answers: Vec<Term>) -> Read {
 ///
 /// The `lies-toward` predicate is supplied by the scene as content (ADR-0006);
 /// this function does not invent geography.
-pub fn read_intent(
-    mind: &Mind,
-    baseline: &Baseline,
-    heading: &str,
-    candidates: &[&str],
-) -> Read {
+pub fn read_intent(mind: &Mind, baseline: &Baseline, heading: &str, candidates: &[&str]) -> Read {
     let beliefs = mind.beliefs(baseline);
     let candidates: Vec<Term> = candidates.iter().map(|c| Term::atom(*c)).collect();
     let heading = heading.to_string();
@@ -93,11 +88,7 @@ pub fn read_intent(
             // … and this mind believes q lies that way.
             holds(
                 &beliefs,
-                Term::list([
-                    Term::atom("lies-toward"),
-                    q,
-                    Term::atom(heading.as_str()),
-                ]),
+                Term::list([Term::atom("lies-toward"), q, Term::atom(heading.as_str())]),
             ),
         )
     });

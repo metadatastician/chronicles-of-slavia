@@ -101,10 +101,9 @@ impl Term {
     /// Build a proper list: `list([a, b])` is `(a b)`, i.e. `Pair(a, Pair(b, Nil))`.
     pub fn list(items: impl IntoIterator<Item = Term>) -> Term {
         let items: Vec<Term> = items.into_iter().collect();
-        items
-            .into_iter()
-            .rev()
-            .fold(Term::Nil, |tail, head| Term::Pair(Rc::new(head), Rc::new(tail)))
+        items.into_iter().rev().fold(Term::Nil, |tail, head| {
+            Term::Pair(Rc::new(head), Rc::new(tail))
+        })
     }
 
     /// The atom's text, if this is an atom. Convenience for reading answers out.
@@ -189,10 +188,9 @@ impl Subst {
     pub fn reify(&self, t: &Term) -> Term {
         let t = self.walk(t);
         match t {
-            Term::Pair(head, tail) => Term::Pair(
-                Rc::new(self.reify(&head)),
-                Rc::new(self.reify(&tail)),
-            ),
+            Term::Pair(head, tail) => {
+                Term::Pair(Rc::new(self.reify(&head)), Rc::new(self.reify(&tail)))
+            }
             other => other,
         }
     }
@@ -235,13 +233,22 @@ pub struct State {
 
 impl State {
     pub fn new() -> Self {
-        State { subst: Subst::new(), next: 0 }
+        State {
+            subst: Subst::new(),
+            next: 0,
+        }
     }
 
     /// A copy of this state, plus a brand-new variable nothing has bound yet.
     pub fn with_fresh(&self) -> (State, Var) {
         let v = Var(self.next);
-        (State { subst: self.subst.clone(), next: self.next + 1 }, v)
+        (
+            State {
+                subst: self.subst.clone(),
+                next: self.next + 1,
+            },
+            v,
+        )
     }
 }
 
@@ -254,7 +261,10 @@ pub type Goal = Rc<dyn Fn(&State) -> Vec<State>>;
 /// `u` and `v` are the same thing. The primitive goal; everything builds on it.
 pub fn eq(u: Term, v: Term) -> Goal {
     Rc::new(move |st: &State| match unify(&u, &v, &st.subst) {
-        Some(subst) => vec![State { subst, next: st.next }],
+        Some(subst) => vec![State {
+            subst,
+            next: st.next,
+        }],
         None => vec![],
     })
 }
@@ -334,8 +344,7 @@ where
     let (st, q) = State::new().with_fresh();
     let query = Term::Var(q);
     let goal = f(query.clone());
-    let mut answers: Vec<Term> =
-        goal(&st).iter().map(|s| s.subst.reify(&query)).collect();
+    let mut answers: Vec<Term> = goal(&st).iter().map(|s| s.subst.reify(&query)).collect();
     if let Some(n) = limit {
         answers.truncate(n);
     }
@@ -383,7 +392,10 @@ mod tests {
                 Term::list([a("lies-toward"), a("usb-stick"), a("south")]),
             )
         });
-        assert!(answers.is_empty(), "south != north must fail the list unify");
+        assert!(
+            answers.is_empty(),
+            "south != north must fail the list unify"
+        );
     }
 
     #[test]
@@ -412,7 +424,9 @@ mod tests {
     #[test]
     fn a_variable_bound_transitively_still_walks_to_ground() {
         // q = x, x = north  =>  q reifies to north.
-        let answers = run(None, |q| fresh(move |x| conj(eq(q.clone(), x.clone()), eq(x, a("north")))));
+        let answers = run(None, |q| {
+            fresh(move |x| conj(eq(q.clone(), x.clone()), eq(x, a("north"))))
+        });
         assert_eq!(answers, vec![a("north")]);
     }
 
@@ -450,6 +464,9 @@ mod tests {
     fn an_unbound_query_reports_as_a_variable_not_a_lie() {
         let answers = run(None, |_q| succeed());
         assert_eq!(answers.len(), 1);
-        assert!(matches!(answers[0], Term::Var(_)), "unbound must stay visible");
+        assert!(
+            matches!(answers[0], Term::Var(_)),
+            "unbound must stay visible"
+        );
     }
 }

@@ -130,39 +130,46 @@ clean-all: clean
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Run all tests
+#
+# This recipe IS the golden path named in ANCHOR: Zone A's five-beat spec
+# holds, the ESM testbed passes, L2 stays deterministic. Nothing here may
+# announce a pass — the runner's exit code is the evidence, and `just` aborts
+# the recipe on any non-zero. Doctrine 3: no silent green.
 test *args:
     @echo "Running tests..."
-    # TODO: Replace with your test command
-    # Examples:
-    #   cargo test {{args}}
-    #   mix test {{args}}
-    #   zig build test {{args}}
-    #   deno test {{args}}
-    @echo "Tests passed!"
+    # L2 — the sacred logic. tests/zone_a.rs is the executable statement of the
+    # five-beat spec; tests/esm_testbed.rs proves belief stays local, that
+    # confidence is the solver's solution count, and that the Guilty Conscience
+    # trap stays emergent rather than coded.
+    cd engine && cargo test -p slavia-core {{ args }}
+    # L3 — the play controller. --no-default-features drops Bevy so this runs
+    # headless (no display, no libwayland). See engine/README.adoc.
+    cd engine && cargo test -p slavia-zone-a --no-default-features {{ args }}
 
 # Run tests with verbose output
 test-verbose:
     @echo "Running tests (verbose)..."
-    # TODO: Replace with verbose test command
+    cd engine && cargo test -p slavia-core -- --nocapture
+    cd engine && cargo test -p slavia-zone-a --no-default-features -- --nocapture
 
-# Smoke test
+# Smoke test — the five beats alone; the fastest proof the core still holds
 test-smoke:
     @echo "Smoke test..."
-    # TODO: Add basic sanity checks
+    cd engine && cargo test -p slavia-core --test zone_a
 
 # Run end-to-end tests (full pipeline: build → run → verify)
 e2e:
-    @echo "Running E2E tests..."
+    @echo "⚠ E2E gate NOT IMPLEMENTED — it runs no tests; this is not a pass." >&2
     # TODO: Replace with your E2E test command. Examples:
     #   bash tests/e2e.sh                    # Shell-based E2E
     #   npx playwright test                  # Browser E2E
     #   mix test test/integration/e2e_test.exs  # Elixir E2E
     #   cargo test --test end_to_end         # Rust E2E
-    @echo "E2E tests passed!"
+    @echo "  Wire one of the above and this gate seals; until then it declines to certify." >&2
 
 # Run aspect tests (cross-cutting concern validation)
 aspect:
-    @echo "Running aspect tests..."
+    @echo "⚠ Aspect gate NOT IMPLEMENTED — it validates no invariant; this is not a pass." >&2
     # TODO: Replace with your aspect test command. Examples:
     #   bash tests/aspect_tests.sh           # Shell-based aspect tests
     #   cargo test --test aspects             # Rust aspect tests
@@ -171,24 +178,24 @@ aspect:
     #   - ABI/FFI contract (declarations match exports)
     #   - SPDX compliance (all files have license headers)
     #   - No dangerous patterns (believe_me, assert_total, etc.)
-    @echo "Aspect tests passed!"
+    @echo "  SPDX + no-dangerous-patterns are the cheap first checks to seal it." >&2
 
 # Run benchmarks (performance regression detection)
 bench:
-    @echo "Running benchmarks..."
+    @echo "⚠ Bench gate NOT IMPLEMENTED — it runs no benchmarks; this is not a pass (and perf is not soundness)." >&2
     # TODO: Replace with your benchmark command. Examples:
     #   cargo bench                           # Rust criterion
     #   zig build bench                       # Zig benchmarks
     #   mix run bench/benchmarks.exs          # Elixir benchee
     #   deno bench                            # Deno bench
-    @echo "Benchmarks complete!"
+    @echo "  Wire e.g. cargo bench to seal it." >&2
 
 # Run readiness tests (Component Readiness Grade: D/C/B)
 readiness:
-    @echo "Running readiness tests..."
+    @echo "⚠ Readiness gate NOT IMPLEMENTED — it grades nothing; this is not a pass." >&2
     # TODO: Replace with your readiness test command. Examples:
     #   cargo test --test readiness -- --nocapture
-    @echo "Readiness tests complete!"
+    @echo "  crg-grade still reads the stated grade from READINESS.md." >&2
 
 # Print the current CRG grade (reads from READINESS.md '**Current Grade:** X' line)
 crg-grade:
@@ -215,7 +222,9 @@ crg-badge:
 # Run the full merge-requirement test suite (ALL categories)
 # Per STANDING rule: P2P + E2E + aspect + execution + lifecycle + bench
 test-all: test e2e aspect bench readiness
-    @echo "All test categories passed — safe to merge!"
+    @echo "test-all: the L2 core suite ('just test') PASSED."
+    @echo "test-all: e2e / aspect / bench / readiness are NOT IMPLEMENTED (banners above) — they verified nothing."
+    @echo "test-all: this is NOT a merge certification; a green exit here does not mean 'safe to merge'."
 
 # Run all quality checks
 quality: fmt-check lint test
@@ -232,30 +241,29 @@ fix: fmt
 # Format all source files [reversible: git checkout]
 fmt:
     @echo "Formatting source files..."
-    # TODO: Replace with your formatter
-    # Examples:
-    #   cargo fmt
-    #   mix format
-    #   gleam format
-    #   deno fmt
+    cd engine && cargo fmt --all
 
 # Check formatting without changes
 fmt-check:
     @echo "Checking formatting..."
-    # TODO: Replace with your format check
-    # Examples:
-    #   cargo fmt --check
-    #   mix format --check-formatted
-    #   gleam format --check
+    cd engine && cargo fmt --all --check
 
 # Run linter
+#
+# Scoped to match `test`: the core strictly, the renderer without Bevy. Linting
+# the full Bevy tree would cost ~70s and need the system X11 dev libs — and an
+# unrunnable gate becomes a skipped gate.
+#
+# `-A dead_code` on the renderer is a scoping fix, not a suppression. Under
+# --no-default-features the Bevy layer is cfg'd out, so everything it calls
+# looks unused; the items are live in the real build. Verified: `cargo check
+# -p slavia-zone-a` (Bevy on) reports none of them. Linting dead_code in a
+# config that structurally cannot see the callers would be gate theatre.
+# L2 gets no such exemption — it has no cfg'd-out callers and is held strict.
 lint:
     @echo "Linting source files..."
-    # TODO: Replace with your linter
-    # Examples:
-    #   cargo clippy -- -D warnings
-    #   mix credo --strict
-    #   gleam check
+    cd engine && cargo clippy -p slavia-core --all-targets -- -D warnings
+    cd engine && cargo clippy -p slavia-zone-a --no-default-features --all-targets -- -D warnings -A dead_code
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # RUN & EXECUTE

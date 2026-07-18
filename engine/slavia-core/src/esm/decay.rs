@@ -124,10 +124,16 @@ mod tests {
     use super::*;
 
     fn errands() -> Vec<String> {
-        ["fetch water", "mind the goat", "greet the miller", "bar the gate", "wait for me"]
-            .iter()
-            .map(|s| s.to_string())
-            .collect()
+        [
+            "fetch water",
+            "mind the goat",
+            "greet the miller",
+            "bar the gate",
+            "wait for me",
+        ]
+        .iter()
+        .map(|s| s.to_string())
+        .collect()
     }
 
     #[test]
@@ -173,8 +179,10 @@ mod tests {
             let kept = retained_instructions(30, &errands(), &mut rng);
             let full = errands();
             // Every retained item appears in the original order.
-            let positions: Vec<usize> =
-                kept.iter().map(|k| full.iter().position(|f| f == k).unwrap()).collect();
+            let positions: Vec<usize> = kept
+                .iter()
+                .map(|k| full.iter().position(|f| f == k).unwrap())
+                .collect();
             let mut sorted = positions.clone();
             sorted.sort_unstable();
             assert_eq!(positions, sorted, "order must be preserved (seed {seed})");
