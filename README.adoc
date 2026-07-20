@@ -1,4 +1,4 @@
-= Chronicles of Slavia Prototype
+= Chronicles of Slavia
 :toc:
 :toclevels: 2
 :sectanchors:
