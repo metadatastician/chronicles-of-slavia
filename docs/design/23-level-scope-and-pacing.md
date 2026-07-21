@@ -126,6 +126,19 @@ can be built against a genuine target instead of an inherited default:
      a second cross-segment thread into A3 (see the fluidity principle
      below), independent of A3's own NPC-sourced artefact.
 
+     **Recharge/health items have a signature tier, not just generic
+     edible filler.** Ordinary edible/palatable items exist, but the
+     *proper* recharge items are each girl's own: **Ukrainian honey** for
+     Anya and **Bulgarian yogurt** for Donna. This is not an arbitrary
+     flavor pick — honey is **naturally found/gathered** (wild, foraged),
+     yogurt is **artificially made** (crafted, fermented), matching each
+     girl's existing chaos/wild vs. order/crafted nature exactly (the same
+     axis stir/settle already runs on). Each girl's signature item likely
+     recharges her more effectively than generic food, and each is
+     plausibly cultural/regional-specific — honey to Anya's Carpathian
+     origin, yogurt to Donna's Rhodope origin (`09-anya-and-donna-
+     backstories.md`).
+
      **Plants do not get the animals' stir/settle taxis reaction.** The
      girls' effect on plants, if any, is closer to **tropism** — bending
      toward, reaching higher, shrinking back, growing out from themselves —
