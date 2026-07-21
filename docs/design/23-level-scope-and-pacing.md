@@ -204,48 +204,50 @@ can be built against a genuine target instead of an inherited default:
 
      **Theory-of-mind splits by mode.** In multiplayer (parked elsewhere in
      canon, but the split matters here): the *other player* supplies their
-     own real theory-of-mind — nothing to simulate. Against **NPCs**, the
-     game needs an actual system, and NPC "memory" should be treated as
-     **one unified thing** covering two channels:
-     - **Relational memory** — how an NPC has been treated, accumulated
-       trust, and persistence of who they believe the girls are (an NPC's
-       read on identity is not reset each encounter).
-     - **Attentional/observational memory** — NPCs notice *behavior
-       patterns*, not just discrete actions: lingering near an object,
-       repeated failed attempts (trying to jump a stream, say), returning
-       to the same spot repeatedly, or digging around, should build an
-       NPC's suspicion that "there's something going on over there."
-       Loitering near a house and fleeing when its owner appears reads as
-       suspicious specifically *because* of the flee, not the loitering
-       alone. NPCs can also reason **indirectly** — seeing a girl outside,
-       then hearing noises on a roof, prompts "what are they doing up
-       there," even unseen — and such inferences can be **deliberately
-       confused**: e.g. Anya arranging birds onto a roof as a decoy,
-       muddying an NPC's read on what actually happened.
+     own real theory-of-mind — nothing to simulate. Against **NPCs**, this
+     is not new ground: `20-cognitive-npcs-and-theory-of-mind.md` already
+     specifies a real, **built and passing** architecture for exactly this
+     (the ESM — `engine/slavia-core/src/esm/`, 10/10 tests green as of
+     2026-07-21) — A5 should be understood as *using* that system, not as
+     needing a new one. Mapping the ideas discussed onto it:
 
-       This attribution is inherently **counterfactual reasoning**, and
-       should be named as such rather than left implicit: an NPC dismissing
-       a noise because "it's just the birds" is really judging "if not for
-       the birds, I'd suspect something else" — the decoy works *because*
-       NPCs compare what happened against what would have happened absent
-       the girls. The same mechanism should also run the other way, for
-       **trust from restraint**: an NPC noticing the girls *could have*
-       taken something, or acted on an opportunity, and didn't — building
-       trust from a counterfactual the NPC infers, not just from completed
-       quests or observed good deeds.
+     - **Attribution and the decoy are the solver's existing confidence
+       read**, not a new mechanism. `esm::intent::Read` already classifies
+       an NPC's belief-driven guess by solution count: `Unified` (one
+       candidate — confident), `Ambiguous` (several candidates — can't
+       tell which), `Contradiction` (zero — "I've been tricked"). Anya
+       arranging birds on a roof as a decoy is, precisely, adding a second
+       candidate cause so the solver reads `Ambiguous` instead of
+       `Unified` — the counterfactual reasoning discussed ("if not for the
+       birds, I'd suspect something else") *is* this classification, not
+       a separate system layered on top of it.
+     - **Relational memory and graded, persistent identity belief are
+       already free**, per `esm::belief`'s own doc comment: belief is
+       `baseline + an entity's own deltas`, so two NPCs can disagree, and
+       an NPC's read on "are these *those* girls" (from folklore, from
+       changed animal behavior, from the still-undocumented A2 tropism
+       thread) persists as that NPC's own delta rather than resetting each
+       encounter — no new mechanism needed, only new *content* (facts) fed
+       into the existing model.
+     - **Attentional pattern detection** (lingering near an object,
+       repeated failed attempts, returning to a spot, fleeing when an
+       owner appears) is a plausible **extension** of the existing
+       intent-reading system (which currently reasons from a single
+       heading against believed `lies-toward` facts) to reason over a
+       short behavior history instead of one instant — not yet built, and
+       not yet specified beyond this note.
 
-     **Identity belief is variable, not binary.** Changed animal behavior
-     (from the girls' own presence, or from the still-undocumented tropism
-     thread — see A2) may make an NPC suspect "these might be *those*
-     girls" from folklore, without confirming it — NPCs hold a graded,
-     not all-or-nothing, belief in the girls' identity, and how overt the
-     player is materially affects whether that suspicion forms at all.
-
-     **Trust gates quests economically, not just narratively.** Completing
-     quests for an NPC raises trust; failing, or disappearing with
-     something an NPC needed, damages it — an NPC who doesn't trust the
-     girls may withhold further quests until trust is rebuilt, rather than
-     simply reacting once and resetting.
+     **Open conflict, not silently resolved: "trust gates quests
+     economically."** This idea — an NPC withholding quests until trust is
+     rebuilt — is closer to `20`'s §E **factional reputation**, which that
+     doc explicitly marks **parked, not built** (per `00-start-here.md`
+     parking "all NPC factions" entirely, and because doc 20 judges it a
+     two-location, Zone-B-trigger mechanic). A5 living inside Zone A (one
+     level, per this doc's own resolution above) may conflict with that
+     parking rather than merely duplicate it. Left as an open question
+     rather than assumed: does A5's trust-gated-quests idea mean
+     un-parking factional reputation now, or does A5 need a lighter,
+     single-NPC version that doesn't require it?
 
      This is a substantial, self-contained system — its scope reaches
      beyond A5 alone (it plausibly governs NPC behavior across every
