@@ -117,7 +117,14 @@ can be built against a genuine target instead of an inherited default:
      unreconciled Zone B mechanism in prior canon research — relocated one
      level segment earlier than expected.
    - **A2 — animals and plants.** Broader ecological interaction beyond the
-     one grove-birds encounter A1 teaches.
+     one grove-birds encounter A1 teaches. Plants split into two kinds:
+     **regular plants** (functional — heal, feed, or provide base repair
+     for armour) and **pattern plants**, which contribute to the girls'
+     clothing patterns — an orthogonal dimension to clothing (alongside
+     whatever A3's costume-identity work already covers), with its own
+     downstream impacts not yet specified. Pattern plants gathered here are
+     a second cross-segment thread into A3 (see the fluidity principle
+     below), independent of A3's own NPC-sourced artefact.
    - **A3 — NPC interaction and clothing.** Human/social response to the
      girls, and costume/appearance as legible identity (ties to
      `15-character-visual-design.md`). The girls **obtain an artefact**
@@ -130,13 +137,13 @@ can be built against a genuine target instead of an inherited default:
      building on the co-op grammar A1 established. **Uses the A3 artefact**
      as part of the combination — its purpose is withheld until here.
 
-   **General principle, not a one-off**: the A3-artefact/A5-payoff is one
-   instance of a broader intent — several things should **cross segment
-   boundaries** (an item, a fact learned, a relationship formed), each
-   planted in one segment and paying off in a later one, so the five
-   segments read as **one fluid level**, not five sealed, independent
-   lessons. Exactly which threads cross which segments is not yet decided
-   beyond this one example.
+   **General principle, not a one-off**: the A3-artefact/A5-payoff and the
+   A2-pattern-plants/A3-clothing link are two instances of a broader
+   intent — several things should **cross segment boundaries** (an item, a
+   fact learned, a relationship formed), each planted in one segment and
+   paying off in a later one, so the five segments read as **one fluid
+   level**, not five sealed, independent lessons. Exactly which threads
+   cross which segments is not yet fully decided beyond these examples.
 
    This is direction, not a full design — segment content, beat counts, and
    exact transitions (how A1 "slides" into A2, etc.) are not yet specified.
