@@ -1,0 +1,9 @@
+# Agda proof manifest — read by scripts/check-proofs.sh agda
+# Format: <source-root>|<module-relative-to-source-root>|gated|quarantine|<note>
+# Ground-truthed 2026-07-17 with agda (agda --safe).
+# NOTE (chronicles issue #12): this file is still the unmodified
+# rsr-template-repo placeholder ("Example: A bounded natural number") — it is
+# gated because it genuinely compiles, not because it encodes a real
+# chronicles invariant. Authoring the game's real Agda content (if any) is
+# separate, owner/PLASMA-supervised work; do not read "gated" here as "done".
+verification/proofs/agda|Properties.agda|gated| compiles under `agda --safe`; still generic template content, not a chronicles invariant (#12)
