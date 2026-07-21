@@ -163,6 +163,16 @@ can be built against a genuine target instead of an inherited default:
      girl is present — order vs. chaos temperament landing better or worse
      with a given NPC — the first *social* instance of "wrong girl for this"
      (A1's bridge gate was the first *mechanical* instance).
+
+     **This should not stay flavor-only** — differential NPC reaction is
+     meant to become a genuine puzzle-design tool: NPC dispositions can form
+     **social puzzles** in their own right (win over, or route around, an
+     NPC who reads one girl badly), and can **inflect *how* a problem gets
+     solved**, not just whether it does — the same girl-vs-girl approach
+     divide the co-op grammar already runs on (A1's stir/settle), extended
+     from "which girl can act at all" to "which girl gets the better/worse
+     outcome, or opens a different path entirely." Not yet a spec, but the
+     intended weight of the mechanic, not a cosmetic aside.
    - **A4 — puzzle dynamics.** Mechanical puzzles building on A1-A3's
      systems. Notably: the Little Books
      (`docs/characters/the-little-book-of-{donna,anya}.adoc`) already
