@@ -155,9 +155,24 @@ can be built against a genuine target instead of an inherited default:
    - **A3 — NPC interaction and clothing.** Human/social response to the
      girls, and costume/appearance as legible identity (ties to
      `15-character-visual-design.md`). The girls **obtain an artefact**
-     here, from an NPC, carried forward — inert until A5.
+     here, from an NPC, carried forward — inert until A5. Costume state
+     (worn vs. pristine, which A2 pattern plants have been applied) plausibly
+     shapes NPC reaction — soft texture, not a hard gate, echoing the
+     mess/damage/humiliation-has-social-consequences idea from earlier
+     design discussion. NPC reception may also plausibly differ by which
+     girl is present — order vs. chaos temperament landing better or worse
+     with a given NPC — the first *social* instance of "wrong girl for this"
+     (A1's bridge gate was the first *mechanical* instance).
    - **A4 — puzzle dynamics.** Mechanical puzzles building on A1-A3's
-     systems.
+     systems. Notably: the Little Books
+     (`docs/characters/the-little-book-of-{donna,anya}.adoc`) already
+     document a full named ability roster per girl — Brace/Anchor
+     Step/Heavy Lift/Reinforce/Logic Link (Donna) vs. Dash Burst/Impulse
+     Jump/Time Flicker/Chaos Pulse/Momentum Chains (Anya) — none of which
+     the currently-built Zone A/A1 exercises (A1 uses only stir/settle/
+     cross). A4 is the natural place to wire some of this existing-but-
+     unused canon into real puzzle mechanics, rather than inventing new
+     puzzle verbs from scratch.
    - **A5 — synthesis.** Combines everything prior, and introduces
      **asymmetric information / theory-of-mind** play — each girl acting on
      what she knows the other doesn't (or believes the other knows),
