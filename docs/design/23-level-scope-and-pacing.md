@@ -133,12 +133,17 @@ can be built against a genuine target instead of an inherited default:
      early-game (A2), so it is **not introduced, taught, or UI-surfaced in
      A2 or for some while after**. It should first appear, subtly, **later
      in the game**, with no tutorial or prompt calling it out — the player
-     is meant to notice a pattern themselves, unaided, the first time. As a
-     safety net for a player who never notices (or hasn't in a long while),
-     one girl may eventually **remark on it in dialogue** — something like
-     "...did you see that?" — a nudge, not an explanation, and only once
-     it's plausible the effect has already been visible for a long stretch
-     of play.
+     is meant to notice a pattern themselves, unaided, the first time.
+
+     **This silence is diegetic, not just a UX choice: Anya and Donna
+     themselves do not know they can do this.** The effect is meant to
+     emerge as a surprise *to the characters*, tied to them growing older
+     and more powerful over the course of the game — not a latent ability
+     they always had and simply never mentioned. So the eventual dialogue
+     safety net ("...did you see that?", for a player who hasn't noticed in
+     a long while) is not a knowing hint from the writers — it plays as one
+     girl genuinely noticing the effect in the moment, alongside the player,
+     for the first time.
 
      To be clear: **hidden from the player is not the same as undocumented
      by us.** This mechanic gets full design-canon treatment like anything
