@@ -84,12 +84,15 @@ can be built against a genuine target instead of an inherited default:
    design call, not a fixed template. (This mirrors Zone A's own internal
    asymmetry — its five success-condition beats and seven traversal beats
    are not evenly weighted either.)
-2. **Spatial shape.** Is a zone meant to be one continuous scrolling space
-   (still one path, just a longer one), a set of **discrete connected rooms**
-   (metroidvania-style, separate screens joined by transitions), or a
-   **hub-and-spoke** shape (a central point the girls return to between
-   excursions)? Each implies a different fix to `Session`'s and `render.rs`'s
-   current one-line, one-screen model.
+2. ~~**Spatial shape.**~~ **Answered.** Primarily **discrete connected
+   rooms** (metroidvania-style, separate spaces joined by transitions) —
+   but a "room" is not assumed screen-sized. Individual rooms may themselves
+   be **larger planar spaces** (their own explorable area, with camera
+   movement inside them), not just single fixed-camera boxes. This means
+   `Session` needs two levels of position, not one: *which room* the girls
+   are in, and *where within that room* — the existing flat `Vec<Beat>` /
+   float-position model (`session.rs`) covers only the second, and
+   `render.rs`'s fixed, non-scrolling camera covers neither.
 3. **Does the scale-up apply to all five zones?** The five-zone map
    (`08-level1-five-zone-map.md`) lists A through E. Does Zone A stay a
    deliberately compact prologue — the calm, small "before" — while B onward
