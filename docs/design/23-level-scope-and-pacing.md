@@ -76,9 +76,14 @@ code now.
 These need real answers — a number, a shape, a yes/no — before the next zone
 can be built against a genuine target instead of an inherited default:
 
-1. **Rough target playtime per zone.** Even an approximate figure (a range in
-   minutes) would let the beat count and area count be sized deliberately
-   instead of guessed.
+1. ~~**Rough target playtime per zone.**~~ **Answered.** Not a single figure —
+   zones are meant to vary in length, with the majority running **long**
+   (several zones' worth of "explorable, several minutes") and a minority
+   running **shorter**, closer to Zone A's own scale. No zone should be
+   assumed uniform in length by default; each zone's length is a per-zone
+   design call, not a fixed template. (This mirrors Zone A's own internal
+   asymmetry — its five success-condition beats and seven traversal beats
+   are not evenly weighted either.)
 2. **Spatial shape.** Is a zone meant to be one continuous scrolling space
    (still one path, just a longer one), a set of **discrete connected rooms**
    (metroidvania-style, separate screens joined by transitions), or a
