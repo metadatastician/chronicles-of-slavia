@@ -120,13 +120,17 @@ can be built against a genuine target instead of an inherited default:
      one grove-birds encounter A1 teaches.
    - **A3 — NPC interaction and clothing.** Human/social response to the
      girls, and costume/appearance as legible identity (ties to
-     `15-character-visual-design.md`).
+     `15-character-visual-design.md`). The girls **obtain an artefact**
+     here, from an NPC — the first cross-segment gate: it is carried
+     forward and does nothing here, only in A5.
    - **A4 — puzzle dynamics.** Mechanical puzzles building on A1-A3's
      systems.
    - **A5 — synthesis.** Combines everything prior, and introduces
      **asymmetric information / theory-of-mind** play — each girl acting on
      what she knows the other doesn't (or believes the other knows),
-     building on the co-op grammar A1 established.
+     building on the co-op grammar A1 established. **Uses the A3 artefact**
+     as part of the combination — its purpose is withheld until here,
+     rewarding a player who carried it forward.
 
    This is direction, not a full design — segment content, beat counts, and
    exact transitions (how A1 "slides" into A2, etc.) are not yet specified.
