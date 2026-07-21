@@ -1,0 +1,9 @@
+# Coq proof manifest — read by scripts/check-proofs.sh coq
+# Format: <source-root>|<module-relative-to-source-root>|gated|quarantine|<note>
+# Ground-truthed 2026-07-17 with coqc.
+# NOTE (chronicles issue #12): this file is still the unmodified
+# rsr-template-repo placeholder ("Template — replace with your project's core
+# types") — it is gated because it genuinely compiles, not because it encodes
+# a real chronicles invariant. Authoring the game's real Coq content (if any)
+# is separate, owner/PLASMA-supervised work; do not read "gated" here as "done".
+verification/proofs/coq|TypeSafety.v|gated| compiles under `coqc`; still generic template content, not a chronicles invariant (#12)
