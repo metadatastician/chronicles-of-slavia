@@ -5,11 +5,19 @@
 //! ADR-0003). Ported from the design validated in the web sketch: the two lands,
 //! the tiered gorge water (wade → abyss), the grove birds answering the girls,
 //! the Rift. Bridge, shrine and the character rig come in later increments;
-//! girls are still blocks here. `slavia-core` is the rules brain; movement and
-//! water physics live in this renderer.
+//! girls are still blocks here.
+//!
+//! All rules-facing state and gating goes through [`crate::session::Session`],
+//! never `slavia_core::World` directly — `Session` is the sole bridge between
+//! renderer and rules core (see `session.rs`'s own doc comment). This renderer
+//! owns only what's genuinely its concern: continuous pixel movement and water
+//! physics. Beat position is *derived* from that pixel space each frame
+//! (`beat_units_for_x`) and fed back into `Session`, so interaction gating
+//! (bird approach, bridge crossing, the Rift) is answered by the rules core,
+//! not by ad hoc pixel-proximity checks.
 
+use crate::session::{BirdState, Crossing, Session, Settle};
 use bevy::prelude::*;
-use slavia_core::{zone_a, Response, World};
 
 const GROUND_Y: f32 = -140.0; // feet level
 const GROVE_X: f32 = -300.0;
@@ -22,20 +30,41 @@ const MOVE_SPEED: f32 = 240.0;
 const GRAVITY: f32 = 900.0;
 const JUMP_V: f32 = 380.0;
 
-#[derive(Clone, Copy, PartialEq)]
-enum BirdMood {
-    Neutral,
-    Stirred,
-    Settled,
-    Disrupted,
+// Zone A's later beats (shrine onward) have no dedicated visuals yet in
+// M2.1 — these landmarks only need to be monotonic and roughly plausible.
+// They exist so the renderer can derive `Session`'s beat-space position
+// from the continuous pixel space it actually simulates.
+const SHRINE_X: f32 = -150.0;
+const RIDGE_X: f32 = 150.0;
+const OVERLOOK_X: f32 = 350.0;
+const FRACTURE_X: f32 = 550.0;
+
+/// Pixel X for each of Zone A's seven beats, in beat order (`docs/design/02`).
+const BEAT_X: [f32; 7] = [
+    ENTRANCE_X, GROVE_X, SHRINE_X, BRIDGE_X, RIDGE_X, OVERLOOK_X, FRACTURE_X,
+];
+
+/// The beat-unit position (possibly fractional, between two beats) for a
+/// pixel X, via piecewise-linear interpolation across `BEAT_X` (monotonic
+/// by construction).
+fn beat_units_for_x(x: f32) -> f32 {
+    let x = x.clamp(BEAT_X[0], BEAT_X[BEAT_X.len() - 1]);
+    for i in 0..BEAT_X.len() - 1 {
+        let (x0, x1) = (BEAT_X[i], BEAT_X[i + 1]);
+        if x <= x1 {
+            let t = if x1 > x0 { (x - x0) / (x1 - x0) } else { 0.0 };
+            return i as f32 + t;
+        }
+    }
+    (BEAT_X.len() - 1) as f32
 }
 
 #[derive(Resource)]
 struct Game {
-    world: World,
-    birds: BirdMood,
-    seen_stir: bool,
-    seen_settle: bool,
+    session: Session,
+    /// The last-announced count of Zone A's five understanding-beats
+    /// (`Session::beats`), so progress prints once per change, not per frame.
+    last_beat_count: usize,
 }
 
 #[derive(Component)]
@@ -61,10 +90,8 @@ pub fn run() {
     App::new()
         .insert_resource(ClearColor(sky(false)))
         .insert_resource(Game {
-            world: World::new(zone_a()),
-            birds: BirdMood::Neutral,
-            seen_stir: false,
-            seen_settle: false,
+            session: Session::new(),
+            last_beat_count: 0,
         })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
@@ -75,7 +102,7 @@ pub fn run() {
             ..default()
         }))
         .add_systems(Startup, setup)
-        .add_systems(Update, (input, physics, sync, quit))
+        .add_systems(Update, (input, physics, sync, announce_progress, quit))
         .run();
 }
 
@@ -85,10 +112,11 @@ fn print_controls() {
          -------------------------------------------\n\
          A/D or <-> walk    Space jump    Tab switch girl\n\
          E  reach the grove birds (near the grove)\n\
+         F  steady the crossing (Donna, at the gorge) / cross it (once steady)\n\
          R  awaken the Rift        Esc quit\n\
-         Wade into the gorge water — the black middle is bottomless, you can't\n\
-         cross it (bridge/shrine come next). Stir the birds as Anya, settle as\n\
-         Donna; wake the Rift and they're disrupted.\n"
+         Wade into the gorge water — the black middle is bottomless until\n\
+         Donna steadies it. Stir the birds as Anya, settle as Donna; wake\n\
+         the Rift and they're disrupted.\n"
     );
 }
 
@@ -166,7 +194,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
     for i in 0..5 {
         commands.spawn((
             Sprite {
-                color: bird_color(BirdMood::Neutral),
+                color: bird_color(BirdState::Neutral),
                 custom_size: Some(Vec2::new(12.0, 12.0)),
                 ..default()
             },
@@ -180,7 +208,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
     }
 
     // girls (blocks for now — rig in M2.2)
-    for c in game.world.spec().characters.iter() {
+    for c in game.session.characters().iter() {
         let id: &'static str = if c.id == "anya" { "anya" } else { "donna" };
         let x = ENTRANCE_X + if id == "anya" { 22.0 } else { -14.0 };
         let y = GROUND_Y + GIRL_H / 2.0;
@@ -229,51 +257,37 @@ fn setup(mut commands: Commands, game: Res<Game>) {
 }
 
 fn active_id(game: &Game) -> String {
-    game.world.active().id.clone()
+    game.session.active_id().to_string()
 }
 
-fn input(keys: Res<ButtonInput<KeyCode>>, mut game: ResMut<Game>, girls: Query<&Girl>) {
+fn input(keys: Res<ButtonInput<KeyCode>>, mut game: ResMut<Game>) {
     if keys.just_pressed(KeyCode::Tab) {
-        let cur = active_id(&game);
-        let other = game
-            .world
-            .spec()
-            .characters
-            .iter()
-            .map(|c| c.id.clone())
-            .find(|i| *i != cur);
-        if let Some(o) = other {
-            game.world.switch_to(&o);
-        }
-        println!("-> now playing {}", game.world.active().name);
+        game.session.toggle_character();
+        println!("-> now playing {}", game.session.active_name());
     }
     if keys.just_pressed(KeyCode::KeyE) {
-        let cur = active_id(&game);
-        let ax = girls
-            .iter()
-            .find(|g| g.id == cur)
-            .map(|g| g.x)
-            .unwrap_or(0.0);
-        if (ax - GROVE_X).abs() < 90.0 {
-            if let Some(r) = game.world.approach("grove-birds") {
-                game.birds = mood_from(&r);
-                match r {
-                    Response::Stirred => game.seen_stir = true,
-                    Response::Settled => game.seen_settle = true,
-                    _ => {}
-                }
-                println!(
-                    "{} reaches out to the birds -> {r:?}",
-                    game.world.active().name
-                );
-            }
-        } else {
-            println!("(no birds here — go to the grove)");
+        match game.session.approach_birds() {
+            Some(r) => println!(
+                "{} reaches out to the birds -> {r:?}",
+                game.session.active_name()
+            ),
+            None => println!("(no birds here — go to the grove)"),
+        }
+    }
+    if keys.just_pressed(KeyCode::KeyF) {
+        match game.session.settle_crossing() {
+            Settle::Settled => println!("Donna steadies the crossing. It's passable now."),
+            Settle::WrongGift => match game.session.cross() {
+                Crossing::Crossed => println!("{} crosses.", game.session.active_name()),
+                Crossing::Unpassable => println!("(the crossing is still unsteady)"),
+                Crossing::NotHere => println!("(nothing to do here)"),
+            },
+            Settle::NotHere => println!("(nothing to do here)"),
         }
     }
     if keys.just_pressed(KeyCode::KeyR) {
-        game.world.awaken_rift();
-        game.birds = BirdMood::Disrupted;
+        game.session.awaken_rift();
+        game.session.birds = BirdState::Disrupted;
         println!("The Rift awakens. The birds stop answering.");
     }
 }
@@ -281,11 +295,11 @@ fn input(keys: Res<ButtonInput<KeyCode>>, mut game: ResMut<Game>, girls: Query<&
 fn physics(
     keys: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
-    game: Res<Game>,
+    mut game: ResMut<Game>,
     mut girls: Query<(&mut Girl, &mut Transform)>,
 ) {
     let active = active_id(&game);
-    let bridge = game.world.bridge_stable;
+    let bridge = game.session.crossing_passable();
     let dt = time.delta_secs();
     for (mut g, mut t) in &mut girls {
         if g.id == active {
@@ -309,6 +323,7 @@ fn physics(
             }
             g.depth = water_at(g.x, bridge).0.max(depth);
             g.x = g.x.clamp(-620.0, 620.0);
+            game.session.set_active_pos(beat_units_for_x(g.x));
 
             let floor = GROUND_Y + GIRL_H / 2.0;
             if g.depth > 0.02 {
@@ -350,18 +365,35 @@ fn sync(
         Option<&PipSprite>,
     )>,
 ) {
-    clear.0 = sky(game.world.rift_active);
+    clear.0 = sky(game.session.rift_active());
     let active = active_id(&game);
     for (mut s, girl, bird, rift, pip) in &mut q {
         if let Some(g) = girl {
             s.color = girl_color(g.id, g.id == active);
         } else if bird.is_some() {
-            s.color = bird_color(game.birds);
+            s.color = bird_color(game.session.birds);
         } else if rift.is_some() {
-            s.color = rift_color(game.world.rift_active);
+            s.color = rift_color(game.session.rift_active());
         } else if let Some(p) = pip {
             s.color = pip_color(pip_on(&game, p.0));
         }
+    }
+}
+
+/// Narrate as Zone A's five understanding-beats (`docs/design/00-start-here.md`)
+/// come in, once per beat rather than once per frame.
+fn announce_progress(mut game: ResMut<Game>) {
+    let count = game.session.beats.count();
+    if count == game.last_beat_count {
+        return;
+    }
+    game.last_beat_count = count;
+    if game.session.beats.all() {
+        println!("Two lands, one heart — Zone A's answer is complete.");
+    } else if game.session.beats.nature_answered() {
+        println!("Nature has answered ({count}/5 understood).");
+    } else {
+        println!("({count}/5 understood.)");
     }
 }
 
@@ -389,20 +421,11 @@ fn water_at(x: f32, bridge_stable: bool) -> (f32, Option<f32>) {
     }
 }
 
-fn mood_from(r: &Response) -> BirdMood {
-    match r {
-        Response::Stirred => BirdMood::Stirred,
-        Response::Settled => BirdMood::Settled,
-        Response::Disrupted => BirdMood::Disrupted,
-        _ => BirdMood::Neutral,
-    }
-}
-
 fn pip_on(game: &Game, i: usize) -> bool {
     match i {
-        0 => game.seen_stir,
-        1 => game.seen_settle,
-        2 => game.world.rift_active,
+        0 => game.session.beats.anya_stirred,
+        1 => game.session.beats.donna_settled,
+        2 => game.session.rift_active(),
         _ => false,
     }
 }
@@ -414,12 +437,12 @@ fn sky(rift: bool) -> Color {
         Color::srgb(0.10, 0.11, 0.16)
     }
 }
-fn bird_color(m: BirdMood) -> Color {
+fn bird_color(m: BirdState) -> Color {
     match m {
-        BirdMood::Neutral => Color::srgb(0.62, 0.62, 0.62),
-        BirdMood::Stirred => Color::srgb(0.96, 0.72, 0.32),
-        BirdMood::Settled => Color::srgb(0.50, 0.76, 0.96),
-        BirdMood::Disrupted => Color::srgb(0.30, 0.30, 0.33),
+        BirdState::Neutral => Color::srgb(0.62, 0.62, 0.62),
+        BirdState::Stirred => Color::srgb(0.96, 0.72, 0.32),
+        BirdState::Settled => Color::srgb(0.50, 0.76, 0.96),
+        BirdState::Disrupted => Color::srgb(0.30, 0.30, 0.33),
     }
 }
 fn girl_color(id: &str, active: bool) -> Color {
