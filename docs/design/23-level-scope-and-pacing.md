@@ -202,6 +202,47 @@ can be built against a genuine target instead of an inherited default:
      building on the co-op grammar A1 established. **Uses the A3 artefact**
      as part of the combination — its purpose is withheld until here.
 
+     **Theory-of-mind splits by mode.** In multiplayer (parked elsewhere in
+     canon, but the split matters here): the *other player* supplies their
+     own real theory-of-mind — nothing to simulate. Against **NPCs**, the
+     game needs an actual system, and NPC "memory" should be treated as
+     **one unified thing** covering two channels:
+     - **Relational memory** — how an NPC has been treated, accumulated
+       trust, and persistence of who they believe the girls are (an NPC's
+       read on identity is not reset each encounter).
+     - **Attentional/observational memory** — NPCs notice *behavior
+       patterns*, not just discrete actions: lingering near an object,
+       repeated failed attempts (trying to jump a stream, say), returning
+       to the same spot repeatedly, or digging around, should build an
+       NPC's suspicion that "there's something going on over there."
+       Loitering near a house and fleeing when its owner appears reads as
+       suspicious specifically *because* of the flee, not the loitering
+       alone. NPCs can also reason **indirectly** — seeing a girl outside,
+       then hearing noises on a roof, prompts "what are they doing up
+       there," even unseen — and such inferences can be **deliberately
+       confused**: e.g. Anya arranging birds onto a roof as a decoy,
+       muddying an NPC's read on what actually happened.
+
+     **Identity belief is variable, not binary.** Changed animal behavior
+     (from the girls' own presence, or from the still-undocumented tropism
+     thread — see A2) may make an NPC suspect "these might be *those*
+     girls" from folklore, without confirming it — NPCs hold a graded,
+     not all-or-nothing, belief in the girls' identity, and how overt the
+     player is materially affects whether that suspicion forms at all.
+
+     **Trust gates quests economically, not just narratively.** Completing
+     quests for an NPC raises trust; failing, or disappearing with
+     something an NPC needed, damages it — an NPC who doesn't trust the
+     girls may withhold further quests until trust is rebuilt, rather than
+     simply reacting once and resetting.
+
+     This is a substantial, self-contained system — its scope reaches
+     beyond A5 alone (it plausibly governs NPC behavior across every
+     segment, not just the synthesis one) and likely deserves its own
+     dedicated design doc rather than living only as a paragraph here; this
+     entry exists so the intent is captured accurately before that doc
+     exists.
+
    **General principle, not a one-off**: the A3-artefact/A5-payoff and the
    A2-pattern-plants/A3-clothing link are two instances of a broader
    intent — several things should **cross segment boundaries** (an item, a
