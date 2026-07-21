@@ -125,6 +125,18 @@ can be built against a genuine target instead of an inherited default:
      downstream impacts not yet specified. Pattern plants gathered here are
      a second cross-segment thread into A3 (see the fluidity principle
      below), independent of A3's own NPC-sourced artefact.
+
+     **Plants do not get the animals' stir/settle taxis reaction.** The
+     girls' effect on plants, if any, is closer to **tropism** — bending
+     toward, reaching higher, shrinking back, growing out from themselves —
+     not the animals' immediate mood response. This is judged too much for
+     early-game (A2), so it is **not introduced or explained here**. Instead
+     it should surface **later in the game, undocumented** — the player
+     comes to notice it themselves as a subtle, cumulative effect, rather
+     than being taught it as a mechanic. A2's plants stay functional
+     (healing/repair/pattern-gathering) only; the tropic response is a
+     later-level, deliberately-undiscovered thread, out of this doc's scope
+     to spec further.
    - **A3 — NPC interaction and clothing.** Human/social response to the
      girls, and costume/appearance as legible identity (ties to
      `15-character-visual-design.md`). The girls **obtain an artefact**
