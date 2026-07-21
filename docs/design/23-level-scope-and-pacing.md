@@ -93,11 +93,11 @@ can be built against a genuine target instead of an inherited default:
    are in, and *where within that room* — the existing flat `Vec<Beat>` /
    float-position model (`session.rs`) covers only the second, and
    `render.rs`'s fixed, non-scrolling camera covers neither.
-3. **Does the scale-up apply to all five zones?** The five-zone map
-   (`08-level1-five-zone-map.md`) lists A through E. Does Zone A stay a
-   deliberately compact prologue — the calm, small "before" — while B onward
-   grow into the new target size? Or does every zone, A included, scale up
-   together?
+3. ~~**Does the scale-up apply to all five zones?**~~ **Answered.** Yes —
+   all five zones (A through E, per `08-level1-five-zone-map.md`) scale up
+   together. Zone A does not stay a deliberately compact prologue; this
+   implies question 4 below resolves toward *expanding* Zone A rather than
+   preserving it as-is (pending explicit confirmation there).
 4. **Does Zone A itself get expanded**, retroactively, to match whatever
    target is set — or is it preserved exactly as built, as a short, settled
    introduction that the rest of the game grows out from?
