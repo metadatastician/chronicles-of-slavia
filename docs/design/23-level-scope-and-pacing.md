@@ -223,6 +223,17 @@ can be built against a genuine target instead of an inherited default:
        confused**: e.g. Anya arranging birds onto a roof as a decoy,
        muddying an NPC's read on what actually happened.
 
+       This attribution is inherently **counterfactual reasoning**, and
+       should be named as such rather than left implicit: an NPC dismissing
+       a noise because "it's just the birds" is really judging "if not for
+       the birds, I'd suspect something else" — the decoy works *because*
+       NPCs compare what happened against what would have happened absent
+       the girls. The same mechanism should also run the other way, for
+       **trust from restraint**: an NPC noticing the girls *could have*
+       taken something, or acted on an opportunity, and didn't — building
+       trust from a counterfactual the NPC infers, not just from completed
+       quests or observed good deeds.
+
      **Identity belief is variable, not binary.** Changed animal behavior
      (from the girls' own presence, or from the still-undocumented tropism
      thread — see A2) may make an NPC suspect "these might be *those*
