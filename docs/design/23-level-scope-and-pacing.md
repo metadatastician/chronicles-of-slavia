@@ -98,9 +98,36 @@ can be built against a genuine target instead of an inherited default:
    together. Zone A does not stay a deliberately compact prologue; this
    implies question 4 below resolves toward *expanding* Zone A rather than
    preserving it as-is (pending explicit confirmation there).
-4. **Does Zone A itself get expanded**, retroactively, to match whatever
-   target is set — or is it preserved exactly as built, as a short, settled
-   introduction that the rest of the game grows out from?
+4. ~~**Does Zone A itself get expanded**, retroactively, to match whatever
+   target is set?~~ **Answered.** Yes — but not by lengthening the existing
+   corridor. Zone A becomes a chain of small, connected sub-zones, each
+   "bitty" (Zone-A-scale — consistent with question 1's "mix of lengths,"
+   not a forced-long piece), each isolating one system before the whole is
+   asked to combine:
+
+   - **A1 — working together.** The currently-built Zone A (stir/settle,
+     the bridge, the Rift's interruption) *is* A1 — this sub-zone already
+     exists; nothing here changes it. A1 ends on a new beat: a marauder
+     appears, and Anya actively **disrupts the bridge to repel them** — a
+     deliberate, protective use of disruption, distinct from the Rift's
+     accidental disruption already in the current build. This may resolve
+     the "marauder hunting them across the bridge" thread noted as an
+     unreconciled Zone B mechanism in prior canon research — relocated one
+     zone earlier than expected.
+   - **A2 — animals and plants.** Broader ecological interaction beyond the
+     one grove-birds encounter A1 teaches.
+   - **A3 — NPC interaction and clothing.** Human/social response to the
+     girls, and costume/appearance as legible identity (ties to
+     `15-character-visual-design.md`).
+   - **A4 — puzzle dynamics.** Mechanical puzzles building on A1-A3's
+     systems.
+   - **A5 — synthesis.** Combines everything prior, and introduces
+     **asymmetric information / theory-of-mind** play — each girl acting on
+     what she knows the other doesn't (or believes the other knows),
+     building on the co-op grammar A1 established.
+
+   This is direction, not a full design — sub-zone content, beat counts, and
+   exact transitions (how A1 "slides" into A2, etc.) are not yet specified.
 
 ## Scope of this doc
 
