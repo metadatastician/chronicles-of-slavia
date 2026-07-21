@@ -130,12 +130,22 @@ can be built against a genuine target instead of an inherited default:
      girls' effect on plants, if any, is closer to **tropism** — bending
      toward, reaching higher, shrinking back, growing out from themselves —
      not the animals' immediate mood response. This is judged too much for
-     early-game (A2), so it is **not introduced or explained here**. Instead
-     it should surface **later in the game, undocumented** — the player
-     comes to notice it themselves as a subtle, cumulative effect, rather
-     than being taught it as a mechanic. A2's plants stay functional
-     (healing/repair/pattern-gathering) only; the tropic response is a
-     later-level, deliberately-undiscovered thread, out of this doc's scope
+     early-game (A2), so it is **not introduced, taught, or UI-surfaced in
+     A2 or for some while after**. It should first appear, subtly, **later
+     in the game**, with no tutorial or prompt calling it out — the player
+     is meant to notice a pattern themselves, unaided, the first time. As a
+     safety net for a player who never notices (or hasn't in a long while),
+     one girl may eventually **remark on it in dialogue** — something like
+     "...did you see that?" — a nudge, not an explanation, and only once
+     it's plausible the effect has already been visible for a long stretch
+     of play.
+
+     To be clear: **hidden from the player is not the same as undocumented
+     by us.** This mechanic gets full design-canon treatment like anything
+     else (its trigger conditions, its visible effect, the dialogue
+     safety-net's timing) — only its *in-game reveal* is deliberately silent.
+     A2's own plants stay functional (healing/repair/pattern-gathering)
+     only; tropism itself is a later-level thread, out of this doc's scope
      to spec further.
    - **A3 — NPC interaction and clothing.** Human/social response to the
      girls, and costume/appearance as legible identity (ties to
