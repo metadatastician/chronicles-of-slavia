@@ -28,7 +28,18 @@ const WADE: f32 = 40.0; // wadeable band width from each bank; beyond = abyss
 const GIRL_H: f32 = 54.0;
 const MOVE_SPEED: f32 = 240.0;
 const GRAVITY: f32 = 900.0;
-const JUMP_V: f32 = 380.0;
+/// Jump takeoff speed, verve-scaled (`15-character-visual-design.md`'s
+/// reactive-rig table: "Jump height | scaled by verve | springs high | low,
+/// heavy"). Was a flat 380.0 for both girls; this restores the spread the
+/// design doc already calls for.
+const JUMP_V_BASE: f32 = 300.0;
+const JUMP_V_VERVE_SCALE: f32 = 110.0;
+fn jump_speed(verve: f32) -> f32 {
+    JUMP_V_BASE + verve * JUMP_V_VERVE_SCALE
+}
+/// Reference jump speed, used only to normalize `vy` into a roughly ±1 range
+/// for the reactive rig below — not a real per-girl jump height.
+const JUMP_V_REF: f32 = 380.0;
 
 // Zone A's later beats (shrine onward) have no dedicated visuals yet in
 // M2.1 — these landmarks only need to be monotonic and roughly plausible.
@@ -76,6 +87,32 @@ struct Girl {
     facing: f32,
     on_ground: bool,
     depth: f32,
+    /// How energetically the body reacts (`15-character-visual-design.md`):
+    /// Anya 1.0, Donna 0.42. Everything below this field is reactive-rig
+    /// state (M2.2), ported from the JS prototype's procedural rig
+    /// (`prototype/zone-a/index.html`) — ported for *shape*, not exact
+    /// numeric parity: the prototype's per-frame canvas units don't map 1:1
+    /// onto Bevy's dt-scaled physics, so constants below are re-tuned to
+    /// read similarly at this engine's scale, not copied verbatim.
+    verve: f32,
+    /// `x` last frame, for deriving an eased animation velocity — the
+    /// prototype tracks `vx` directly from input; here it's derived from
+    /// position so this system doesn't need to duplicate `physics`' input
+    /// handling.
+    prev_x: f32,
+    /// Eased horizontal velocity, animation-only (movement itself is not
+    /// affected — this never touches `x`).
+    vx: f32,
+    /// Walk-cycle phase; advances only while moving.
+    walk: f32,
+    /// Idle/breathing phase; advances always.
+    idle: f32,
+    /// Eased 0..1 "is walking" blend, so gait fades in/out instead of
+    /// snapping.
+    gait: f32,
+    /// Trailing hair/ribbon offset (`15`'s "Hair / ribbons" row).
+    hair_x: f32,
+    hair_y: f32,
 }
 
 #[derive(Component)]
@@ -84,6 +121,10 @@ struct BirdSprite;
 struct RiftSprite;
 #[derive(Component)]
 struct PipSprite(usize);
+/// The trailing hair/ribbon accent behind a girl — owns her id so it can
+/// track her position each frame without a parent/child transform.
+#[derive(Component)]
+struct HairSprite(&'static str);
 
 pub fn run() {
     print_controls();
@@ -102,7 +143,10 @@ pub fn run() {
             ..default()
         }))
         .add_systems(Startup, setup)
-        .add_systems(Update, (input, physics, sync, announce_progress, quit))
+        .add_systems(
+            Update,
+            (input, physics, reactive_rig, sync, announce_progress, quit).chain(),
+        )
         .run();
 }
 
@@ -207,11 +251,14 @@ fn setup(mut commands: Commands, game: Res<Game>) {
         ));
     }
 
-    // girls (blocks for now — rig in M2.2)
+    // girls — blocks, but M2.2 gives them the verve-scaled reactive rig
+    // (lean/bounce/breathe/billow/hair-trail) from `15-character-visual-
+    // design.md`, ported from the JS prototype's procedural rig.
     for c in game.session.characters().iter() {
         let id: &'static str = if c.id == "anya" { "anya" } else { "donna" };
         let x = ENTRANCE_X + if id == "anya" { 22.0 } else { -14.0 };
         let y = GROUND_Y + GIRL_H / 2.0;
+        let verve = if id == "anya" { 1.0 } else { 0.42 };
         commands.spawn((
             Sprite {
                 color: girl_color(id, id == "anya"),
@@ -227,7 +274,24 @@ fn setup(mut commands: Commands, game: Res<Game>) {
                 facing: 1.0,
                 on_ground: true,
                 depth: 0.0,
+                verve,
+                prev_x: x,
+                vx: 0.0,
+                walk: 0.0,
+                idle: 0.0,
+                gait: 0.0,
+                hair_x: 0.0,
+                hair_y: 0.0,
             },
+        ));
+        commands.spawn((
+            Sprite {
+                color: hair_color(id),
+                custom_size: Some(Vec2::new(8.0, 20.0)),
+                ..default()
+            },
+            Transform::from_xyz(x, y + GIRL_H * 0.3, 0.9),
+            HairSprite(id),
         ));
     }
 
@@ -336,7 +400,7 @@ fn physics(
                 if (keys.just_pressed(KeyCode::Space) || keys.just_pressed(KeyCode::ArrowUp))
                     && g.on_ground
                 {
-                    g.vy = JUMP_V;
+                    g.vy = jump_speed(g.verve);
                     g.on_ground = false;
                 }
                 g.vy -= GRAVITY * dt;
@@ -350,6 +414,67 @@ fn physics(
         }
         t.translation.x = g.x;
         t.translation.y = g.y;
+    }
+}
+
+/// M2.2's verve-scaled reactive rig (`15-character-visual-design.md`): lean
+/// into motion, walk-cycle bounce, idle breathing, skirt billow on a fall,
+/// and a trailing hair/ribbon accent. Runs after `physics` each frame:
+/// `physics` sets the girls' base pose (`translation.x/y` from `g.x/g.y`);
+/// this system displaces from that base for render only, so it never
+/// affects movement, collision, or the beat position derived from `g.x`.
+///
+/// Ported for *shape* from the JS prototype's procedural rig, not exact
+/// numeric parity — see the `verve` field's doc comment on [`Girl`].
+#[allow(clippy::type_complexity)]
+fn reactive_rig(
+    time: Res<Time>,
+    mut girls: Query<(&mut Girl, &mut Transform, &mut Sprite), Without<HairSprite>>,
+    mut hair: Query<(&HairSprite, &mut Transform), Without<Girl>>,
+) {
+    let dt = time.delta_secs();
+    for (mut g, mut t, mut sprite) in &mut girls {
+        // Eased animation velocity, derived from position so this system
+        // doesn't need to know which girl is active or duplicate input
+        // handling — `physics` already moved `g.x`.
+        let raw_vx = if dt > 0.0 { (g.x - g.prev_x) / dt } else { 0.0 };
+        g.prev_x = g.x;
+        let ease = 0.12 + g.verve * 0.05;
+        g.vx += (raw_vx - g.vx) * (dt * 60.0 * ease).min(1.0);
+        let vx_norm = (g.vx / MOVE_SPEED).clamp(-1.5, 1.5);
+        let vy_norm = (g.vy / JUMP_V_REF).clamp(-1.5, 1.5);
+
+        let moving = g.on_ground && g.vx.abs() > 10.0;
+        g.gait += ((moving as u8 as f32) - g.gait) * (dt * 10.0).min(1.0);
+        if moving {
+            g.walk += dt * (6.0 + vx_norm.abs() * 1.2);
+        }
+        g.idle += dt * 1.6;
+
+        let flow = 1.2 + g.verve * 1.6;
+        let target_hair_x = -vx_norm.abs() * flow;
+        g.hair_x += (target_hair_x - g.hair_x) * (dt * 8.0).min(1.0);
+        let target_hair_y = (if g.on_ground { 0.0 } else { vy_norm }) * (0.6 + g.verve);
+        g.hair_y += (target_hair_y - g.hair_y) * (dt * 8.0).min(1.0);
+
+        let lean = (vx_norm * 0.4 * (0.5 + g.verve)).clamp(-0.3, 0.3);
+        let bounce = g.walk.sin().abs() * g.gait * (1.0 + g.verve * 1.3) * 3.0;
+        let breathe = g.idle.sin() * 0.6 * (1.0 - g.gait);
+        let air = !g.on_ground;
+        let billow = (if air { vy_norm } else { 0.0 }) * 0.4 * (1.1 - g.verve * 0.4);
+        let bw = (1.0 + billow).clamp(0.85, 1.3);
+
+        t.translation.y = g.y + bounce + breathe;
+        t.rotation = Quat::from_rotation_z(lean * 0.3);
+        t.scale.x = bw;
+        sprite.flip_x = g.facing < 0.0;
+    }
+
+    for (h, mut t) in &mut hair {
+        if let Some((g, gt, _)) = girls.iter().find(|(g, ..)| g.id == h.0) {
+            t.translation.x = gt.translation.x + g.hair_x * g.facing;
+            t.translation.y = gt.translation.y + GIRL_H * 0.3 - g.hair_y * 8.0;
+        }
     }
 }
 
@@ -452,6 +577,16 @@ fn girl_color(id: &str, active: bool) -> Color {
         (0.35, 0.60, 0.90)
     };
     Color::srgba(r, g, b, if active { 1.0 } else { 0.4 })
+}
+/// Hair/ribbon accent colors, taken directly from the JS prototype's own
+/// palette (`prototype/zone-a/index.html`: `ANYA_HAIR`/`DONNA_HAIR`) rather
+/// than invented fresh.
+fn hair_color(id: &str) -> Color {
+    if id == "anya" {
+        Color::srgb_u8(0x6b, 0x3a, 0x1e) // auburn
+    } else {
+        Color::srgb_u8(0x2c, 0x26, 0x20) // dark — mostly under Donna's headscarf
+    }
 }
 fn rift_color(active: bool) -> Color {
     if active {
