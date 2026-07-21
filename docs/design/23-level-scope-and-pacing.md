@@ -99,21 +99,23 @@ can be built against a genuine target instead of an inherited default:
    implies question 4 below resolves toward *expanding* Zone A rather than
    preserving it as-is (pending explicit confirmation there).
 4. ~~**Does Zone A itself get expanded**, retroactively, to match whatever
-   target is set?~~ **Answered.** Yes — but not by lengthening the existing
-   corridor. Zone A becomes a chain of small, connected sub-zones, each
-   "bitty" (Zone-A-scale — consistent with question 1's "mix of lengths,"
-   not a forced-long piece), each isolating one system before the whole is
-   asked to combine:
+   target is set?~~ **Answered.** Yes — but not into a longer version of the
+   same corridor, and not into several separate zones either. **Zone A stays
+   one level, played as one continuous session, roughly five times its
+   current scope** — not five loadable levels, but one long tutorial
+   internally divided into five segments, each individually about the size
+   of today's Zone A, with a **save point at each segment boundary**. Each
+   segment isolates one system before A5 asks the player to combine them:
 
    - **A1 — working together.** The currently-built Zone A (stir/settle,
-     the bridge, the Rift's interruption) *is* A1 — this sub-zone already
+     the bridge, the Rift's interruption) *is* segment A1 — it already
      exists; nothing here changes it. A1 ends on a new beat: a marauder
      appears, and Anya actively **disrupts the bridge to repel them** — a
      deliberate, protective use of disruption, distinct from the Rift's
      accidental disruption already in the current build. This may resolve
      the "marauder hunting them across the bridge" thread noted as an
      unreconciled Zone B mechanism in prior canon research — relocated one
-     zone earlier than expected.
+     level segment earlier than expected.
    - **A2 — animals and plants.** Broader ecological interaction beyond the
      one grove-birds encounter A1 teaches.
    - **A3 — NPC interaction and clothing.** Human/social response to the
@@ -126,7 +128,7 @@ can be built against a genuine target instead of an inherited default:
      what she knows the other doesn't (or believes the other knows),
      building on the co-op grammar A1 established.
 
-   This is direction, not a full design — sub-zone content, beat counts, and
+   This is direction, not a full design — segment content, beat counts, and
    exact transitions (how A1 "slides" into A2, etc.) are not yet specified.
 
 ## Scope of this doc
