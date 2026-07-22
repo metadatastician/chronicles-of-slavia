@@ -615,7 +615,11 @@ fn reactive_rig(
 
         t.translation.x = g.x;
         t.translation.y = g.y - GIRL_H / 2.0 + bounce + breathe;
-        t.rotation = Quat::from_rotation_z(lean * 0.3);
+        // Negated: the JS prototype's `lean` sign assumes canvas's Y-down,
+        // clockwise-positive rotation (`ctx.rotate`); Bevy is Y-up,
+        // counterclockwise-positive, so the same sign tips the body away
+        // from the direction of travel instead of into it.
+        t.rotation = Quat::from_rotation_z(-lean * 0.3);
         // Mirrors the whole child rig for free (Bevy composes parent scale
         // into every child's local offset too) — replaces the old
         // `sprite.flip_x`, which only had one flat sprite to flip.
