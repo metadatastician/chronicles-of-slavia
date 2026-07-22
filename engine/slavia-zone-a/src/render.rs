@@ -25,7 +25,16 @@ const BRIDGE_X: f32 = 0.0; // centre of the gorge
 const ENTRANCE_X: f32 = -520.0;
 const GORGE_HALF: f32 = 100.0; // water spans BRIDGE_X ± GORGE_HALF
 const WADE: f32 = 40.0; // wadeable band width from each bank; beyond = abyss
-const GIRL_H: f32 = 54.0;
+/// Was 54.0 for the single flat-block sprite. M2.3's paper-doll rig (below)
+/// needs a real pixel budget to read as a figure rather than noise — bumped
+/// to roughly the JS prototype's ~92px scale (`15-character-visual-design.md`).
+/// Collision/water math below is all parametric on this constant, so the
+/// bump is visual-only; it does not change jump feel (that's `JUMP_V_*`,
+/// unrelated) or gameplay geometry.
+const GIRL_H: f32 = 88.0;
+/// Torso/shoulder width reference, matching the JS prototype's own w:h
+/// ratio (36:94, `prototype/zone-a/index.html`'s `girl()`).
+const GIRL_W: f32 = GIRL_H * 0.383;
 const MOVE_SPEED: f32 = 240.0;
 const GRAVITY: f32 = 900.0;
 /// Jump takeoff speed, verve-scaled (`15-character-visual-design.md`'s
@@ -121,8 +130,40 @@ struct BirdSprite;
 struct RiftSprite;
 #[derive(Component)]
 struct PipSprite(usize);
-/// The trailing hair/ribbon accent behind a girl — owns her id so it can
-/// track her position each frame without a parent/child transform.
+
+/// One piece of the paper-doll rig (M2.3): the JS prototype draws each girl
+/// as ~20 layered vector-path calls per frame (`prototype/zone-a/index.html`
+/// `drawGirl`) — a real, if stylized, costumed figure. Bevy's `Sprite` only
+/// draws axis-aligned rectangles, so that look is rebuilt here as a small
+/// rig of rectangle sprites (a "paper doll") rather than one flat block —
+/// enough to read as a figure in costume, not a 1:1 vector-path port.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Part {
+    Head,
+    Torso,
+    Vest,
+    SkirtUpper,
+    SkirtLower,
+    Apron, // Donna only — Rodopska woven apron over the sukman
+    Belt,
+    ArmL,
+    ArmR,
+    HandL,
+    HandR,
+    BootL,
+    BootR,
+}
+
+/// A body-part sprite, spawned as a Bevy child of its girl's [`Girl`] entity
+/// so the parent's lean/bounce/facing-flip transform composes onto every
+/// part automatically (`bevy_transform` propagation) — only each part's own
+/// local animation (stride, sway, arm swing, skirt billow) is set by hand.
+#[derive(Component)]
+struct BodyPart(&'static str, Part);
+
+/// The trailing hair/ribbon accent behind a girl — a child, like [`BodyPart`],
+/// but kept as its own component since its trail/lift motion (`hair_x`/
+/// `hair_y`) is unlike any other part's animation.
 #[derive(Component)]
 struct HairSprite(&'static str);
 
@@ -251,48 +292,152 @@ fn setup(mut commands: Commands, game: Res<Game>) {
         ));
     }
 
-    // girls — blocks, but M2.2 gives them the verve-scaled reactive rig
-    // (lean/bounce/breathe/billow/hair-trail) from `15-character-visual-
-    // design.md`, ported from the JS prototype's procedural rig.
+    // girls — a paper-doll rig (M2.3): a Girl root (feet-anchor, carries the
+    // verve-scaled lean/bounce/facing-flip transform) with body-part sprites
+    // as Bevy children, so the group transform composes onto every part for
+    // free. Colors ported from the JS prototype's own costume palette
+    // (`prototype/zone-a/index.html`), not invented fresh.
     for c in game.session.characters().iter() {
         let id: &'static str = if c.id == "anya" { "anya" } else { "donna" };
         let x = ENTRANCE_X + if id == "anya" { 22.0 } else { -14.0 };
-        let y = GROUND_Y + GIRL_H / 2.0;
+        let y = GROUND_Y + GIRL_H / 2.0; // physics' own center-referenced y
         let verve = if id == "anya" { 1.0 } else { 0.42 };
-        commands.spawn((
-            Sprite {
-                color: girl_color(id, id == "anya"),
-                custom_size: Some(Vec2::new(26.0, GIRL_H)),
-                ..default()
-            },
-            Transform::from_xyz(x, y, 1.0),
-            Girl {
-                id,
-                x,
-                y,
-                vy: 0.0,
-                facing: 1.0,
-                on_ground: true,
-                depth: 0.0,
-                verve,
-                prev_x: x,
-                vx: 0.0,
-                walk: 0.0,
-                idle: 0.0,
-                gait: 0.0,
-                hair_x: 0.0,
-                hair_y: 0.0,
-            },
-        ));
-        commands.spawn((
-            Sprite {
-                color: hair_color(id),
-                custom_size: Some(Vec2::new(8.0, 20.0)),
-                ..default()
-            },
-            Transform::from_xyz(x, y + GIRL_H * 0.3, 0.9),
-            HairSprite(id),
-        ));
+        let anya = id == "anya";
+        commands
+            .spawn((
+                Transform::from_xyz(x, y - GIRL_H / 2.0, 1.0),
+                Visibility::default(),
+                Girl {
+                    id,
+                    x,
+                    y,
+                    vy: 0.0,
+                    facing: 1.0,
+                    on_ground: true,
+                    depth: 0.0,
+                    verve,
+                    prev_x: x,
+                    vx: 0.0,
+                    walk: 0.0,
+                    idle: 0.0,
+                    gait: 0.0,
+                    hair_x: 0.0,
+                    hair_y: 0.0,
+                },
+            ))
+            .with_children(|p| {
+                let hip_w = GIRL_W * 0.34;
+                let sh_w = GIRL_W * 0.33;
+                let head_r = GIRL_H * 0.10;
+
+                p.spawn((
+                    Sprite {
+                        color: skin_color(),
+                        custom_size: Some(Vec2::new(head_r * 2.0, head_r * 2.0)),
+                        ..default()
+                    },
+                    Transform::from_xyz(0.0, GIRL_H * 0.86, 0.6),
+                    BodyPart(id, Part::Head),
+                ));
+                p.spawn((
+                    Sprite {
+                        color: blouse_color(anya),
+                        custom_size: Some(Vec2::new(sh_w * 1.8, GIRL_H * 0.22)),
+                        ..default()
+                    },
+                    Transform::from_xyz(0.0, GIRL_H * 0.61, 0.4),
+                    BodyPart(id, Part::Torso),
+                ));
+                p.spawn((
+                    Sprite {
+                        color: vest_color(anya),
+                        custom_size: Some(Vec2::new(sh_w * 1.3, GIRL_H * 0.16)),
+                        ..default()
+                    },
+                    Transform::from_xyz(0.0, GIRL_H * 0.64, 0.5),
+                    BodyPart(id, Part::Vest),
+                ));
+                p.spawn((
+                    Sprite {
+                        color: skirt_color(anya),
+                        custom_size: Some(Vec2::new(hip_w * 2.0, GIRL_H * 0.20)),
+                        ..default()
+                    },
+                    Transform::from_xyz(0.0, GIRL_H * 0.40, 0.35),
+                    BodyPart(id, Part::SkirtUpper),
+                ));
+                p.spawn((
+                    Sprite {
+                        color: skirt_color(anya),
+                        custom_size: Some(Vec2::new(GIRL_W * 0.9, GIRL_H * 0.22)),
+                        ..default()
+                    },
+                    Transform::from_xyz(0.0, GIRL_H * 0.19, 0.35),
+                    BodyPart(id, Part::SkirtLower),
+                ));
+                if !anya {
+                    p.spawn((
+                        Sprite {
+                            color: Color::srgb_u8(0x7a, 0x21, 0x30), // RHODOPE_APRON
+                            custom_size: Some(Vec2::new(GIRL_W * 0.55, GIRL_H * 0.30)),
+                            ..default()
+                        },
+                        Transform::from_xyz(0.0, GIRL_H * 0.28, 0.45),
+                        BodyPart(id, Part::Apron),
+                    ));
+                }
+                p.spawn((
+                    Sprite {
+                        color: trim_color(anya),
+                        custom_size: Some(Vec2::new(hip_w * 2.0, GIRL_H * 0.035)),
+                        ..default()
+                    },
+                    Transform::from_xyz(0.0, GIRL_H * 0.50, 0.55),
+                    BodyPart(id, Part::Belt),
+                ));
+                for (part, side) in [(Part::ArmL, -1.0f32), (Part::ArmR, 1.0)] {
+                    p.spawn((
+                        Sprite {
+                            color: blouse_color(anya),
+                            custom_size: Some(Vec2::new(GIRL_W * 0.14, GIRL_H * 0.22)),
+                            ..default()
+                        },
+                        Transform::from_xyz(side * sh_w * 0.95, GIRL_H * 0.58, 0.3),
+                        BodyPart(id, part),
+                    ));
+                }
+                for (part, side) in [(Part::HandL, -1.0f32), (Part::HandR, 1.0)] {
+                    p.spawn((
+                        Sprite {
+                            color: skin_color(),
+                            custom_size: Some(Vec2::new(GIRL_W * 0.11, GIRL_W * 0.11)),
+                            ..default()
+                        },
+                        Transform::from_xyz(side * sh_w * 0.95, GIRL_H * 0.47, 0.3),
+                        BodyPart(id, part),
+                    ));
+                }
+                for (part, side) in [(Part::BootL, -1.0f32), (Part::BootR, 1.0)] {
+                    p.spawn((
+                        Sprite {
+                            color: Color::srgb_u8(0x3a, 0x26, 0x17), // worn boot leather
+                            custom_size: Some(Vec2::new(GIRL_W * 0.30, GIRL_H * 0.09)),
+                            ..default()
+                        },
+                        Transform::from_xyz(side * hip_w * 0.5, GIRL_H * 0.045, 0.3),
+                        BodyPart(id, part),
+                    ));
+                }
+                p.spawn((
+                    Sprite {
+                        color: hair_color(id),
+                        custom_size: Some(Vec2::new(GIRL_W * 0.28, GIRL_H * 0.32)),
+                        ..default()
+                    },
+                    Transform::from_xyz(0.0, GIRL_H * 0.78, 0.65),
+                    HairSprite(id),
+                ));
+            });
     }
 
     // beat pips (stir / settle / rift)
@@ -426,14 +571,21 @@ fn physics(
 ///
 /// Ported for *shape* from the JS prototype's procedural rig, not exact
 /// numeric parity — see the `verve` field's doc comment on [`Girl`].
+///
+/// The `Girl` root gets one group transform (feet-anchor translation, lean
+/// rotation, `facing` mirror via `scale.x`) that Bevy's transform hierarchy
+/// composes onto every [`BodyPart`]/[`HairSprite`] child automatically —
+/// this system only sets each child's own *local* animation (stride, sway,
+/// billow, arm swing, hair trail) on top of that shared group pose.
 #[allow(clippy::type_complexity)]
 fn reactive_rig(
     time: Res<Time>,
-    mut girls: Query<(&mut Girl, &mut Transform, &mut Sprite), Without<HairSprite>>,
-    mut hair: Query<(&HairSprite, &mut Transform), Without<Girl>>,
+    mut girls: Query<(&mut Girl, &mut Transform)>,
+    mut parts: Query<(&BodyPart, &mut Transform), Without<Girl>>,
+    mut hair: Query<(&HairSprite, &mut Transform), (Without<Girl>, Without<BodyPart>)>,
 ) {
     let dt = time.delta_secs();
-    for (mut g, mut t, mut sprite) in &mut girls {
+    for (mut g, mut t) in &mut girls {
         // Eased animation velocity, derived from position so this system
         // doesn't need to know which girl is active or duplicate input
         // handling — `physics` already moved `g.x`.
@@ -460,20 +612,91 @@ fn reactive_rig(
         let lean = (vx_norm * 0.4 * (0.5 + g.verve)).clamp(-0.3, 0.3);
         let bounce = g.walk.sin().abs() * g.gait * (1.0 + g.verve * 1.3) * 3.0;
         let breathe = g.idle.sin() * 0.6 * (1.0 - g.gait);
+
+        t.translation.x = g.x;
+        t.translation.y = g.y - GIRL_H / 2.0 + bounce + breathe;
+        t.rotation = Quat::from_rotation_z(lean * 0.3);
+        // Mirrors the whole child rig for free (Bevy composes parent scale
+        // into every child's local offset too) — replaces the old
+        // `sprite.flip_x`, which only had one flat sprite to flip.
+        t.scale.x = g.facing;
+    }
+
+    for (part, mut t) in &mut parts {
+        let Some((g, ..)) = girls.iter().find(|(g, ..)| g.id == part.0) else {
+            continue;
+        };
+        let vx_norm = (g.vx / MOVE_SPEED).clamp(-1.5, 1.5);
+        let vy_norm = (g.vy / JUMP_V_REF).clamp(-1.5, 1.5);
         let air = !g.on_ground;
         let billow = (if air { vy_norm } else { 0.0 }) * 0.4 * (1.1 - g.verve * 0.4);
         let bw = (1.0 + billow).clamp(0.85, 1.3);
+        // Sway grows with height off the ground (hem more than waist) —
+        // applied per skirt tier below, not as one flat offset.
+        let sway = vx_norm * GIRL_W * 0.5
+            + g.walk.sin() * g.gait * (GIRL_W * 0.18 + g.verve * GIRL_W * 0.25);
+        let stride = g.walk.sin() * g.gait;
+        let head_bob = g.gait * GIRL_H * 0.02;
 
-        t.translation.y = g.y + bounce + breathe;
-        t.rotation = Quat::from_rotation_z(lean * 0.3);
-        t.scale.x = bw;
-        sprite.flip_x = g.facing < 0.0;
+        match part.1 {
+            Part::Head => t.translation.x = head_bob,
+            Part::SkirtUpper => t.translation.x = sway * 0.35,
+            Part::SkirtLower | Part::Apron => {
+                t.translation.x = sway;
+                t.scale.x = bw;
+            }
+            Part::ArmL | Part::ArmR => {
+                let side = if matches!(part.1, Part::ArmL) {
+                    -1.0
+                } else {
+                    1.0
+                };
+                let swing = if !air && g.gait > 0.08 {
+                    (g.walk
+                        + if side > 0.0 {
+                            std::f32::consts::PI
+                        } else {
+                            0.0
+                        })
+                    .sin()
+                        * g.gait
+                        * (1.0 + g.verve * 1.2)
+                } else {
+                    0.0
+                };
+                t.translation.y = GIRL_H * 0.58 - swing * GIRL_H * 0.04;
+            }
+            Part::HandL | Part::HandR => {
+                let side = if matches!(part.1, Part::HandL) {
+                    -1.0
+                } else {
+                    1.0
+                };
+                let swing = if !air && g.gait > 0.08 {
+                    (g.walk
+                        + if side > 0.0 {
+                            std::f32::consts::PI
+                        } else {
+                            0.0
+                        })
+                    .sin()
+                        * g.gait
+                        * (1.0 + g.verve * 1.2)
+                } else {
+                    0.0
+                };
+                t.translation.y = GIRL_H * 0.47 - swing * GIRL_H * 0.04;
+            }
+            Part::BootL => t.translation.x = -GIRL_W * 0.17 + stride * GIRL_W * 0.22,
+            Part::BootR => t.translation.x = GIRL_W * 0.17 - stride * GIRL_W * 0.22,
+            Part::Torso | Part::Vest | Part::Belt => {}
+        }
     }
 
     for (h, mut t) in &mut hair {
-        if let Some((g, gt, _)) = girls.iter().find(|(g, ..)| g.id == h.0) {
-            t.translation.x = gt.translation.x + g.hair_x * g.facing;
-            t.translation.y = gt.translation.y + GIRL_H * 0.3 - g.hair_y * 8.0;
+        if let Some((g, ..)) = girls.iter().find(|(g, ..)| g.id == h.0) {
+            t.translation.x = g.hair_x * (GIRL_H * 0.06);
+            t.translation.y = GIRL_H * 0.78 - g.hair_y * (GIRL_H * 0.09);
         }
     }
 }
@@ -482,26 +705,37 @@ fn reactive_rig(
 fn sync(
     game: Res<Game>,
     mut clear: ResMut<ClearColor>,
-    mut q: Query<(
-        &mut Sprite,
-        Option<&Girl>,
-        Option<&BirdSprite>,
-        Option<&RiftSprite>,
-        Option<&PipSprite>,
-    )>,
+    mut q: Query<
+        (
+            &mut Sprite,
+            Option<&BirdSprite>,
+            Option<&RiftSprite>,
+            Option<&PipSprite>,
+        ),
+        (Without<BodyPart>, Without<HairSprite>),
+    >,
+    mut parts: Query<(&mut Sprite, &BodyPart), Without<HairSprite>>,
+    mut hair: Query<(&mut Sprite, &HairSprite), Without<BodyPart>>,
 ) {
     clear.0 = sky(game.session.rift_active());
     let active = active_id(&game);
-    for (mut s, girl, bird, rift, pip) in &mut q {
-        if let Some(g) = girl {
-            s.color = girl_color(g.id, g.id == active);
-        } else if bird.is_some() {
+    for (mut s, bird, rift, pip) in &mut q {
+        if bird.is_some() {
             s.color = bird_color(game.session.birds);
         } else if rift.is_some() {
             s.color = rift_color(game.session.rift_active());
         } else if let Some(p) = pip {
             s.color = pip_color(pip_on(&game, p.0));
         }
+    }
+    // The inactive girl's whole rig dims together (was one `girl_color` call
+    // on the flat block; now every part/hair sprite keeps its own costume
+    // hue and only alpha changes).
+    for (mut s, part) in &mut parts {
+        s.color = s.color.with_alpha(if part.0 == active { 1.0 } else { 0.4 });
+    }
+    for (mut s, h) in &mut hair {
+        s.color = s.color.with_alpha(if h.0 == active { 1.0 } else { 0.4 });
     }
 }
 
@@ -570,13 +804,40 @@ fn bird_color(m: BirdState) -> Color {
         BirdState::Disrupted => Color::srgb(0.30, 0.30, 0.33),
     }
 }
-fn girl_color(id: &str, active: bool) -> Color {
-    let (r, g, b) = if id == "anya" {
-        (0.96, 0.55, 0.25)
+/// Costume palette below is taken directly from the JS prototype's own hex
+/// constants (`prototype/zone-a/index.html`), not invented fresh — Anya's
+/// Hutsul vyshyvanka vs. Donna's Rodopska nosia (`15-character-visual-
+/// design.md`).
+fn skin_color() -> Color {
+    Color::srgb_u8(0xe9, 0xc4, 0xa0) // SKIN
+}
+fn blouse_color(anya: bool) -> Color {
+    if anya {
+        Color::srgb_u8(0xf2, 0xed, 0xe0) // LINEN — sorochka
     } else {
-        (0.35, 0.60, 0.90)
-    };
-    Color::srgba(r, g, b, if active { 1.0 } else { 0.4 })
+        Color::srgb_u8(0xef, 0xe8, 0xda) // RIZA
+    }
+}
+fn vest_color(anya: bool) -> Color {
+    if anya {
+        Color::srgb_u8(0x8a, 0x5a, 0x2c) // KEPTAR — embroidered sheepskin vest
+    } else {
+        Color::srgb_u8(0x22, 0x1d, 0x2c) // RHODOPE_SUKMAN — dark bodice strap
+    }
+}
+fn skirt_color(anya: bool) -> Color {
+    if anya {
+        Color::srgb_u8(0x5e, 0x1d, 0x2a) // HUTSUL_SKIRT — zapaska
+    } else {
+        Color::srgb_u8(0x22, 0x1d, 0x2c) // RHODOPE_SUKMAN
+    }
+}
+fn trim_color(anya: bool) -> Color {
+    if anya {
+        Color::srgb_u8(0xb5, 0x20, 0x2a) // EMRED — woven belt
+    } else {
+        Color::srgb_u8(0xc9, 0x8a, 0x3a) // RHODOPE_STRIPE
+    }
 }
 /// Hair/ribbon accent colors, taken directly from the JS prototype's own
 /// palette (`prototype/zone-a/index.html`: `ANYA_HAIR`/`DONNA_HAIR`) rather
