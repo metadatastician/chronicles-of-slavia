@@ -57,7 +57,7 @@ Deny: **Nix, Node/npm, TypeScript, Python, Go, AGPL**. (Guix, not Nix.)
 
 # This repo: `chronicles-of-slavia`  ·  clade `gm-chronicles-of-slavia`
 
-- **Identity** — uuid `b1507e91-78ca-5d30-a66c-dc675ad678f0`; clade `gm`; born 2026-07-06; forge `hyperpolymath/chronicles-of-slavia`.
+- **Identity** — uuid `b1507e91-78ca-5d30-a66c-dc675ad678f0`; clade `gm`; born 2026-07-06; forge `metadatastician/chronicles-of-slavia` (transferred 2026-07-25).
 - **IS** — A two-character Slavic-folkloric narrative game. The world answers the player through an emotional grammar — Anya stirs, Donna settles — and the animal's own nature decides the result. The game is authored as data (the SGS) over a pure, deterministic rules core; the renderer is a skin.
 - **IS-NOT** — rsr-template-repo (the template it was instantiated from) · IDApTIK (the estate's other game project) · idaptik-ums (the modding studio — IDApTIK's, not this) · a Bevy project (Bevy is a replaceable L3 skin) · a multiplayer game (parked) · an AI or neurosymbolic research project
 - **Where it sits** — pipeline position **endpoint**; chain `standards → rsr-template-repo → chronicles-of-slavia`; coordination = `self`.

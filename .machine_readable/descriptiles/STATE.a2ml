@@ -12,7 +12,7 @@
 [metadata]
 project = "chronicles-of-slavia"
 version = "0.0.0"          # both crates are 0.0.0 — pre-release, deliberately
-last-updated = "2026-07-16"
+last-updated = "2026-07-25"
 status = "active"          # active | paused | archived
 
 [project-context]
@@ -30,12 +30,14 @@ completion-percentage = 5
 phase = "implementation"   # design | implementation | testing | maintenance | archived
 maturity = "experimental"  # experimental | alpha | beta | production | lts
 visibility = "private working material — see README; publication not decided"
+estate = "metadatastician"
 
 [route-to-mvp]
 milestones = [
   { name = "Zone A five-beat prototype — the success condition in 00-start-here.md", completion = 100, evidence = "engine/slavia-core/tests/zone_a.rs, 7 tests green" },
   { name = "L2 rules core (slavia-core) — emotional grammar, living taxis, spec parsing", completion = 100, evidence = "29 unit tests green; deps are serde + toml only" },
   { name = "M3.1 ESM — belief, kanren, intent, decay (ADR-0004)", completion = 100, evidence = "10 testbed tests green; headless, deliberately not wired to a zone" },
+  { name = "UMS Zone A / Border Path profile", completion = 100, evidence = "Sibling UMS profiles/slavia/v1 validates; descriptive only, no runtime loader" },
   { name = "L3 renderer (Bevy, ADR-0003)", completion = 0, notes = "Adopted on paper; nothing built. The zero-FFI seam is the point of the choice." },
   { name = "Zones B–E of Chronicle I", completion = 0, notes = "GATED. 08-level1-five-zone-map.md: 'Do not build Zones B–E until Zone A holds.' Zone B is already designed as the Fracture Line (separation) — it is not an environment sandbox." },
   { name = "Chronicle II (The Echo Engine)", completion = 0 },
@@ -84,3 +86,4 @@ open-failures = 0
 part-of = ["RSR Framework"]
 depends-on = ["serde", "toml"]   # slavia-core, deliberately tiny and wasm-friendly
 planned-depends-on = ["bevy"]    # L3 only, per ADR-0003; not yet a dependency
+profile-status = "UMS profile validated externally; Enaction and package loading remain future integrations"

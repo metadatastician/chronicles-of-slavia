@@ -178,7 +178,7 @@ pub fn run() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Chronicles of Slavia — Zone A (Bevy · M2.1)".into(),
-                resolution: (1180.0, 640.0).into(),
+                resolution: (1180.0_f32, 640.0_f32).into(),
                 ..default()
             }),
             ..default()

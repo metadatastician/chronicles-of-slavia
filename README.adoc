@@ -8,6 +8,7 @@ Code licence: MPL-2.0 +
 Docs licence: CC-BY-SA-4.0 +
 Status: Private exploratory prototype +
 Repository standard: Rhodium Standard Repository aligned
+Estate: `metadatastician` (transferred 2026-07-25)
 
 # [IMPORTANT]
 
@@ -69,6 +70,24 @@ They need each other. +
 Slavia itself knows this.
 
 ---
+
+== UMS and Enaction status
+
+Universal Modding Studio now has a bounded, validated Zone A / Border Path
+profile containing Anya, Donna, birds, the unstable bridge, a shrine, one Rift
+disturbance and a cooperative completion condition. It captures quickening,
+settling, responses according to the recipient's nature, environmental
+receptivity, place memory, moral/world marking, Rift
+disruption/inversion/corruption/severance, and the cost of either heroine's
+absence.
+
+That profile is evidence that UMS can describe Slavia without making UMS Core
+IDApTIK-specific. It is not a Slavia runtime package integration: no loader was
+added here, and this game does not depend on the UMS UI.
+
+Enaction is a future source of neutral deterministic primitives—events,
+appraisal domains, relationships, influence and memory—not a shared narrative
+vocabulary. The terms and rules above remain Slavia-owned. See ADR-0004.
 
 == Quick start
 
