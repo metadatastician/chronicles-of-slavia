@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<!--
+SPDX-FileCopyrightText: 2026 Chronicles of Slavia contributors
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+Design reference only. This file is not a claim that the startup interface or
+its displayed runtime integrations have been implemented.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#171323" />
+  <title>Chronicles of Slavia — Startup Interface Mock-up</title>
+  <style>
+    :root {
+      --night: #130f1c;
+      --night-2: #1d1728;
+      --ink: #f5efe4;
+      --muted: #c2b6aa;
+      --faint: #887c78;
+      --panel: rgba(23, 17, 31, .90);
+      --panel-soft: rgba(37, 26, 43, .84);
+      --line: rgba(239, 218, 178, .22);
+      --gold: #e4bd72;
+      --gold-soft: #9c7948;
+      --anya: #e8574f;
+      --anya-blue: #468bd7;
+      --donna: #65a96b;
+      --donna-red: #c3464f;
+      --rift: #ad70e7;
+      --rift-hot: #e88bd7;
+      --sky: #705c8a;
+      --earth: #745342;
+      --leaf: #718c55;
+      --shadow: 0 28px 80px rgba(0,0,0,.55);
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width:100%; height:100%; }
+    body {
+      margin:0;
+      overflow:hidden;
+      color:var(--ink);
+      font-family:var(--sans);
+      background:
+        radial-gradient(circle at 50% 10%, rgba(163,126,186,.25), transparent 35%),
+        linear-gradient(180deg, #221a30 0%, #171322 46%, #0d0d13 100%);
+    }
+
+    button, input, select { font:inherit; }
+    button { color:inherit; }
+
+    .hidden { display:none !important; }
+    .app { width:100%; height:100%; position:relative; isolation:isolate; }
+
+    /* embroidered border */
+    .frame {
+      position:absolute; inset:10px; pointer-events:none; z-index:50;
+      border:1px solid rgba(228,189,114,.42);
+      box-shadow: inset 0 0 0 4px rgba(40,23,44,.75), inset 0 0 0 5px rgba(228,189,114,.17);
+    }
+    .frame::before, .frame::after {
+      content:"◆  ◇  ◆  ◇  ◆  ◇  ◆  ◇  ◆";
+      position:absolute; left:50%; transform:translateX(-50%);
+      color:rgba(228,189,114,.58); letter-spacing:8px; font-size:10px;
+      white-space:nowrap; text-shadow:0 0 12px rgba(228,189,114,.4);
+    }
+    .frame::before { top:-7px; }
+    .frame::after { bottom:-7px; }
+    .corner { position:absolute; width:58px; height:58px; border-color:rgba(228,189,114,.62); }
+    .corner.tl { left:-1px; top:-1px; border-left:3px solid; border-top:3px solid; }
+    .corner.tr { right:-1px; top:-1px; border-right:3px solid; border-top:3px solid; }
+    .corner.bl { left:-1px; bottom:-1px; border-left:3px solid; border-bottom:3px solid; }
+    .corner.br { right:-1px; bottom:-1px; border-right:3px solid; border-bottom:3px solid; }
+
+    /* opening veil */
+    .opening {
+      position:absolute; inset:0; z-index:100; display:grid; place-items:center;
+      background:
+        radial-gradient(circle at center, rgba(93,65,112,.4), transparent 35%),
+        #100d17;
+      transition:opacity .9s ease, visibility .9s ease;
+    }
+    .opening.gone { opacity:0; visibility:hidden; }
+    .opening-card { text-align:center; width:min(760px, 90vw); }
+    .opening-mark {
+      width:112px; height:112px; margin:0 auto 24px; position:relative;
+      border:1px solid rgba(228,189,114,.48); transform:rotate(45deg);
+      box-shadow:0 0 40px rgba(173,112,231,.22), inset 0 0 28px rgba(173,112,231,.12);
+    }
+    .opening-mark::before, .opening-mark::after { content:""; position:absolute; inset:18px; border:1px solid rgba(228,189,114,.3); }
+    .opening-mark::after { inset:36px; background:linear-gradient(135deg,var(--anya) 0 49%,var(--donna) 51% 100%); opacity:.9; }
+    .opening h1 { margin:0; font:700 clamp(38px,7vw,82px)/.95 var(--serif); letter-spacing:.03em; }
+    .opening .subtitle { margin-top:12px; color:var(--gold); letter-spacing:.28em; text-transform:uppercase; font-size:12px; }
+    .opening .motto { margin:28px 0 38px; color:#d8cddd; font:italic 20px/1.5 var(--serif); }
+    .enter-button {
+      border:1px solid rgba(228,189,114,.55); padding:13px 26px; background:rgba(40,27,49,.78);
+      text-transform:uppercase; letter-spacing:.18em; font-size:12px; cursor:pointer;
+      box-shadow:0 14px 30px rgba(0,0,0,.3); transition:.25s ease;
+    }
+    .enter-button:hover { transform:translateY(-2px); background:rgba(83,52,91,.8); box-shadow:0 18px 42px rgba(0,0,0,.42),0 0 28px rgba(173,112,231,.16); }
+
+    /* background world */
+    .world { position:absolute; inset:0; overflow:hidden; }
+    .sky-glow { position:absolute; inset:0; background:radial-gradient(ellipse at 65% 28%, rgba(220,169,176,.18), transparent 28%); }
+    .moon { position:absolute; width:86px; height:86px; border-radius:50%; top:9%; right:14%; background:#e8d9c2; box-shadow:0 0 35px rgba(232,217,194,.34); opacity:.8; }
+    .moon::after { content:""; position:absolute; width:80px; height:80px; border-radius:50%; left:23px; top:-8px; background:#251b32; }
+    .ridge { position:absolute; left:-5%; right:-5%; bottom:23%; height:41%; background:#2d2738; clip-path:polygon(0 66%,10% 52%,19% 59%,29% 31%,40% 55%,50% 27%,61% 53%,72% 37%,82% 58%,91% 43%,100% 61%,100% 100%,0 100%); opacity:.93; }
+    .ridge.back { bottom:32%; height:35%; background:#46384f; opacity:.65; filter:blur(.5px); }
+    .ground { position:absolute; left:0; right:0; bottom:0; height:37%; background:linear-gradient(180deg,#4d3b35,#1b181c 78%); clip-path:polygon(0 18%,12% 9%,26% 20%,39% 8%,52% 19%,67% 6%,81% 17%,100% 4%,100% 100%,0 100%); }
+    .path { position:absolute; bottom:-4%; left:37%; width:38%; height:44%; background:linear-gradient(180deg,rgba(171,129,89,.75),rgba(69,48,40,.6)); clip-path:polygon(42% 0,57% 0,100% 100%,0 100%); opacity:.72; }
+
+    .tree { position:absolute; bottom:24%; width:14px; height:130px; background:#17151a; border-radius:8px; transform-origin:bottom; }
+    .tree::before,.tree::after { content:""; position:absolute; width:82px; height:82px; border-radius:52% 48% 55% 45%; background:#293126; left:-35px; top:-34px; box-shadow:-24px 24px 0 #222a21, 30px 18px 0 #30362a; }
+    .tree.t1 { left:8%; transform:scale(1.25) rotate(-2deg); }
+    .tree.t2 { left:19%; transform:scale(.86) rotate(3deg); }
+    .tree.t3 { right:6%; transform:scale(1.18) rotate(2deg); }
+    .tree.t4 { right:24%; transform:scale(.76) rotate(-3deg); }
+
+    .rift {
+      position:absolute; right:24%; top:24%; width:13px; height:275px; z-index:3;
+      background:linear-gradient(180deg,transparent,var(--rift-hot) 12%,var(--rift) 48%,#7f4dda 82%,transparent);
+      filter:drop-shadow(0 0 10px var(--rift)) drop-shadow(0 0 22px rgba(173,112,231,.68));
+      clip-path:polygon(48% 0,80% 12%,45% 25%,92% 38%,38% 54%,70% 67%,32% 82%,54% 100%,22% 85%,45% 68%,10% 54%,55% 39%,21% 25%);
+      opacity:.84; animation:riftPulse 3.2s ease-in-out infinite;
+    }
+    .rift::before { content:""; position:absolute; inset:-30px -45px; background:radial-gradient(ellipse,rgba(173,112,231,.2),transparent 66%); }
+    @keyframes riftPulse { 0%,100%{transform:scaleX(.85);opacity:.65} 50%{transform:scaleX(1.25);opacity:1} }
+
+    .bridge { position:absolute; left:50%; bottom:27%; width:235px; height:22px; transform:translateX(-15%); z-index:7; }
+    .bridge .plank { position:absolute; top:5px; width:23px; height:10px; background:#8a6550; border:1px solid #3d2b27; transform:rotate(var(--r,0deg)) translateY(var(--y,0px)); }
+    .bridge::before,.bridge::after { content:""; position:absolute; left:0; right:0; height:2px; background:#b58b61; }
+    .bridge::before { top:1px; transform:rotate(-2deg); }
+    .bridge::after { bottom:0; transform:rotate(2deg); }
+    .bridge.steadied .plank { transform:rotate(0) translateY(0) !important; transition:transform .8s ease; }
+
+    .shrine { position:absolute; left:35%; bottom:28%; width:50px; height:84px; z-index:6; cursor:pointer; transition:.25s ease; }
+    .shrine:hover { transform:translateY(-4px); filter:drop-shadow(0 0 14px rgba(228,189,114,.35)); }
+    .shrine-roof { position:absolute; left:2px; top:0; width:46px; height:22px; background:#51363b; clip-path:polygon(50% 0,100% 100%,0 100%); }
+    .shrine-body { position:absolute; left:10px; top:20px; width:31px; height:54px; background:#8d725e; border:2px solid #3b2d2e; }
+    .shrine-icon { position:absolute; left:20px; top:34px; width:12px; height:18px; border:1px solid var(--gold); border-radius:50% 50% 35% 35%; box-shadow:0 0 10px rgba(228,189,114,.32); }
+
+    .birds { position:absolute; left:41%; top:36%; width:150px; height:80px; z-index:4; }
+    .bird { position:absolute; width:18px; height:8px; border-top:2px solid #d2c9c0; border-radius:50%; transform:rotate(var(--rot,0deg)); animation:birdFloat var(--dur,4s) ease-in-out infinite; animation-delay:var(--delay,0s); opacity:.82; }
+    .bird::after { content:""; position:absolute; left:8px; top:-2px; width:9px; height:6px; border-top:2px solid #d2c9c0; border-radius:50%; }
+    @keyframes birdFloat { 0%,100%{translate:0 0} 50%{translate:12px -9px} }
+    .birds.agitated .bird { animation-duration:.75s; }
+    .birds.settled .bird { animation-duration:6s; transform:translateY(24px) scale(.85); }
+
+    .mist { position:absolute; left:-10%; right:-10%; bottom:12%; height:25%; background:linear-gradient(180deg,transparent,rgba(209,194,204,.11),transparent); filter:blur(16px); animation:mist 11s ease-in-out infinite alternate; }
+    @keyframes mist { from{transform:translateX(-3%)} to{transform:translateX(4%)} }
+
+    .firefly { position:absolute; width:3px; height:3px; border-radius:50%; background:#f6d88e; box-shadow:0 0 10px #f6d88e; z-index:8; opacity:.75; animation:fly var(--t,7s) ease-in-out infinite alternate; }
+    @keyframes fly { from{transform:translate(0,0);opacity:.25} 50%{opacity:1} to{transform:translate(var(--dx,30px),var(--dy,-40px));opacity:.45} }
+
+    /* main interface */
+    .shell { position:absolute; inset:0; z-index:20; display:grid; grid-template-rows:92px 1fr 62px; padding:24px 30px 24px; }
+    .topbar { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; border-bottom:1px solid var(--line); }
+    .brand { align-self:end; padding-bottom:16px; }
+    .brand-kicker { color:var(--gold); text-transform:uppercase; letter-spacing:.32em; font-size:9px; }
+    .brand-title { margin-top:4px; font:700 29px/1 var(--serif); letter-spacing:.025em; text-shadow:0 3px 22px rgba(0,0,0,.8); }
+    .chapter { text-align:center; align-self:end; padding-bottom:16px; }
+    .chapter small { display:block; color:var(--muted); text-transform:uppercase; letter-spacing:.2em; font-size:9px; }
+    .chapter strong { display:block; margin-top:5px; font:600 14px var(--serif); color:#f1dec3; }
+    .status { justify-self:end; align-self:end; padding-bottom:16px; display:flex; gap:12px; align-items:center; }
+    .status-chip { border:1px solid var(--line); background:rgba(24,17,31,.65); padding:7px 10px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+    .status-dot { width:8px; height:8px; border-radius:50%; background:var(--donna); box-shadow:0 0 12px var(--donna); }
+
+    .main { display:grid; grid-template-columns:minmax(260px,340px) 1fr minmax(300px,390px); gap:24px; min-height:0; padding:24px 0 18px; }
+    .glass { background:linear-gradient(180deg,rgba(26,18,33,.84),rgba(18,14,24,.91)); border:1px solid var(--line); box-shadow:var(--shadow); backdrop-filter:blur(12px); }
+
+    /* menu */
+    .menu-panel { align-self:center; padding:19px; position:relative; overflow:hidden; }
+    .menu-panel::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(var(--anya),var(--gold),var(--donna)); }
+    .menu-heading { margin:2px 8px 15px; color:var(--gold); font:italic 15px var(--serif); }
+    .menu { display:grid; gap:7px; }
+    .menu-btn {
+      position:relative; width:100%; border:1px solid transparent; background:transparent; padding:12px 13px 12px 17px; text-align:left; cursor:pointer;
+      transition:.2s ease; display:grid; grid-template-columns:28px 1fr auto; gap:8px; align-items:center;
+    }
+    .menu-btn:hover,.menu-btn.active { background:rgba(102,73,108,.22); border-color:rgba(228,189,114,.26); transform:translateX(3px); }
+    .menu-btn.active::before { content:""; position:absolute; left:-2px; top:8px; bottom:8px; width:2px; background:var(--gold); box-shadow:0 0 12px var(--gold); }
+    .menu-icon { color:var(--gold); font-family:var(--serif); font-size:18px; text-align:center; }
+    .menu-label strong { display:block; font:600 14px var(--serif); }
+    .menu-label small { display:block; margin-top:3px; color:var(--faint); font-size:9px; letter-spacing:.04em; }
+    .menu-key { color:var(--faint); font:9px var(--mono); }
+    .menu-divider { height:1px; background:var(--line); margin:6px 9px; }
+
+    /* centre active world focus */
+    .centre { position:relative; min-width:0; pointer-events:none; }
+    .world-caption { position:absolute; left:4%; bottom:4%; max-width:520px; padding:13px 16px; border-left:2px solid var(--gold); background:linear-gradient(90deg,rgba(13,10,18,.7),transparent); text-shadow:0 2px 12px #000; }
+    .world-caption .eyebrow { color:var(--gold); text-transform:uppercase; letter-spacing:.25em; font-size:9px; }
+    .world-caption h2 { margin:6px 0 4px; font:600 26px var(--serif); }
+    .world-caption p { margin:0; max-width:470px; color:#d4c9c4; font:italic 14px/1.55 var(--serif); }
+
+    .heroine { position:absolute; bottom:18%; z-index:10; width:82px; height:205px; transition:.35s ease; filter:drop-shadow(0 15px 12px rgba(0,0,0,.45)); }
+    .heroine.anya { left:35%; }
+    .heroine.donna { left:44%; }
+    .heroine .head { position:absolute; width:31px; height:36px; border-radius:48% 48% 44% 44%; left:25px; top:5px; background:#c99577; border:2px solid #221921; }
+    .heroine .hair { position:absolute; left:18px; top:0; width:44px; height:93px; background:#17141c; border-radius:50% 50% 30% 30%; }
+    .heroine.anya .hair { height:145px; left:11px; width:56px; clip-path:polygon(20% 0,80% 0,100% 76%,71% 100%,52% 70%,31% 100%,0 75%); transform:rotate(4deg); }
+    .heroine.donna .hair { height:48px; top:-3px; border-radius:50%; box-shadow:16px -5px 0 -7px #17141c; }
+    .heroine .body { position:absolute; left:18px; top:40px; width:47px; height:114px; clip-path:polygon(25% 0,75% 0,100% 100%,0 100%); border:2px solid #241a25; }
+    .heroine.anya .body { background:linear-gradient(90deg,var(--anya-blue) 0 32%,#e8c957 32% 45%,var(--anya) 45% 100%); }
+    .heroine.donna .body { background:linear-gradient(90deg,#eee7d9 0 38%,var(--donna) 38% 68%,var(--donna-red) 68% 100%); }
+    .heroine .leg { position:absolute; top:146px; width:14px; height:53px; background:#2a2432; border:2px solid #17131c; }
+    .heroine .leg.l { left:22px; transform:rotate(2deg); }
+    .heroine .leg.r { left:45px; transform:rotate(-2deg); }
+    .heroine.focused { transform:translateY(-7px) scale(1.05); filter:drop-shadow(0 18px 15px rgba(0,0,0,.5)) drop-shadow(0 0 18px rgba(228,189,114,.2)); }
+
+    /* right context */
+    .context { align-self:center; min-height:520px; padding:20px; display:flex; flex-direction:column; }
+    .context-head { border-bottom:1px solid var(--line); padding-bottom:13px; }
+    .context-head .eyebrow { text-transform:uppercase; color:var(--gold); letter-spacing:.23em; font-size:9px; }
+    .context-head h2 { margin:6px 0 3px; font:600 24px var(--serif); }
+    .context-head p { margin:0; color:var(--muted); font:13px/1.5 var(--serif); }
+    .context-body { flex:1; overflow:auto; padding:16px 2px 4px; scrollbar-width:thin; scrollbar-color:var(--gold-soft) transparent; }
+
+    .continue-card { border:1px solid var(--line); background:rgba(54,38,58,.4); padding:15px; margin-bottom:12px; }
+    .continue-card .scene { display:flex; justify-content:space-between; gap:10px; align-items:start; }
+    .continue-card strong { font:600 17px var(--serif); }
+    .continue-card small { color:var(--muted); display:block; margin-top:4px; }
+    .progress { height:4px; margin:14px 0 8px; background:rgba(255,255,255,.08); }
+    .progress > span { display:block; width:28%; height:100%; background:linear-gradient(90deg,var(--anya),var(--gold),var(--donna)); }
+
+    .action-row { display:flex; gap:8px; margin-top:14px; }
+    .primary,.secondary {
+      border:1px solid rgba(228,189,114,.4); padding:10px 13px; cursor:pointer; text-transform:uppercase; letter-spacing:.13em; font-size:9px; transition:.2s ease;
+    }
+    .primary { background:linear-gradient(90deg,rgba(144,67,67,.74),rgba(74,89,63,.74)); flex:1; }
+    .secondary { background:rgba(47,35,52,.72); }
+    .primary:hover,.secondary:hover { transform:translateY(-2px); border-color:var(--gold); box-shadow:0 10px 25px rgba(0,0,0,.25); }
+
+    .duality { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin:12px 0; }
+    .soul-card { border:1px solid var(--line); padding:12px; cursor:pointer; background:rgba(35,25,40,.58); transition:.2s ease; }
+    .soul-card:hover,.soul-card.active { border-color:rgba(228,189,114,.55); transform:translateY(-2px); }
+    .soul-card.anya.active { box-shadow:inset 0 0 0 1px rgba(232,87,79,.5); }
+    .soul-card.donna.active { box-shadow:inset 0 0 0 1px rgba(101,169,107,.5); }
+    .soul-card .name { font:600 16px var(--serif); }
+    .soul-card .trait { color:var(--muted); font-size:10px; margin-top:4px; }
+    .meter { height:3px; background:rgba(255,255,255,.08); margin-top:10px; }
+    .soul-card.anya .meter span { display:block; width:76%; height:100%; background:var(--anya); }
+    .soul-card.donna .meter span { display:block; width:69%; height:100%; background:var(--donna); }
+
+    .world-pillars { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .pillar { padding:10px; border:1px solid rgba(228,189,114,.17); background:rgba(49,35,54,.32); }
+    .pillar strong { font:600 13px var(--serif); color:#f0dec3; }
+    .pillar small { display:block; color:var(--faint); margin-top:3px; font-size:9px; }
+
+    .mode-list { display:grid; gap:8px; }
+    .mode { border:1px solid var(--line); background:rgba(47,34,51,.38); padding:12px; cursor:pointer; transition:.2s ease; }
+    .mode:hover,.mode.selected { border-color:rgba(228,189,114,.48); transform:translateX(2px); background:rgba(76,52,79,.46); }
+    .mode strong { display:block; font:600 15px var(--serif); }
+    .mode span { display:block; color:var(--muted); font-size:10px; margin-top:4px; line-height:1.45; }
+    .tag { display:inline-block; margin-top:7px; padding:3px 6px; border:1px solid var(--line); color:var(--gold); font-size:8px; letter-spacing:.11em; text-transform:uppercase; }
+
+    .setting { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(228,189,114,.1); }
+    .setting strong { display:block; font:600 13px var(--serif); }
+    .setting small { color:var(--faint); font-size:9px; }
+    .toggle { width:40px; height:20px; border-radius:12px; background:#403345; border:1px solid var(--line); cursor:pointer; position:relative; }
+    .toggle::after { content:""; position:absolute; width:14px; height:14px; left:3px; top:2px; border-radius:50%; background:#b8a7ae; transition:.2s ease; }
+    .toggle.on { background:#617151; }
+    .toggle.on::after { left:21px; background:#e6d2a5; }
+
+    /* footer */
+    .footer { border-top:1px solid var(--line); display:grid; grid-template-columns:1fr auto 1fr; align-items:center; color:var(--faint); font-size:9px; letter-spacing:.08em; }
+    .footer-quote { font:italic 12px var(--serif); color:#bdb0ba; }
+    .footer-help { justify-self:center; display:flex; gap:15px; }
+    .key { border:1px solid var(--line); padding:3px 6px; font-family:var(--mono); color:var(--muted); background:rgba(18,13,23,.5); }
+    .footer-version { justify-self:end; font-family:var(--mono); }
+
+    /* modal / launch */
+    .modal-layer { position:absolute; inset:0; z-index:80; display:grid; place-items:center; background:rgba(8,7,11,.72); backdrop-filter:blur(12px); opacity:0; visibility:hidden; transition:.25s ease; }
+    .modal-layer.show { opacity:1; visibility:visible; }
+    .modal { width:min(760px,90vw); max-height:84vh; overflow:auto; padding:26px; border:1px solid rgba(228,189,114,.48); background:linear-gradient(180deg,#281d30,#17121d); box-shadow:0 35px 100px rgba(0,0,0,.72); position:relative; }
+    .modal::before { content:""; position:absolute; inset:8px; border:1px solid rgba(228,189,114,.12); pointer-events:none; }
+    .close { position:absolute; right:14px; top:12px; width:32px; height:32px; border:1px solid var(--line); background:rgba(0,0,0,.2); cursor:pointer; }
+    .modal h2 { margin:0 44px 5px 0; font:600 28px var(--serif); }
+    .modal .lead { color:var(--muted); font:italic 14px/1.5 var(--serif); }
+    .launch-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin:20px 0; }
+    .launch-step { border:1px solid var(--line); padding:13px; background:rgba(47,35,52,.55); }
+    .launch-step.active { border-color:var(--gold); box-shadow:inset 0 -2px 0 var(--gold); }
+    .launch-step small { color:var(--faint); text-transform:uppercase; letter-spacing:.15em; font-size:8px; }
+    .launch-step strong { display:block; margin-top:5px; font:600 14px var(--serif); }
+    .launch-summary { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .summary-box { border:1px solid var(--line); padding:13px; background:rgba(28,21,34,.6); }
+    .summary-box small { color:var(--faint); text-transform:uppercase; letter-spacing:.13em; font-size:8px; }
+    .summary-box strong { display:block; margin-top:5px; font:600 15px var(--serif); }
+    .launch-button { width:100%; margin-top:18px; border:1px solid var(--gold); padding:13px; background:linear-gradient(90deg,rgba(160,69,66,.82),rgba(79,102,67,.82)); cursor:pointer; text-transform:uppercase; letter-spacing:.2em; font-size:10px; }
+
+    .transition-screen { position:absolute; inset:0; z-index:120; background:#0e0c12; display:grid; place-items:center; opacity:0; visibility:hidden; transition:.5s ease; }
+    .transition-screen.show { opacity:1; visibility:visible; }
+    .transition-content { text-align:center; width:min(680px,90vw); }
+    .transition-symbol { margin:0 auto 26px; width:100px; height:100px; position:relative; }
+    .transition-symbol::before,.transition-symbol::after { content:""; position:absolute; top:0; width:43px; height:100px; border:1px solid var(--gold); }
+    .transition-symbol::before { left:2px; background:linear-gradient(180deg,rgba(232,87,79,.5),transparent); transform:skewY(-12deg); }
+    .transition-symbol::after { right:2px; background:linear-gradient(180deg,rgba(101,169,107,.5),transparent); transform:skewY(12deg); }
+    .transition-content h2 { margin:0; font:600 32px var(--serif); }
+    .transition-content p { color:var(--muted); font:italic 15px var(--serif); }
+    .loading-line { height:2px; background:rgba(255,255,255,.08); margin:24px auto 10px; width:72%; overflow:hidden; }
+    .loading-line span { display:block; width:0; height:100%; background:linear-gradient(90deg,var(--anya),var(--gold),var(--donna)); transition:width 2.5s ease; }
+    .transition-screen.show .loading-line span { width:100%; }
+
+    .toast { position:absolute; left:50%; bottom:78px; z-index:70; transform:translate(-50%,18px); opacity:0; padding:10px 15px; border:1px solid var(--line); background:rgba(25,18,31,.94); color:#e3d6ca; box-shadow:0 14px 35px rgba(0,0,0,.4); transition:.25s ease; font-size:11px; }
+    .toast.show { opacity:1; transform:translate(-50%,0); }
+
+    @media (max-width:1100px) {
+      .main { grid-template-columns:280px 1fr 330px; gap:14px; }
+      .shell { padding-left:20px; padding-right:20px; }
+      .heroine.anya { left:26%; } .heroine.donna { left:41%; }
+    }
+    @media (max-width:850px) {
+      body { overflow:auto; }
+      .app { min-height:900px; }
+      .shell { position:relative; min-height:900px; grid-template-rows:86px auto 62px; }
+      .main { grid-template-columns:1fr; padding-top:15px; }
+      .centre { min-height:260px; order:-1; }
+      .menu-panel,.context { align-self:stretch; }
+      .context { min-height:440px; }
+      .world-caption { bottom:0; }
+      .topbar { grid-template-columns:1fr auto; }
+      .chapter { display:none; }
+      .status-chip { display:none; }
+      .footer { grid-template-columns:1fr auto; }
+      .footer-help { display:none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="frame"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></div>
+
+  <section class="opening" id="opening">
+    <div class="opening-card">
+      <div class="opening-mark"></div>
+      <div class="subtitle">Invisible Door presents</div>
+      <h1>Chronicles<br>of Slavia</h1>
+      <div class="motto">“What do you become when the world breaks?”</div>
+      <button class="enter-button" id="enterWorld">Enter the Chronicle</button>
+    </div>
+  </section>
+
+  <div class="world" aria-hidden="true">
+    <div class="sky-glow"></div><div class="moon"></div>
+    <div class="ridge back"></div><div class="ridge"></div><div class="ground"></div><div class="path"></div>
+    <div class="tree t1"></div><div class="tree t2"></div><div class="tree t3"></div><div class="tree t4"></div>
+    <div class="rift" id="rift"></div>
+    <div class="bridge" id="bridge"></div>
+    <div class="shrine" id="shrine"><div class="shrine-roof"></div><div class="shrine-body"></div><div class="shrine-icon"></div></div>
+    <div class="birds" id="birds"></div>
+    <div class="mist"></div>
+    <div id="fireflies"></div>
+  </div>
+
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-kicker">A living world remembers</div>
+        <div class="brand-title">Chronicles of Slavia</div>
+      </div>
+      <div class="chapter"><small>Current Chronicle</small><strong>The First Tear · Border Path</strong></div>
+      <div class="status"><span class="status-dot"></span><span class="status-chip">Local chronicle ready</span></div>
+    </header>
+
+    <section class="main">
+      <aside class="menu-panel glass">
+        <div class="menu-heading">Open the book at…</div>
+        <nav class="menu" id="menu">
+          <button class="menu-btn active" data-view="continue"><span class="menu-icon">❧</span><span class="menu-label"><strong>Continue the Chronicle</strong><small>Return to the unstable bridge</small></span><span class="menu-key">C</span></button>
+          <button class="menu-btn" data-view="new"><span class="menu-icon">✦</span><span class="menu-label"><strong>Begin a New Chronicle</strong><small>Start again at the first tear</small></span><span class="menu-key">N</span></button>
+          <button class="menu-btn" data-view="chapters"><span class="menu-icon">⌘</span><span class="menu-label"><strong>Chapter Map</strong><small>Places, memories and unfinished paths</small></span><span class="menu-key">M</span></button>
+          <button class="menu-btn" data-view="worldbook"><span class="menu-icon">⌑</span><span class="menu-label"><strong>The World Book</strong><small>Folklore, remedies and remembered choices</small></span><span class="menu-key">W</span></button>
+          <button class="menu-btn" data-view="bond"><span class="menu-icon">∞</span><span class="menu-label"><strong>Anya &amp; Donna</strong><small>The bond that lets the world answer</small></span><span class="menu-key">B</span></button>
+          <div class="menu-divider"></div>
+          <button class="menu-btn" data-view="ums"><span class="menu-icon">◇</span><span class="menu-label"><strong>Universal Modding Studio</strong><small>Open this world for authoring</small></span><span class="menu-key">U</span></button>
+          <button class="menu-btn" data-view="settings"><span class="menu-icon">⚙</span><span class="menu-label"><strong>Settings &amp; Accessibility</strong><small>Motion, reading, sound and assistance</small></span><span class="menu-key">S</span></button>
+          <button class="menu-btn" data-view="credits"><span class="menu-icon">✥</span><span class="menu-label"><strong>Credits &amp; Provenance</strong><small>People, sources and licences</small></span><span class="menu-key">I</span></button>
+        </nav>
+      </aside>
+
+      <section class="centre">
+        <div class="heroine anya focused" id="anyaFigure"><div class="hair"></div><div class="head"></div><div class="body"></div><div class="leg l"></div><div class="leg r"></div></div>
+        <div class="heroine donna" id="donnaFigure"><div class="hair"></div><div class="head"></div><div class="body"></div><div class="leg l"></div><div class="leg r"></div></div>
+        <div class="world-caption">
+          <div class="eyebrow" id="captionEyebrow">Level I · The First Tear</div>
+          <h2 id="captionTitle">The Border Path remembers them.</h2>
+          <p id="captionText">Anya wakes the world. Donna helps it hold. Beyond the bridge, something has begun answering incorrectly.</p>
+        </div>
+      </section>
+
+      <aside class="context glass">
+        <div class="context-head"><div class="eyebrow" id="contextEyebrow">Continue</div><h2 id="contextTitle">The Unstable Bridge</h2><p id="contextLead">Return to the moment where movement needs care, and courage needs structure.</p></div>
+        <div class="context-body" id="contextBody"></div>
+      </aside>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-quote">Slavia is memory, medicine, folklore and moral choice.</div>
+      <div class="footer-help"><span><b class="key">↑↓</b> Choose</span><span><b class="key">Enter</b> Open</span><span><b class="key">Esc</b> Back</span></div>
+      <div class="footer-version">prototype portal · zone-a</div>
+    </footer>
+  </main>
+
+  <div class="modal-layer" id="modalLayer"><div class="modal" id="modal"><button class="close" id="closeModal">×</button><div id="modalContent"></div></div></div>
+  <div class="transition-screen" id="transition"><div class="transition-content"><div class="transition-symbol"></div><h2>Entering the Border Path</h2><p id="transitionText">The world listens for two different footsteps.</p><div class="loading-line"><span></span></div><small>Preparing the First Tear…</small></div></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const state = { view:'continue', focus:'anya', mode:'story', toggles:{motion:true, subtitles:true, cues:true, contrast:false} };
+
+  const bridge = $('#bridge');
+  for(let i=0;i<10;i++){
+    const p=document.createElement('span'); p.className='plank'; p.style.left=`${i*23}px`; p.style.setProperty('--r',`${[-7,3,-4,8,-2,5,-8,4,-3,6][i]}deg`); p.style.setProperty('--y',`${[1,3,-1,4,0,-2,4,-1,2,0][i]}px`); bridge.appendChild(p);
+  }
+  const birds=$('#birds');
+  for(let i=0;i<7;i++){ const b=document.createElement('i'); b.className='bird'; b.style.left=`${8+i*19}px`; b.style.top=`${8+(i%3)*18}px`; b.style.setProperty('--rot',`${(i%2?1:-1)*(3+i)}deg`); b.style.setProperty('--dur',`${3.4+i*.35}s`); b.style.setProperty('--delay',`${-i*.4}s`); birds.appendChild(b); }
+  const ff=$('#fireflies');
+  for(let i=0;i<24;i++){ const f=document.createElement('i'); f.className='firefly'; f.style.left=`${8+Math.random()*86}%`; f.style.top=`${38+Math.random()*48}%`; f.style.setProperty('--t',`${4+Math.random()*7}s`); f.style.setProperty('--dx',`${-35+Math.random()*70}px`); f.style.setProperty('--dy',`${-20-Math.random()*55}px`); f.style.animationDelay=`${-Math.random()*7}s`; ff.appendChild(f); }
+
+  const views = {
+    continue:{
+      eyebrow:'Continue', title:'The Unstable Bridge', lead:'Return to the moment where movement needs care, and courage needs structure.',
+      caption:['Level I · The First Tear','The Border Path remembers them.','Anya wakes the world. Donna helps it hold. Beyond the bridge, something has begun answering incorrectly.'],
+      html:`<div class="continue-card"><div class="scene"><div><strong>Zone A · Border Path</strong><small>At the unstable bridge · 18 minutes played</small></div><span class="tag">Autosaved</span></div><div class="progress"><span></span></div><small>Donna has reached the bridge. Anya waits on the western bank. The birds are restless.</small><div class="action-row"><button class="primary" data-action="launch">Continue Journey</button><button class="secondary" data-action="restart">Restart Zone</button></div></div><div class="world-pillars"><div class="pillar"><strong>Memory</strong><small>The shrine recalls care.</small></div><div class="pillar"><strong>Medicine</strong><small>No remedy carried yet.</small></div><div class="pillar"><strong>Folklore</strong><small>Bird-sign unsettled.</small></div><div class="pillar"><strong>Choice</strong><small>No lasting mark made.</small></div></div>`
+    },
+    new:{
+      eyebrow:'New Chronicle', title:'How will you enter Slavia?', lead:'The story begins with both girls, but the world can be approached through different forms of play.',
+      caption:['A new telling','The same path never answers exactly twice.','Begin with the authored story, revisit its living systems freely, or enter a quiet guided version focused on the bond.'],
+      html:`<div class="mode-list"><div class="mode selected" data-mode="story"><strong>Story Chronicle</strong><span>The authored journey of Anya, Donna and the first tear. Core route, meaningful variation, lasting choices.</span><i class="tag">Recommended</i></div><div class="mode" data-mode="memory"><strong>Memory Walk</strong><span>Explore completed spaces, revisit responses and examine how choices marked the world.</span><i class="tag">Reflective</i></div><div class="mode" data-mode="sandbox"><strong>Living World Study</strong><span>A systems-oriented mode for experimenting with quickening, settling, animals and place-memory.</span><i class="tag">Exploratory</i></div></div><div class="action-row"><button class="primary" data-action="newLaunch">Begin New Chronicle</button></div>`
+    },
+    chapters:{
+      eyebrow:'Chapter Map', title:'Known places and sealed paths', lead:'Each place is geography, memory and consequence. Only the Border Path is open in this prototype.',
+      caption:['The map is incomplete','Some roads are hidden by distance. Others by memory.','The First Tear is only the opening wound. Future chapters remain deliberately unwritten here.'],
+      html:`<div class="mode-list"><div class="mode selected"><strong>I · The First Tear</strong><span>Zone A: Border Path. Shrine, birds, unstable bridge and the first Rift interruption.</span><i class="tag">Available</i></div><div class="mode" style="opacity:.55"><strong>II · Beyond the Overlook</strong><span>The path exists in the world design, but is not yet part of the playable prototype.</span><i class="tag">Sealed</i></div><div class="mode" style="opacity:.4"><strong>The Mirror of Misalignment</strong><span>A future corruption that weaponises each heroine's imbalance against the other.</span><i class="tag">Parked</i></div></div>`
+    },
+    worldbook:{
+      eyebrow:'The World Book', title:'What Slavia remembers', lead:'The archive records not trivia, but the meanings by which the world responds.',
+      caption:['Four interwoven grammars','Memory. Medicine. Folklore. Moral choice.','The world is not scenery around the protagonists. It has its own nature, wounds, habits and recollections.'],
+      html:`<div class="world-pillars"><div class="pillar"><strong>Memory</strong><small>Places retain repeated care, violence, neglect and repair.</small></div><div class="pillar"><strong>Medicine</strong><small>Remedies are material, ethical and diagnostic—not generic potions.</small></div><div class="pillar"><strong>Folklore</strong><small>Signs and creatures act according to situated traditions and local nature.</small></div><div class="pillar"><strong>Moral Choice</strong><small>Decisions leave marks in relationships, landscapes and later possibilities.</small></div></div><div class="continue-card" style="margin-top:12px"><strong>Living taxis</strong><small>Animals are never buttons or controllable units. The heroines change the rhythm around them, and each creature answers according to its own nature.</small><div class="action-row"><button class="secondary" data-action="birdsAnya">Show quickening</button><button class="secondary" data-action="birdsDonna">Show settling</button></div></div>`
+    },
+    bond:{
+      eyebrow:'The Bond', title:'Two forces, neither complete alone', lead:'Switching characters is not merely switching powers. It changes what the world can become.',
+      caption:['Anya and Donna','One stirs. One steadies. Both can become too much.','Their differences are not a red-and-blue key system. Each changes living responses, environmental tendencies and the meaning of absence.'],
+      html:`<div class="duality"><div class="soul-card anya active" data-focus="anya"><div class="name">Anya</div><div class="trait">Chaos · movement · courage · quickening</div><div class="meter"><span></span></div></div><div class="soul-card donna" data-focus="donna"><div class="name">Donna</div><div class="trait">Order · care · structure · settling</div><div class="meter"><span></span></div></div></div><div class="continue-card"><strong id="bondTitle">Anya wakes the world</strong><small id="bondText">She stirs birds, quickens living things and crosses the path Donna makes capable of holding.</small><div class="action-row"><button class="secondary" data-action="switchSoul">Switch focus</button><button class="primary" data-action="bondDemo">Demonstrate bond</button></div></div>`
+    },
+    ums:{
+      eyebrow:'Authoring Portal', title:'Open Slavia in UMS', lead:'Inspect the profile as a living model: landscape, creatures, influences, memories, objectives and Rift distortions.',
+      caption:['Universal Modding Studio','The world can be opened without flattening its particularity.','UMS provides the lenses and verification. The Chronicles of Slavia profile supplies the living grammar.'],
+      html:`<div class="continue-card"><div class="scene"><div><strong>Slavia profile · Zone A</strong><small>Profile contract: mythic landscape, living response, affective fields, place memory and cooperative progression.</small></div><span class="tag">Profile</span></div><div class="world-pillars" style="margin-top:12px"><div class="pillar"><strong>World</strong><small>Path, shrine, bridge, overlook.</small></div><div class="pillar"><strong>Affect</strong><small>Quickening and settling.</small></div><div class="pillar"><strong>Ecology</strong><small>Birds answer naturally.</small></div><div class="pillar"><strong>Rift</strong><small>Inversion and corruption.</small></div></div><div class="action-row"><button class="primary" data-action="openUms">Open UMS Portal</button></div></div>`
+    },
+    settings:{
+      eyebrow:'Settings', title:'Shape the telling to the player', lead:'Accessibility is part of the world contract, not an afterthought.',
+      caption:['A gentler or clearer path','The story should remain legible without losing its atmosphere.','Motion, cues, text and contrast can change while the simulation and meaning remain coherent.'],
+      html:`<div class="setting"><div><strong>Reduced motion</strong><small>Calmer Rift, particles and camera transitions</small></div><button class="toggle on" data-toggle="motion"></button></div><div class="setting"><div><strong>Subtitles and speaker names</strong><small>Dialogue, environmental voices and folklore narration</small></div><button class="toggle on" data-toggle="subtitles"></button></div><div class="setting"><div><strong>Non-colour interaction cues</strong><small>Patterns and symbols accompany heroine colour accents</small></div><button class="toggle on" data-toggle="cues"></button></div><div class="setting"><div><strong>High-contrast embroidery</strong><small>Strengthen frame, icons and interactive edges</small></div><button class="toggle" data-toggle="contrast"></button></div><div class="action-row"><button class="primary" data-action="saveSettings">Keep These Settings</button></div>`
+    },
+    credits:{
+      eyebrow:'Credits & Provenance', title:'A world made from many inheritances', lead:'The project separates source, influence, authorship, licence and cultural responsibility.',
+      caption:['Acknowledgement is part of the work','Folklore should not become anonymous texture.','Sources, artistic interpretation and design invention should remain distinguishable as the project develops.'],
+      html:`<div class="continue-card"><strong>Chronicles of Slavia</strong><small>Private exploratory prototype. Code and configuration intend MPL-2.0; prose and design documentation intend CC-BY-SA-4.0, subject to repository publication decisions and per-file SPDX declarations.</small></div><div class="world-pillars"><div class="pillar"><strong>Design</strong><small>Anya, Donna, the Rift and living-world grammar.</small></div><div class="pillar"><strong>Culture</strong><small>Ukrainian, Bulgarian and wider Slavic references require explicit sourcing.</small></div><div class="pillar"><strong>Engine</strong><small>Future Enaction Engine integration.</small></div><div class="pillar"><strong>Authoring</strong><small>Universal Modding Studio profile.</small></div></div>`
+    }
+  };
+
+  function render(view){
+    state.view=view; const v=views[view];
+    $('#contextEyebrow').textContent=v.eyebrow; $('#contextTitle').textContent=v.title; $('#contextLead').textContent=v.lead; $('#contextBody').innerHTML=v.html;
+    $('#captionEyebrow').textContent=v.caption[0]; $('#captionTitle').textContent=v.caption[1]; $('#captionText').textContent=v.caption[2];
+    $$('.menu-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+    bindDynamic();
+  }
+
+  function focusSoul(which){
+    state.focus=which; $('#anyaFigure').classList.toggle('focused',which==='anya'); $('#donnaFigure').classList.toggle('focused',which==='donna');
+    $$('.soul-card').forEach(c=>c.classList.toggle('active',c.dataset.focus===which));
+    const title=$('#bondTitle'), text=$('#bondText');
+    if(title){ title.textContent=which==='anya'?'Anya wakes the world':'Donna lets the world hold'; text.textContent=which==='anya'?'She stirs birds, quickens living things and crosses the path Donna makes capable of holding.':'She settles birds, steadies fragile structures and gives movement a form that can endure.'; }
+    birds.className='birds '+(which==='anya'?'agitated':'settled');
+    bridge.classList.toggle('steadied',which==='donna');
+  }
+
+  function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>t.classList.remove('show'),2200); }
+
+  function launch(newGame=false){
+    const label=newGame?'Begin at the First Tear':'Continue at the Bridge';
+    $('#modalContent').innerHTML=`<h2>${label}</h2><p class="lead">Confirm the form of this telling before entering the living world.</p><div class="launch-steps"><div class="launch-step active"><small>Step I</small><strong>Chronicle</strong></div><div class="launch-step active"><small>Step II</small><strong>Accessibility</strong></div><div class="launch-step active"><small>Step III</small><strong>Enter</strong></div></div><div class="launch-summary"><div class="summary-box"><small>Mode</small><strong>${newGame?({'story':'Story Chronicle','memory':'Memory Walk','sandbox':'Living World Study'}[state.mode]):'Continue Chronicle'}</strong></div><div class="summary-box"><small>Starting focus</small><strong>${state.focus==='anya'?'Anya · Quickening':'Donna · Settling'}</strong></div><div class="summary-box"><small>Location</small><strong>${newGame?'Border Path entrance':'Unstable bridge'}</strong></div><div class="summary-box"><small>World state</small><strong>Natural response intact</strong></div></div><button class="launch-button" id="confirmLaunch">Open the Chronicle</button>`;
+    $('#modalLayer').classList.add('show');
+    $('#confirmLaunch').onclick=()=>{ $('#modalLayer').classList.remove('show'); $('#transitionText').textContent=state.focus==='anya'?'Anya moves first. The birds feel the quickening.':'Donna moves first. The bridge begins to settle.'; $('#transition').classList.add('show'); setTimeout(()=>{ $('#transition').classList.remove('show'); toast('Prototype launch complete — returning to portal'); },3400); };
+  }
+
+  function bindDynamic(){
+    $$('[data-focus]').forEach(x=>x.onclick=()=>focusSoul(x.dataset.focus));
+    $$('[data-mode]').forEach(x=>x.onclick=()=>{ state.mode=x.dataset.mode; $$('[data-mode]').forEach(m=>m.classList.toggle('selected',m===x)); });
+    $$('[data-toggle]').forEach(x=>{ x.classList.toggle('on',state.toggles[x.dataset.toggle]); x.onclick=()=>{ state.toggles[x.dataset.toggle]=!state.toggles[x.dataset.toggle]; x.classList.toggle('on'); if(x.dataset.toggle==='motion') $('#app').classList.toggle('reduced-motion',!state.toggles.motion); }; });
+    $$('[data-action]').forEach(x=>x.onclick=()=>{
+      const a=x.dataset.action;
+      if(a==='launch') launch(false);
+      if(a==='newLaunch') launch(true);
+      if(a==='restart') { toast('Zone restart prepared'); launch(true); }
+      if(a==='switchSoul') focusSoul(state.focus==='anya'?'donna':'anya');
+      if(a==='bondDemo'){ focusSoul('donna'); setTimeout(()=>focusSoul('anya'),1200); setTimeout(()=>{birds.className='birds';bridge.classList.remove('steadied');toast('The bridge holds because both forces arrive in sequence');},2600); }
+      if(a==='birdsAnya') focusSoul('anya');
+      if(a==='birdsDonna') focusSoul('donna');
+      if(a==='saveSettings') toast('Accessibility settings kept for this device');
+      if(a==='openUms') toast('UMS hand-off simulated: chronicles-of-slavia profile · zone-a');
+    });
+  }
+
+  $$('.menu-btn').forEach(b=>b.onclick=()=>render(b.dataset.view));
+  $('#enterWorld').onclick=()=>$('#opening').classList.add('gone');
+  $('#closeModal').onclick=()=>$('#modalLayer').classList.remove('show');
+  $('#modalLayer').onclick=e=>{ if(e.target===$('#modalLayer')) $('#modalLayer').classList.remove('show'); };
+  $('#shrine').onclick=()=>{ render('worldbook'); toast('The shrine remembers a careful touch'); };
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){ $('#modalLayer').classList.remove('show'); $('#transition').classList.remove('show'); return; }
+    const keys={c:'continue',n:'new',m:'chapters',w:'worldbook',b:'bond',u:'ums',s:'settings',i:'credits'};
+    if(keys[e.key.toLowerCase()]) render(keys[e.key.toLowerCase()]);
+    if(e.key==='Enter' && !$('#opening').classList.contains('gone')) $('#enterWorld').click();
+  });
+
+  render('continue');
+  setTimeout(()=>{ if(!$('#opening').classList.contains('gone')) $('#enterWorld').focus(); },400);
+})();
+</script>
+</body>
+</html>

@@ -10,7 +10,7 @@
 //! types — the whole traversal is testable headlessly, and it survives any
 //! future engine choice (M2) because it is engine-agnostic.
 
-use slavia_core::{zone_a, Beat, CrossError, Response, World};
+use slavia_core::{zone_a, Beat, Character, CrossError, Response, World};
 use std::collections::HashMap;
 
 /// Zone A's single animal, and the beats that gate interactions.
@@ -160,6 +160,11 @@ impl Session {
         &self.world.spec().beats
     }
 
+    /// Zone A's cast, as declared in the spec — for a renderer to spawn.
+    pub fn characters(&self) -> &[Character] {
+        &self.world.spec().characters
+    }
+
     fn last_index(&self) -> usize {
         self.beats_slice().len().saturating_sub(1)
     }
@@ -185,12 +190,22 @@ impl Session {
 
     /// Move the active girl by `dx` beat units. Returns the index of a *newly
     /// reached* beat, if this move stepped onto one.
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn move_active(&mut self, dx: f32) -> Option<usize> {
+        self.set_active_pos(self.active_pos() + dx)
+    }
+
+    /// Set the active girl's absolute position, in beat units, clamped to the
+    /// path's extent. Returns the index of a *newly reached* beat, if this
+    /// lands on one for the first time. For a renderer that simulates a
+    /// continuous space (e.g. pixels) and derives beat position from it,
+    /// rather than moving in beat units directly.
+    pub fn set_active_pos(&mut self, beat_units: f32) -> Option<usize> {
         let id = self.active_id().to_string();
         let max = self.last_index() as f32;
         let before = self.nearest_beat_index();
         if let Some(p) = self.pos.get_mut(&id) {
-            *p = (*p + dx).clamp(0.0, max);
+            *p = beat_units.clamp(0.0, max);
         }
         let after = self.nearest_beat_index();
         if after != before {
