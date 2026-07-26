@@ -768,6 +768,23 @@ fn announce_progress(mut game: ResMut<Game>) {
     }
 }
 
+/// Narrate as Zone A's five understanding-beats (`docs/design/00-start-here.md`)
+/// come in, once per beat rather than once per frame.
+fn announce_progress(mut game: ResMut<Game>) {
+    let count = game.session.beats.count();
+    if count == game.last_beat_count {
+        return;
+    }
+    game.last_beat_count = count;
+    if game.session.beats.all() {
+        println!("Two lands, one heart — Zone A's answer is complete.");
+    } else if game.session.beats.nature_answered() {
+        println!("Nature has answered ({count}/5 understood).");
+    } else {
+        println!("({count}/5 understood.)");
+    }
+}
+
 fn quit(keys: Res<ButtonInput<KeyCode>>, mut exit: EventWriter<AppExit>) {
     if keys.just_pressed(KeyCode::Escape) {
         exit.send(AppExit::Success);
