@@ -117,26 +117,152 @@ can be built against a genuine target instead of an inherited default:
      unreconciled Zone B mechanism in prior canon research — relocated one
      level segment earlier than expected.
    - **A2 — animals and plants.** Broader ecological interaction beyond the
-     one grove-birds encounter A1 teaches.
+     one grove-birds encounter A1 teaches. Plants split into two kinds:
+     **regular plants** (functional — heal, feed, or provide base repair
+     for armour) and **pattern plants**, which contribute to the girls'
+     clothing patterns — an orthogonal dimension to clothing (alongside
+     whatever A3's costume-identity work already covers), with its own
+     downstream impacts not yet specified. Pattern plants gathered here are
+     a second cross-segment thread into A3 (see the fluidity principle
+     below), independent of A3's own NPC-sourced artefact.
+
+     **Recharge/health items have a signature tier, not just generic
+     edible filler.** Ordinary edible/palatable items exist, but the
+     *proper* recharge items are each girl's own: **Ukrainian honey** for
+     Anya and **Bulgarian yogurt** for Donna. This is not an arbitrary
+     flavor pick — honey is **naturally found/gathered** (wild, foraged),
+     yogurt is **artificially made** (crafted, fermented), matching each
+     girl's existing chaos/wild vs. order/crafted nature exactly (the same
+     axis stir/settle already runs on). Each girl's signature item likely
+     recharges her more effectively than generic food, and each is
+     plausibly cultural/regional-specific — honey to Anya's Carpathian
+     origin, yogurt to Donna's Rhodope origin (`09-anya-and-donna-
+     backstories.md`).
+
+     **Plants do not get the animals' stir/settle taxis reaction.** The
+     girls' effect on plants, if any, is closer to **tropism** — bending
+     toward, reaching higher, shrinking back, growing out from themselves —
+     not the animals' immediate mood response. This is judged too much for
+     early-game (A2), so it is **not introduced, taught, or UI-surfaced in
+     A2 or for some while after**. It should first appear, subtly, **later
+     in the game**, with no tutorial or prompt calling it out — the player
+     is meant to notice a pattern themselves, unaided, the first time.
+
+     **This silence is diegetic, not just a UX choice: Anya and Donna
+     themselves do not know they can do this.** The effect is meant to
+     emerge as a surprise *to the characters*, tied to them growing older
+     and more powerful over the course of the game — not a latent ability
+     they always had and simply never mentioned. So the eventual dialogue
+     safety net ("...did you see that?", for a player who hasn't noticed in
+     a long while) is not a knowing hint from the writers — it plays as one
+     girl genuinely noticing the effect in the moment, alongside the player,
+     for the first time.
+
+     To be clear: **hidden from the player is not the same as undocumented
+     by us.** This mechanic gets full design-canon treatment like anything
+     else (its trigger conditions, its visible effect, the dialogue
+     safety-net's timing) — only its *in-game reveal* is deliberately silent.
+     A2's own plants stay functional (healing/repair/pattern-gathering)
+     only; tropism itself is a later-level thread, out of this doc's scope
+     to spec further.
    - **A3 — NPC interaction and clothing.** Human/social response to the
      girls, and costume/appearance as legible identity (ties to
      `15-character-visual-design.md`). The girls **obtain an artefact**
-     here, from an NPC, carried forward — inert until A5.
+     here, from an NPC, carried forward — inert until A5. Costume state
+     (worn vs. pristine, which A2 pattern plants have been applied) plausibly
+     shapes NPC reaction — soft texture, not a hard gate, echoing the
+     mess/damage/humiliation-has-social-consequences idea from earlier
+     design discussion. NPC reception may also plausibly differ by which
+     girl is present — order vs. chaos temperament landing better or worse
+     with a given NPC — the first *social* instance of "wrong girl for this"
+     (A1's bridge gate was the first *mechanical* instance).
+
+     **This should not stay flavor-only** — differential NPC reaction is
+     meant to become a genuine puzzle-design tool: NPC dispositions can form
+     **social puzzles** in their own right (win over, or route around, an
+     NPC who reads one girl badly), and can **inflect *how* a problem gets
+     solved**, not just whether it does — the same girl-vs-girl approach
+     divide the co-op grammar already runs on (A1's stir/settle), extended
+     from "which girl can act at all" to "which girl gets the better/worse
+     outcome, or opens a different path entirely." Not yet a spec, but the
+     intended weight of the mechanic, not a cosmetic aside.
    - **A4 — puzzle dynamics.** Mechanical puzzles building on A1-A3's
-     systems.
+     systems. Notably: the Little Books
+     (`docs/characters/the-little-book-of-{donna,anya}.adoc`) already
+     document a full named ability roster per girl — Brace/Anchor
+     Step/Heavy Lift/Reinforce/Logic Link (Donna) vs. Dash Burst/Impulse
+     Jump/Time Flicker/Chaos Pulse/Momentum Chains (Anya) — none of which
+     the currently-built Zone A/A1 exercises (A1 uses only stir/settle/
+     cross). A4 is the natural place to wire some of this existing-but-
+     unused canon into real puzzle mechanics, rather than inventing new
+     puzzle verbs from scratch.
    - **A5 — synthesis.** Combines everything prior, and introduces
      **asymmetric information / theory-of-mind** play — each girl acting on
      what she knows the other doesn't (or believes the other knows),
      building on the co-op grammar A1 established. **Uses the A3 artefact**
      as part of the combination — its purpose is withheld until here.
 
-   **General principle, not a one-off**: the A3-artefact/A5-payoff is one
-   instance of a broader intent — several things should **cross segment
-   boundaries** (an item, a fact learned, a relationship formed), each
-   planted in one segment and paying off in a later one, so the five
-   segments read as **one fluid level**, not five sealed, independent
-   lessons. Exactly which threads cross which segments is not yet decided
-   beyond this one example.
+     **Theory-of-mind splits by mode.** In multiplayer (parked elsewhere in
+     canon, but the split matters here): the *other player* supplies their
+     own real theory-of-mind — nothing to simulate. Against **NPCs**, this
+     is not new ground: `20-cognitive-npcs-and-theory-of-mind.md` already
+     specifies a real, **built and passing** architecture for exactly this
+     (the ESM — `engine/slavia-core/src/esm/`, 10/10 tests green as of
+     2026-07-21) — A5 should be understood as *using* that system, not as
+     needing a new one. Mapping the ideas discussed onto it:
+
+     - **Attribution and the decoy are the solver's existing confidence
+       read**, not a new mechanism. `esm::intent::Read` already classifies
+       an NPC's belief-driven guess by solution count: `Unified` (one
+       candidate — confident), `Ambiguous` (several candidates — can't
+       tell which), `Contradiction` (zero — "I've been tricked"). Anya
+       arranging birds on a roof as a decoy is, precisely, adding a second
+       candidate cause so the solver reads `Ambiguous` instead of
+       `Unified` — the counterfactual reasoning discussed ("if not for the
+       birds, I'd suspect something else") *is* this classification, not
+       a separate system layered on top of it.
+     - **Relational memory and graded, persistent identity belief are
+       already free**, per `esm::belief`'s own doc comment: belief is
+       `baseline + an entity's own deltas`, so two NPCs can disagree, and
+       an NPC's read on "are these *those* girls" (from folklore, from
+       changed animal behavior, from the still-undocumented A2 tropism
+       thread) persists as that NPC's own delta rather than resetting each
+       encounter — no new mechanism needed, only new *content* (facts) fed
+       into the existing model.
+     - **Attentional pattern detection** (lingering near an object,
+       repeated failed attempts, returning to a spot, fleeing when an
+       owner appears) is a plausible **extension** of the existing
+       intent-reading system (which currently reasons from a single
+       heading against believed `lies-toward` facts) to reason over a
+       short behavior history instead of one instant — not yet built, and
+       not yet specified beyond this note.
+
+     **Open conflict, not silently resolved: "trust gates quests
+     economically."** This idea — an NPC withholding quests until trust is
+     rebuilt — is closer to `20`'s §E **factional reputation**, which that
+     doc explicitly marks **parked, not built** (per `00-start-here.md`
+     parking "all NPC factions" entirely, and because doc 20 judges it a
+     two-location, Zone-B-trigger mechanic). A5 living inside Zone A (one
+     level, per this doc's own resolution above) may conflict with that
+     parking rather than merely duplicate it. Left as an open question
+     rather than assumed: does A5's trust-gated-quests idea mean
+     un-parking factional reputation now, or does A5 need a lighter,
+     single-NPC version that doesn't require it?
+
+     This is a substantial, self-contained system — its scope reaches
+     beyond A5 alone (it plausibly governs NPC behavior across every
+     segment, not just the synthesis one) and likely deserves its own
+     dedicated design doc rather than living only as a paragraph here; this
+     entry exists so the intent is captured accurately before that doc
+     exists.
+
+   **General principle, not a one-off**: the A3-artefact/A5-payoff and the
+   A2-pattern-plants/A3-clothing link are two instances of a broader
+   intent — several things should **cross segment boundaries** (an item, a
+   fact learned, a relationship formed), each planted in one segment and
+   paying off in a later one, so the five segments read as **one fluid
+   level**, not five sealed, independent lessons. Exactly which threads
+   cross which segments is not yet fully decided beyond these examples.
 
    This is direction, not a full design — segment content, beat counts, and
    exact transitions (how A1 "slides" into A2, etc.) are not yet specified.
