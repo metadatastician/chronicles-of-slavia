@@ -190,6 +190,7 @@ impl Session {
 
     /// Move the active girl by `dx` beat units. Returns the index of a *newly
     /// reached* beat, if this move stepped onto one.
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn move_active(&mut self, dx: f32) -> Option<usize> {
         self.set_active_pos(self.active_pos() + dx)
     }
