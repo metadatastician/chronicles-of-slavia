@@ -1,0 +1,31 @@
+= ADR-0004: Validate the Slavia UMS profile before adding a runtime loader
+:status: accepted
+:date: 2026-07-25
+
+== Context
+
+Zone A already has a game-specific grammar in `slavia-core`: Anya quickens,
+Donna settles, animals answer according to their own nature, Donna steadies the
+crossing and the Rift interrupts the natural answer. Generalising this too
+early would erase the distinction between reusable engine structure and
+Slavia's meaning.
+
+== Decision
+
+Universal Modding Studio holds an isolated
+`profiles/slavia/v1` declaration and the bounded Zone A / Border Path fixture.
+The generic UMS profile validator proves coverage and reference integrity
+without adding Slavia terms to UMS Core.
+
+Slavia does not load that package in this pass. A typed loader will be designed
+only after the runtime has a stable contract worth publishing. Enaction may
+eventually supply neutral events, appraisals, affective/conative state,
+relationships, fields and place memory, but Slavia retains all narrative
+vocabulary and response rules.
+
+== Consequences
+
+* Profile architecture is tested without making the runtime depend on UMS.
+* The profile cannot be presented as a completed runtime integration.
+* Future loader work must map to `slavia-core` types or a game-owned versioned
+  contract, never a hand-copied UMS enum.

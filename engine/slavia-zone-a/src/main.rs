@@ -6,9 +6,8 @@
 //! Run it:            `cargo run -p slavia-zone-a`
 //! Verify logic only: `cargo test -p slavia-zone-a --no-default-features`
 
-// `session` (the M1 beat-model bridge) is retained for its grammar tests; the
-// M2 renderer talks to slavia-core directly, so it's unused in the render build.
-#[cfg_attr(feature = "render", allow(dead_code))]
+// `Session` is the sole bridge between renderer and rules core, in both the
+// headless build (below) and the M2 Bevy renderer (`render.rs`).
 mod session;
 
 #[cfg(feature = "render")]
