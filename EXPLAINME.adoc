@@ -8,6 +8,25 @@ image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,lin
 
 This file explains how the key template claims map to real files.
 
+== External profile evidence
+
+Claim:
+Slavia's world grammar can be described by UMS without moving that grammar into
+UMS Core or claiming a runtime integration.
+
+How this is implemented:
+
+* The sibling UMS repository owns
+  `profiles/slavia/v1/profile.json` and the Zone A / Border Path fixture.
+* `just slavia-profile-check` runs a generic profile validator.
+* `docs/decisions/0004-ums-profile-before-runtime-integration.adoc` records why
+  no loader is added in this pass.
+
+Caveat:
+
+The profile is validated editor data. `slavia-core` remains authoritative for
+the current playable grammar, and no package is consumed by this runtime yet.
+
 == Central Session Protocol Authority
 
 Claim:

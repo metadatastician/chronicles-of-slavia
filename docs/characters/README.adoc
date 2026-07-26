@@ -1,0 +1,95 @@
+= Character Compendia
+:toc:
+
+Fan-style, in-world compendia for the two player characters of
+_Chronicles of Slavia_ — **Donna** and **Anya**.
+
+== What these are
+
+* `the-little-book-of-donna.adoc` / `.pdf` — everything the design canon
+  establishes about Donna: her backstory, her grammar (she *lowers* taxis —
+  settles, calms, steadies), her powers, her costume, her bond with Anya, and
+  what the design still leaves open about her.
+* `the-little-book-of-anya.adoc` / `.pdf` — the same for Anya, who *raises*
+  taxis — stirs, quickens, emboldens.
+
+Each book is written in the register of a devoted fan's character guide (the
+kind of thing that later becomes a game wiki page), but every factual claim
+is sourced from the actual design canon in `docs/design/`, the Zone A game
+data (`engine/slavia-core/data/zone-a.sgs.toml`), the engine source
+(`engine/slavia-core/src/{character,animal}.rs`), and the playable prototype
+(`prototype/zone-a/index.html`). Nothing is invented; open questions are
+flagged as open questions, collected in each book's final chapter, rather
+than answered with invented lore.
+
+== Canon sources used
+
+[cols="1,3"]
+|===
+| Backstories, identity, bond
+| `docs/design/09-anya-and-donna-backstories.md`
+
+| World principle, the guardian spirit
+| `docs/design/01-world-principle.md`
+
+| The taxis gift (stir/settle)
+| `docs/design/03-living-taxis.md`, `docs/design/06-attunement-and-modifiers.md`
+
+| Animal / spirit natures
+| `docs/design/07-species-essence-and-control.md`
+
+| Costume and motion design
+| `docs/design/15-character-visual-design.md`
+
+| Flora, spirits roster
+| `docs/design/16-flora-and-non-animal-npcs.md`
+
+| Clothing / pattern weaving
+| `docs/design/17-clothing-repair-and-pattern-weaving.md`
+
+| Design touchstones
+| `docs/design/18-touchstones-and-positioning.md`
+
+| Manpu legibility (Fan Corner)
+| `docs/design/21-manpu-legibility.md`
+
+| Zone A beats, verbatim in-world text
+| `engine/slavia-core/data/zone-a.sgs.toml`
+
+| Verbatim dialogue
+| `prototype/zone-a/index.html`
+
+| Taxis / nature enums
+| `engine/slavia-core/src/character.rs`, `engine/slavia-core/src/animal.rs`
+
+| Pitch, strapline
+| `README.adoc`
+|===
+
+== Rebuilding the PDFs
+
+Requires Ruby + the `asciidoctor-pdf` gem (`gem install --user-install
+asciidoctor-pdf`; Guix/system packages are also fine — see the estate
+language policy in the root `CLAUDE.md`, which permits Ruby).
+
+[source,sh]
+----
+cd docs/characters
+asciidoctor-pdf the-little-book-of-donna.adoc
+asciidoctor-pdf the-little-book-of-anya.adoc
+----
+
+Each book pulls its colour theme from `theme/donna-theme.yml` /
+`theme/anya-theme.yml` — Donna's palette follows the Rhodope sukman (dark
+earthy reds, near-black, cream); Anya's follows the Hutsul sorochka (vivid
+red, black, gold).
+
+== Future: turning this into a wiki
+
+Both books are AsciiDoc, which converts cleanly to MediaWiki/DokuWiki/plain
+HTML via `asciidoctor` or `pandoc` — the intent flagged when this compendium
+was commissioned. Each book's chapter structure (Profile at a Glance / Who
+She Is / Before the Rift / Her Grammar / Her Powers / What She Wears / Two
+Lands One Heart / Her Side of Slavia / Quotes & Moments / Fan Corner / Open
+Questions) maps directly onto a set of wiki sections or sub-pages, should
+this move online later.

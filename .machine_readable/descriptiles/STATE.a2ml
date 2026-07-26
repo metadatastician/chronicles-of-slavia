@@ -12,7 +12,7 @@
 [metadata]
 project = "chronicles-of-slavia"
 version = "0.0.0"          # both crates are 0.0.0 — pre-release, deliberately
-last-updated = "2026-07-16"
+last-updated = "2026-07-25"
 status = "active"          # active | paused | archived
 
 [project-context]
@@ -30,12 +30,14 @@ completion-percentage = 5
 phase = "implementation"   # design | implementation | testing | maintenance | archived
 maturity = "experimental"  # experimental | alpha | beta | production | lts
 visibility = "private working material — see README; publication not decided"
+estate = "metadatastician"
 
 [route-to-mvp]
 milestones = [
   { name = "Zone A five-beat prototype — the success condition in 00-start-here.md", completion = 100, evidence = "engine/slavia-core/tests/zone_a.rs, 7 tests green" },
   { name = "L2 rules core (slavia-core) — emotional grammar, living taxis, spec parsing", completion = 100, evidence = "29 unit tests green; deps are serde + toml only" },
   { name = "M3.1 ESM — belief, kanren, intent, decay (ADR-0004)", completion = 100, evidence = "10 testbed tests green; headless, deliberately not wired to a zone" },
+  { name = "UMS Zone A / Border Path profile", completion = 100, evidence = "Sibling UMS profiles/slavia/v1 validates; descriptive only, no runtime loader" },
   { name = "L3 renderer (Bevy, ADR-0003)", completion = 0, notes = "Adopted on paper; nothing built. The zero-FFI seam is the point of the choice." },
   { name = "Zones B–E of Chronicle I", completion = 0, notes = "GATED. 08-level1-five-zone-map.md: 'Do not build Zones B–E until Zone A holds.' Zone B is already designed as the Fracture Line (separation) — it is not an environment sandbox." },
   { name = "Chronicle II (The Echo Engine)", completion = 0 },
@@ -53,8 +55,9 @@ issues = [
 
 [critical-next-actions]
 actions = [
+  "Consolidate the bounded Zone A fixture into the canonical UMS profiles/chronicles-of-slavia layout after the UMS SDK reconciliation.",
   "Settle co-op vs switch-only — it constrains the engine and is currently self-contradictory in canon.",
-  "Register chronicles-of-slavia in gv-clade-index. CLADE.a2ml now carries a correctly derived UUID (b1507e91-78ca-5d30-a66c-dc675ad678f0) but the repo is absent from the registry. Owner's action — registration is outward-facing.",
+  "Register chronicles-of-slavia in gv-clade-index. CLADE.a2ml now carries the post-transfer UUID (9a94f798-67f8-517c-b88b-4b27417a0218) derived from github.com/metadatastician/chronicles-of-slavia, but the repo is absent from the registry. Owner's action — registration is outward-facing.",
   "Decide whether the ESM earns a place in a real scene, or stays headless. ADR-0004 deliberately left it unwired.",
   "Resolve the 2 ignored tests in the workspace (see [technical-debt]).",
 ]
@@ -84,3 +87,40 @@ open-failures = 0
 part-of = ["RSR Framework"]
 depends-on = ["serde", "toml"]   # slavia-core, deliberately tiny and wasm-friendly
 planned-depends-on = ["bevy"]    # L3 only, per ADR-0003; not yet a dependency
+profile-status = "UMS profile validated externally; Enaction and package loading remain future integrations"
+
+[cross-repository-reconciliation]
+coordination-id = "ums-idaptik-slavia-enaction-2026-07-25"
+decision-status = "working direction recorded for the next agent; UMS profile consolidation remains"
+role = "Authoritative owner of Slavia world grammar and eventual runtime semantics; not a dependency of UMS Core and not a source of generic Enaction vocabulary."
+estate-status = "Canonical checkout and GitHub repository are in the metadatastician estate; no actual checkout remains at hyper-repos/chronicles-of-slavia."
+worktree-note = "Git metadata still lists a locked stale worktree path under the former hyper-repos location, but that filesystem path does not exist; do not mistake it for a duplicate repository."
+settled = [
+  "Anya quickens and Donna settles; these are not interchangeable generic chaos/order scores",
+  "Animals respond according to their own nature",
+  "Slavia-specific quickening, settling, Rift, shrine, bridge, and place-memory vocabulary stays outside UMS Core and Enaction",
+  "No Slavia runtime package loader is claimed in this pass",
+]
+local-alignment-branch = "agent/ums-profile-alignment"
+local-alignment-commit = "70452f9ec5836cf1c4de152775cf66402e3b92a7"
+remote-feature-base = "4d0fc1f899d5e918dde4d59dbb23bc7cabfdf24b"
+local-alignment-status = "One local commit ahead of origin/agent/ums-profile-alignment; two commits ahead of origin/main; no pull request."
+current-profile-proof = "The sibling UMS bounded Zone A / Border Path fixture validates and covers both heroines, birds, bridge, shrine, Rift disturbance, cooperative completion, absence costs, receptivity, place memory, and moral/world marking."
+canonical-ums-destination = "profiles/chronicles-of-slavia under the reconciled ums-profile-sdk"
+required-order = [
+  "Reconcile the two UMS profile SDKs first",
+  "Move the complete bounded Slavia semantic fixture into the canonical profile layout",
+  "Rerun generic profile validation and UMS Core vocabulary-isolation tests",
+  "Publish truthful profile-alignment documentation without adding a Slavia runtime dependency",
+]
+future-only = [
+  "Slavia-owned package contract",
+  "headless Slavia package loader",
+  "Enaction runtime integration",
+  "shared field, place-memory, and relationship primitives",
+]
+do-not = [
+  "Do not add combat, inventory, classes, bosses, factions, or production art to this profile slice",
+  "Do not make Slavia depend on the UMS user interface",
+  "Do not let the UMS profile become authoritative over Slavia canon",
+]

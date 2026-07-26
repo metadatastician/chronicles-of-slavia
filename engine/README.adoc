@@ -23,11 +23,11 @@ touching the design.
   tests before any renderer exists.
 
 | *L3 — renderer*
-| A swappable skin over L2. First spike lives in `slavia-zone-a` — a **Bevy**
+| A thin skin over L2. `slavia-zone-a` is the selected **Bevy**
   renderer for Zone A (schematic, coloured blocks). It holds only view state and
   forwards input; every rule decision goes through `Session` → `slavia-core`.
-  The *final* engine decision (Bevy / Fyrox / other) is still M2, made on
-  evidence from this working spike rather than up front.
+  ADR-0003 resolved the M2 evaluation in favour of Bevy while preserving the
+  renderer-neutral rules boundary.
 |===
 
 == Run the tests
@@ -64,7 +64,9 @@ Build note: uses Bevy's `x11` backend only (no `wayland`), so it builds without
 
 == Status
 
-Milestone *M1* — a first playable renderer (Bevy) over the proven core.
-Next: *M2*, the deliberate engine decision, made on evidence from this spike.
+Milestone *M2* — Bevy selected as the production renderer over the proven core.
+The playable Zone A implementation remains deliberately bounded.
 
-See `docs/decisions/0002-layered-game-as-data-architecture.adoc` for the why.
+See `docs/decisions/0002-layered-game-as-data-architecture.adoc` for the
+layering and `docs/decisions/0003-adopt-bevy-as-the-l3-engine.adoc` for the
+renderer decision.
