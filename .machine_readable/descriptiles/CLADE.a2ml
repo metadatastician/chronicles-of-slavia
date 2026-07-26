@@ -5,11 +5,12 @@
 # THE UUID IS DERIVED, NOT ALLOCATED. The registry spec
 # (gv-clade-index: docs/SPEC-clade-verisim-portal.adoc §Identity Model) defines it as:
 #
-#     uuid = UUIDv5(namespace = URL, name = "github.com/hyperpolymath/<canonical-name>")
+#     uuid = UUIDv5(namespace = URL, name = "github.com/<primary-owner>/<canonical-name>")
 #
 # So it is a fact anyone can recompute and check, not a choice. The value below was
 # derived that way, and the method was verified first by reproducing the registry's
 # own worked example (januskey → e216170e-ff47-5a5c-bbdd-15e61c8190c8) byte-for-byte.
+# It was re-derived after the 2026-07-25 transfer to the Metadatastician estate.
 #
 # CORRECTED 2026-07-16. This file previously declared uuid
 # a5ea1382-a34c-5334-8a46-a2ebe904c810 with canonical-name `rsr-template-repo` —
@@ -20,9 +21,9 @@
 # same bug; fixing them is out of scope here — reported to the owner instead.)
 
 [identity]
-uuid = "b1507e91-78ca-5d30-a66c-dc675ad678f0"
+uuid = "9a94f798-67f8-517c-b88b-4b27417a0218"
 primary-forge = "github"
-primary-owner = "hyperpolymath"
+primary-owner = "metadatastician"
 canonical-name = "chronicles-of-slavia"
 prefixed-name = "gm-chronicles-of-slavia"
 
@@ -33,7 +34,7 @@ assigned = "2026-07-16"
 rationale = "Games & Interactive (`gm`): the core value proposition is a playable narrative game. The rules core, the authoring schema, and the engine all exist to serve it. `fv` is deliberately NOT claimed as a secondary — the Idris2 and Zig present here are inherited RSR ABI/FFI scaffolding, not this project's value proposition. Per the registry spec, the primary clade reflects the core value proposition, not implementation details."
 
 [forges]
-github = "hyperpolymath/chronicles-of-slavia"
+github = "metadatastician/chronicles-of-slavia"
 gitlab = ""       # populated if/when mirrored
 bitbucket = ""    # populated if/when mirrored
 
@@ -52,12 +53,7 @@ instantiated-from = "rsr-template-repo"
 # as REGISTERING one. Registration is outward-facing, so it is the owner's to do
 # (doctrine 11, stop-first); an agent must not.
 #
-# Deliberately NOT pre-empted here — the owner has flagged both as wanted but not
-# yet a priority:
-#   * the intended move to the `metadatastician` org
-#   * internal (organisation-visible) rather than public visibility
-#
-# Either would change `primary-owner`, and the UUID is derived FROM the owner path,
-# so the UUID changes with it. This file records what is TRUE TODAY, which is
-# `hyperpolymath/chronicles-of-slavia` (confirmed against `git remote -v`).
+# The repository moved to the `metadatastician` organisation on 2026-07-25.
+# `primary-owner`, the forge path, and the derived UUID now record that transfer.
+# Repository visibility remains an independent owner decision.
 # ---------------------------------------------------------------------------

@@ -1,0 +1,562 @@
+= The Little Book of Donna
+:doctype: book
+:toc:
+:toclevels: 2
+:sectanchors:
+:sectnums:
+:source-highlighter: rouge
+:pdf-theme: theme/donna-theme.yml
+:pdf-fontsdir: GEM_FONTS_DIR;DATA_DIR/fonts
+:icons: font
+:subtitle: She Who Holds the World Together — an Unofficial Fan Compendium
+:front-cover-image: none
+
+[.text-center]
+--
+_Chronicles of Slavia_ +
+_"What do you become when the world breaks?"_
+--
+
+<<<
+
+[abstract]
+== A note before you begin
+
+This is a fan-style compendium of everything currently known about **Donna**,
+one of the two player characters of _Chronicles of Slavia_. It is written from
+inside the world — the way a devoted player might compile a character guide —
+but every fact in it is drawn from the game's actual design canon
+(`docs/design/*.md`), the Zone A game data (`engine/slavia-core/data/zone-a.sgs.toml`),
+the engine source, and the playable prototype (`prototype/zone-a/index.html`).
+
+Where the canon is genuinely settled, this book states it as settled. Where the
+canon is still open — an unanswered question the designers themselves have
+flagged — this book says so plainly, and collects those questions at the end
+for whoever picks up the design next. Nothing here is invented lore dressed up
+as fact.
+
+_Chronicles of Slavia_ is presently a private, exploratory prototype (Level 1,
+Zone A only — "Border Path"). This book describes a five-percent-built world.
+Treat everything past Zone A as **design canon for later**, not shipped
+content — this is called out chapter by chapter.
+
+<<<
+
+== Profile at a Glance
+
+[cols="1,3", options="header"]
+|===
+| Field | Donna
+
+| Nationality (in-world)
+| Bulgarian — Rhodope mountains
+
+| Defined by
+| **Structure** — physical, emotional, intellectual. "Order, but order with compassion."
+
+| Her gift (attunement)
+| **Lowers taxis** — calms, settles, steadies, reassures. She draws out an animal's peace.
+
+| Native terrain
+| **Mountains** — stronger aura, more damage resistance, heals over time
+
+| Weakening terrain
+| **Swampland** — diminished aura, more vulnerable
+
+| Motion `verve`
+| **0.42** (planted, damped, measured — see <<motion>>)
+
+| Emotional flaw
+| Carries too much responsibility; refuses to ask for help
+
+| Hidden strength
+| Her calm is not passive — it is powerful; she can stabilize anything she touches
+
+| Costume
+| Rodopska nosia — sukman, riza, prestilka, woven belt, headscarf (see <<attire>>)
+
+| Colours
+| Near-black, earthy Rhodope red and black, white
+
+| Signature abilities
+| Brace, Anchor Step, Heavy Lift, Reinforce, Logic Link
+
+| Bond
+| One of two halves of a single guardian spirit — Donna is its **structure**, Anya its **impulse**
+|===
+
+<<<
+
+== Who She Is
+
+Donna is a Bulgarian girl defined by structure — physical, emotional,
+intellectual. She builds things, repairs things, organizes things. She is
+**order, but order with compassion**.
+
+That last clause matters more than it looks. This is not a game about a
+"stern, orderly" character who exists to be a counterweight to a "wild, chaotic"
+one. Donna's order is explicitly, canonically **protective** — never rigid for
+its own sake. The design doctrine draws the line directly: her calm is not
+passivity, it is a kind of quiet power. She can stabilize anything she
+touches.
+
+Underneath that competence sits a flaw the game is honest about: Donna
+**carries too much responsibility, and refuses to ask for help**. She is the
+one who fixes things, so she has learned — long before the Rift ever opened —
+to be the one who is fixed, always, for everyone else. What she has never
+quite learned is how to let someone hold *her* up.
+
+[quote, docs/design/09-anya-and-donna-backstories.md]
+Her order is not rigid — it is protective.
+
+<<<
+
+== Before the Rift
+
+Donna grew up in a mountain village near the **Rhodopes** — the range that
+runs along Bulgaria's southern border, famous in-world (and in life) for its
+weaving and its mask-carving traditions. Her family were makers:
+
+* Her **grandmother carved kukeri masks** — the ritual masks worn in Bulgarian
+  folk tradition to drive out evil spirits.
+* Her **uncle built wooden bridges**.
+
+From them, Donna inherited two things at once: craftsmanship, and a
+protective instinct. Long before any Rift, the village had already given her
+a role — "**the reliable one**." She was the girl who fixed things, who
+stayed calm, who didn't break, no matter what was asked of her.
+
+But the design is careful to give this a cost. Inside, she felt trapped by
+the *expectation* of it. She wanted to explore, to create, to be something
+more than "the stable one" — a wish the story has not yet let her have, and
+one that quietly defines who she needs to become across the Chronicles still
+to come.
+
+<<<
+
+== The Day the World Broke
+
+On the day of the Tear, Donna was doing exactly what the village expected of
+her: **repairing a collapsed walkway**. Mid-repair, she paused at a strange
+vibration running through the wood under her hands.
+
+[quote, docs/design/09-anya-and-donna-backstories.md]
+____
+The mountains rumbled; the kukeri carvings glowed; the ground folded like
+paper. She didn't fall because she slipped — she fell because the Rift opened
+beneath her. It saw her order. It needed her order.
+____
+
+The wording is deliberate and worth sitting with: Donna did not stumble into
+the story. The Rift did not take her by accident, the way a disaster might
+take anyone standing nearby. It *saw* what she already was, and it *needed*
+exactly that. Her order — her whole life's habit of holding things together —
+is not incidental to the plot. It is the reason the plot has her in it at
+all.
+
+<<<
+
+[[her-grammar]]
+== Her Grammar — What "Settling" Actually Means
+
+Donna's core gift is not a superpower bolted onto her from outside. In the
+design's own words, her abilities are **emotional extensions** of who she
+already was before the Tear — every one of them recognisable as "the girl who
+holds everything together," now made literal.
+
+=== Attunement, not command
+
+Animals in Slavia are never tools, pets, buttons, or controllable units — they
+are living participants, indicators, and sometimes helpers. Donna and Anya do
+not *command* animals. They **change the rhythm of the world around them**.
+
+[quote, docs/design/03-living-taxis.md]
+Donna tends to calm, slow, settle, quieten, or reassure natural animals. The
+animal's own nature determines the result.
+
+Mechanically, what she moves is called **taxis** — the rate and direction of
+a living thing's motion and response (the biological sense of the word: an
+organism's taxis toward or away from a stimulus). **Donna lowers the taxis.**
+She calms, settles, steadies, reassures — she draws out an animal's *peace*,
+not its submission.
+
+This is an important distinction the design insists on: Donna's gift works
+**with** an animal's own nature, drawing out its genuine, best self. It never
+imposes an alien state. A creature Donna has settled is still fully itself —
+just at peace. That is categorically different from an enemy who forces
+**Obedience** on a creature (mindless, will-less, an instrument). Donna's
+settling and an enemy's obedience can look similar from a distance; the game
+treats the difference as a moral line, not a cosmetic one.
+
+There is a hard limit that holds no matter how skilled Donna becomes:
+**attunement amplifies a thing's nature, it never perverts it.** She can calm
+a creature; she cannot make it betray what it is.
+
+=== An aura, not a button
+
+The gift is described as an **aura** — it emanates from Donna and acts,
+passively, on what passes near her, magnified and honed with practice (the
+canon's own touchstone here is the Nen/Zen aura discipline from _Hunter ×
+Hunter_: something you first leak unbidden, then learn to sense, contain, and
+direct).
+
+Mastery has two separate axes: **Strength** (how far and how powerfully the
+aura reaches) and **Control** (how reliably and selectively it acts). Early
+on, Donna's control is low and leaky — she can simply walk past a spot and
+nothing happens, where Anya walking past that same spot startles a bird into
+motion. That asymmetry is a deliberate feature of the early game, not a bug:
+it is what makes the two girls feel different to *play*, not just to read
+about.
+
+=== Only Donna can stabilise
+
+The taxis duality is not limited to animals — it extends to the world itself.
+
+[quote, docs/design/06-attunement-and-modifiers.md]
+Only Donna can stabilise; only Anya can agitate. Neither can do the other's
+act.
+
+The stream bridge in Zone A is the game's first and clearest demonstration of
+this. Donna can still the crossing — settle its trembling, its instability —
+so that it can be walked. Anya, trying the same thing, can only set it
+**bucking and bullwhipping**: useless for crossing, though not useless for
+everything (an agitated bridge might later deter a pursuer — a possibility
+recorded, but not yet built, as the "Zone A climax idea: the marauder").
+
+[quote, prototype/zone-a/index.html]
+Donna stills the crossing. Now it can be crossed.
+
+The line the game's own README uses to summarise the entire mechanic, in
+miniature, is built from exactly this scene:
+
+[quote, README.adoc]
+Anya wants to cross. The bridge will not hold. Donna steadies it. Anya
+crosses because Donna has made the path hold. This is the game in miniature.
+
+=== What the world becomes without her
+
+Together, Donna and Anya hold the world's taxis in balance — one lowering,
+one raising. Apart, the balance breaks, and the world tips wholesale toward
+whichever sister remains.
+
+[quote, docs/design/06-attunement-and-modifiers.md]
+Anya taken (only Donna's lowering is left): the world grows over-sedate,
+lifeless — dulled and still — and stays that way, harder to rouse, until
+Donna reaches her.
+
+This is not flavour text. It is a standing gameplay pressure that persists
+until the two are reunited — the world itself makes Donna's absence, and
+Anya's, felt.
+
+<<<
+
+== Her Powers, Named
+
+The design is explicit that none of these are magic bolted onto Donna from
+outside — every one is an **extension of stability** she already possessed
+before the Rift ever touched her.
+
+[cols="1,3", options="header"]
+|===
+| Ability | What it is
+
+| **Brace**
+| She's always held things together.
+
+| **Anchor Step**
+| She creates stability wherever she stands.
+
+| **Heavy Lift**
+| She carries burdens, literal and emotional.
+
+| **Reinforce**
+| She strengthens weak structures.
+
+| **Logic Link**
+| She sees patterns others miss.
+|===
+
+<<<
+
+[[attire]]
+== What She Wears
+
+Donna's costume is culturally grounded — not an aesthetic layered on top of
+her character, but the visual language of her whole nature. The design is
+explicit about getting the specific folk-costume region right: Donna is
+**Rhodope**, not Северняшка (Severnyashka, the two-apron costume of Northern
+Bulgaria) — a distinction the design canon corrects deliberately, because the
+Rhodopska nosia is "the sober, grounded one — the visual of stability," where
+Severnyashka would have sent the wrong signal entirely.
+
+=== The Rodopska nosia
+
+* **Sukman** — a dark, near-black, heavy, sleeveless pinafore dress over the
+  chemise; ankle-length and grounded.
+* **Riza** — the white chemise beneath, with embroidered sleeves showing.
+* **Prestilka** (woven apron) — earthy Rhodope reds and blacks in geometric
+  stripes; the Rhodopes are known in-world (as in life) for their woven wool
+  textiles.
+* **Woven belt** and **headscarf** — hair covered and neat; little movement.
+
+[[motion]]
+=== Motion encodes personality
+
+Both girls share a single procedural animation rig; a per-character `verve`
+value scales how energetically the body reacts to motion. Anya's is `1.0`.
+**Donna's is `0.42`.**
+
+[cols="1,2", options="header"]
+|===
+| Reactive element | Donna (low verve)
+
+| Body lean
+| slight
+
+| Walk bounce
+| planted
+
+| Jump height
+| low, heavy
+
+| Skirt
+| heavy, damped
+
+| Headscarf
+| barely moves
+
+| Hem sway
+| subdued
+
+| Reaction speed
+| measured
+|===
+
+The design's own framing is worth keeping in mind: this is a schematic,
+game-scale *evocation* of the embroidery and costume detail, not a literal
+reproduction — a higher-fidelity portrait pass is explicitly a later art
+task. What is fixed now is the *behaviour*: Donna's whole body reads as
+grounded, before a single word of dialogue is spoken.
+
+<<<
+
+== Two Lands, One Heart
+
+Slavia is not just geography. It is memory, medicine, folklore, and moral
+choice — a world where places remember what happened in them, where every act
+of courage, care, fear, resentment, trust, or betrayal leaves a mark on the
+land. Donna and Anya do not simply travel through it. They are read by it,
+healed by it, tested by it — and eventually, the design intends, they learn
+to heal it in return.
+
+=== Why the Rift chose both of them
+
+The design's deepest answer to "why these two girls" is metaphysical, not
+coincidental:
+
+[quote, docs/design/01-world-principle.md]
+____
+Slavia is a world built on balance, and Anya and Donna are two halves of one
+guardian spirit: Anya — the spirit's impulse. Donna — the spirit's structure.
+Together — the spirit's harmony.
+____
+
+The Rift did not tear at them because they happened to be nearby. It tore at
+them *because* they are the one whole thing capable of being split. Their
+gift — attunement — belongs to them alone, in-world, for exactly this reason:
+it is not two gifted girls who happen to complement each other, it is one
+nature, split in two. The guardian spirit itself is glimpsed later in the
+design (Zone E of the planned five-zone map) and gathered piece by piece
+before that, through collectible Guardian Spirit Fragments — none of this is
+built yet.
+
+=== How she sees Anya
+
+Where Anya has always felt misunderstood, Donna is canonically the first
+person who doesn't try to slow her down. Donna's instinct instead is to
+**anchor** her — not restrain her, not correct her, *anchor* her, the way she
+anchors everything else she touches. The design notes that Anya trusts Donna
+more than she admits — a trust Donna, in turn, has never had modelled back at
+her: someone whose steadiness is *for* her, not extracted from her by
+circumstance.
+
+The two can also **sense each other across the Rift itself** — not merely
+that the world tilts when one of them is missing, but a direct awareness that
+survives the barrier between them. This is the mechanical seed for future
+rescue missions, echo puzzles, and split-path levels: the world can separate
+their bodies, but never fully their bond.
+
+=== What they share, underneath the contrast
+
+Their differences — order/logic/stability against chaos/impulse/motion — are
+the engine of the game. But underneath the contrast, the design is careful to
+name what actually makes them the chosen pair:
+
+* **Courage** — both push forward even when afraid.
+* **Loyalty** — neither abandons the other; the emotional spine of the story.
+* **Curiosity** — both want to understand Slavia, even by opposite routes.
+* **Resilience** — they keep going even when the Rift reacts violently.
+
+<<<
+
+== Her Side of Slavia
+
+Everything in this chapter is **design canon for later** — none of it is
+built in the current Zone A prototype, and several items are marked, in the
+source documents themselves, as still open to the owner's final word. It is
+included here because it is the clearest picture that exists of where Donna's
+story is *headed*.
+
+=== A possible path
+
+The design's parking-lot notes sketch three tentative class leanings for
+Donna — **Pillar, Architect, Guardian** — introduced, in-world, by an
+apothecary figure who "diagnoses a leaning and offers a path," asking the
+same question the whole game turns on: _"What do you become when the world
+breaks?"_ No path has been chosen; this is a menu of possibilities, not a
+commitment.
+
+=== Spirits of her heritage
+
+The Bulgarian/Rhodope side of the world's spirit roster (candidate figures,
+not yet confirmed by the owner) includes the **samodiva / vila** (a
+forest-mountain nymph), the **stopan** (a house spirit — the home hearth), and
+unnamed gorski (forest) spirits. Like supernatural animals, a spirit's
+alignment is never shown as an obvious tell (no glow, no halo) — it is
+revealed only through behaviour, and the girls default to **innocent until
+proven guilty**, a naivety the design treats as part of their character, not
+a gap.
+
+=== Flora and healing
+
+If flora affinity follows the same taxis rule as animals — the design's stated
+intent, though unimplemented — Donna would still and root growth rather than
+quicken it: closing buds, deepening roots, calming a thrashing plant,
+retracting overgrowth. The purest restorative in Slavia, deliberately kept
+small and fixed rather than built into a sprawling recipe system, is the
+shared Bulgarian/Ukrainian staple: **yogurt and honey**.
+
+=== What she wears, as she grows
+
+The clothing system's second, still-conceptual layer — **pattern weaving** —
+would let Donna weave sacred-geometry motifs from the **Kanatitsa / Elbetitsa**
+line (Bulgarian folk-embroidery traditions) into her sukman as she develops.
+The design is emphatic that these patterns are never a "moveset of triggered
+special moves" — no cooldowns, no combos. They are passive, ambient, and
+above all **social**: a pattern is a blueprint of who you are, and the world
+reads it. _"You have THAT pattern? Then of course you are welcome here."_
+
+<<<
+
+== Quotes & Moments
+
+Every line below is verbatim from the existing prototype, game data, or the
+game's own README — nothing paraphrased.
+
+[quote, prototype/zone-a/index.html]
+Donna: &#8220;Why didn&#8217;t I just stabilise the bridge, Anya?&#8221;
+
+[quote, prototype/zone-a/index.html]
+Donna stills the crossing. Now it can be crossed.
+
+[quote, prototype/zone-a/index.html]
+Anya crosses what Donna steadied.
+
+[quote, engine/slavia-core/data/zone-a.sgs.toml — the Shrine beat]
+Two lands, one heart.
+
+[quote, engine/slavia-core/data/zone-a.sgs.toml — the Overlook beat]
+For a moment, the world feels whole.
+
+[quote, engine/slavia-core/data/zone-a.sgs.toml — the Fracture prelude]
+The Rift awakens. The birds stop answering normally.
+
+[quote, docs/design/09-anya-and-donna-backstories.md]
+It saw her order. It needed her order.
+
+<<<
+
+== Fan Corner
+
+**Where her design comes from.** The design's own touchstones document names
+_Hunter × Hunter_'s Nen/Zen aura system as the mechanical north star for
+Donna's (and Anya's) gift — a rigorous, rule-based system that reveals
+character rather than escalating into raw power, deliberately built *without*
+the shōnen "everything becomes an ultimate" trap. It also names _Axis Powers
+Hetalia_ as the touchstone for treating Donna as a genuine
+**personification of a land** — Donna *is* Rhodope Bulgaria, the way that
+show's characters *are* their countries — while explicitly leaving Hetalia's
+comedy register behind in favour of something "mythic and earnest."
+
+**A line worth knowing.** The design's one-sentence pitch for the whole game
+doubles as the tightest possible description of what Donna is *for*:
+
+[quote, docs/design/18-touchstones-and-positioning.md]
+A folkloric Brothers-meets-Ōkami with a Trine-like switch between two girls —
+one who stirs, one who stills — and Nen-like systematic depth, set in a
+Slavic world that reads who you are.
+
+**Legibility, in-world.** A later design layer called _manpu_ (manga-style
+visual shorthand — swirls, sweat-drops, sleep-marks) is proposed to make the
+world's hidden state readable at a glance. One sketched example belongs
+entirely to Donna: she settles a sheepdog until it visibly falls asleep
+(rendered with a manga "Zzz" mark), lowering its detection and opening a
+stealth route. Not built; a strong hint of what "settling" will eventually
+*feel* like to use.
+
+<<<
+
+== Open Questions for Further Development
+
+These are drawn directly from what the design canon itself leaves
+unresolved — not invented gaps, but the actual open questions a next
+designer, writer, or wiki contributor would need to answer.
+
+=== About Donna herself
+
+. What does Donna actually look like, beyond her costume and hair colour? No
+  age, height, build, eye colour, or skin tone is specified anywhere in the
+  canon.
+. What is Donna's surname, or her family's names? Her grandmother (the
+  kukeri mask-carver) and uncle (the bridge-builder) are described only by
+  role, never named.
+. What, specifically, was the "collapsed walkway" she was repairing on the
+  day of the Tear — where was it, and why had it collapsed?
+. How does Donna actually *talk*? Only one line of dialogue exists for her in
+  the whole corpus (&#8220;Why didn&#8217;t I just stabilise the bridge, Anya?&#8221;). Is she
+  formal, wry, terse, warm-but-guarded?
+. How did Donna and Anya first meet — before the Rift, or only after?
+
+=== About her powers and path
+
+. Which of her three sketched class paths — Pillar, Architect, or Guardian —
+  is she meant to lean toward, or is the choice left entirely to the player?
+. The imported (non-canon, flagged "to refine") material suggests Donna's
+  anchoring, applied too rigidly, can *shear* things rather than protect
+  them — is that tension something the finished story explores, or was it a
+  discarded idea?
+. Does Donna ever learn to ask for help — the flaw the design explicitly
+  names for her — and if so, in which Chronicle?
+
+=== About her world
+
+. Which of the candidate Bulgarian/Rhodope spirits (samodiva, stopan, other
+  gorski spirits) are confirmed canon, and do any of them appear in
+  Chronicle I specifically, or only later?
+. Do plants have will of their own, the way supernatural animals do, or only
+  the rare supernatural ones?
+. Is Chronicle I's tone meant to be calm and folkloric (as Zone A currently
+  plays) or "surreal, dangerous, fast-paced" (as an earlier structure
+  document describes it)? The design itself flags this as unresolved.
+. Is the eventual game switch-only between the two girls, or genuinely
+  co-operative/simultaneous? Both are recorded in different documents as
+  live possibilities.
+
+<<<
+
+[.text-center]
+--
+_This compendium reflects the design canon of Chronicles of Slavia as of the
+date it was compiled. It is not an official design document — treat it as a
+fan's-eye map of what is known, built to make the next step easier to take._
+--
