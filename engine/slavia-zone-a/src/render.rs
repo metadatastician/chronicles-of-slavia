@@ -178,7 +178,7 @@ pub fn run() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Chronicles of Slavia — Zone A (Bevy · M2.1)".into(),
-                resolution: (1180.0, 640.0).into(),
+                resolution: (1180.0_f32, 640.0_f32).into(),
                 ..default()
             }),
             ..default()
@@ -637,7 +637,15 @@ fn reactive_rig(
         let bw = (1.0 + billow).clamp(0.85, 1.3);
         // Sway grows with height off the ground (hem more than waist) —
         // applied per skirt tier below, not as one flat offset.
-        let sway = vx_norm * GIRL_W * 0.5
+        //
+        // The speed term uses `.abs()`, not signed `vx_norm` — this local
+        // offset is authored in "facing-right" space and gets mirrored by
+        // the parent's `scale.x = facing` (like the hair trail above). A
+        // signed term would get mirrored *twice* (once here, once by
+        // `facing`, which share the same sign during sustained movement),
+        // landing the hem in front of the girl on one side and correctly
+        // behind on the other instead of trailing behind on both.
+        let sway = -vx_norm.abs() * GIRL_W * 0.5
             + g.walk.sin() * g.gait * (GIRL_W * 0.18 + g.verve * GIRL_W * 0.25);
         let stride = g.walk.sin() * g.gait;
         let head_bob = g.gait * GIRL_H * 0.02;
