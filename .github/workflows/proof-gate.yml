@@ -1,0 +1,133 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# Honest Proof Gate — Required by doctrine #8 (wire-first: unwired is not done).
+# Runs the formal proof suite across all five provers: Idris2, Lean4, Agda, Coq, TLA+.
+#
+# A missing prover is FATAL, never a skip — an unrun prover means the proofs are
+# UNVERIFIED and this gate declines to certify them (doctrine #2: ground-truth
+# by running, not asserting).
+#
+# This workflow converges with the canonical estate shape in hyperpolymath/
+# rsr-template-repo (issue #147) using the shared check-proofs.sh + MANIFEST
+# mechanism. Chronicles adds TLA+ support (proof-check-tla recipe) which is
+# chronicles-specific content.
+#
+# Related: PR #10 (honest proof gate landing), issue #13 (wiring into CI).
+name: Proof Gate
+on:
+  pull_request:
+    branches: ['**']
+  push:
+    branches: [main, master]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  proof-check:
+    name: Honest proof check (all provers)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # Prover toolchain provisioning — ALL required for the gate to be honest.
+      # A missing toolchain = UNVERIFIED proofs = gate FAIL (deliberately fatal).
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+      - name: Install system dependencies (Agda, Coq, Java for TLA+)
+        run: |
+          echo "=== Installing apt-based provers ==="
+          sudo apt-get update
+          sudo apt-get install -y agda coq openjdk-17-jre-headless
+          echo "agda:  $(agda --version 2>&1 | head -1 || echo 'unknown')"
+          echo "coq:   $(coqc --version 2>&1 | head -1 || echo 'unknown')"
+          echo "java:  $(java --version 2>&1 | head -1 || echo 'unknown')"
+
+      - name: Install Lean 4 via elan
+        run: |
+          echo "=== Installing Lean 4 via elan ==="
+          curl -fsSL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o /tmp/elan-init.sh
+          bash /tmp/elan-init.sh -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.elan/bin:$PATH"
+          elan --version
+          lean --version
+
+      - name: Install Idris 2 via pack
+        run: |
+          echo "=== Installing Idris 2 via pack ==="
+          # Install pack (Idris 2 package manager)
+          curl -fsSL https://github.com/idris-lang/pack/releases/latest/download/x86_64-linuxpack -o /tmp/pack
+          chmod +x /tmp/pack
+          sudo mv /tmp/pack /usr/local/bin/pack
+          pack --version
+          # Install Idris 2 >= 0.8.0 (estate requirement)
+          pack install idris2 >= 0.8.0
+          # Ensure idris2 binary is on PATH
+          echo "$HOME/.idris2/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.idris2/bin:$PATH"
+          idris2 --version
+
+      - name: Install TLA+ Tools
+        run: |
+          echo "=== Installing TLA+ Tools ==="
+          # Download tla2tools.jar — using the version referenced in the estate
+          # The gate reads $TLA2TOOLS_JAR; we set it here so proof-check-tla can find it.
+          TLA2TOOLS_VERSION="1.8.0"
+          TLA2TOOLS_URL="https://github.com/tlaplus/tlaplus/releases/download/v${TLA2TOOLS_VERSION}/tla2tools.jar"
+          curl -fsSL -o /tmp/tla2tools.jar "$TLA2TOOLS_URL"
+          echo "TLA2TOOLS_JAR=/tmp/tla2tools.jar" >> $GITHUB_ENV
+          echo "TLA+ Tools jar: $(ls -lh /tmp/tla2tools.jar)"
+
+      - name: Verify all provers are available
+        run: |
+          echo "=== Verifying prover toolchain ==="
+          command -v agda     && echo "✓ agda found"     || (echo "✗ agda MISSING" >&2 && exit 1)
+          command -v coqc     && echo "✓ coqc found"     || (echo "✗ coqc MISSING" >&2 && exit 1)
+          command -v lean     && echo "✓ lean found"     || (echo "✗ lean MISSING" >&2 && exit 1)
+          command -v idris2   && echo "✓ idris2 found"   || (echo "✗ idris2 MISSING" >&2 && exit 1)
+          command -v java     && echo "✓ java found"     || (echo "✗ java MISSING" >&2 && exit 1)
+          [ -f "$TLA2TOOLS_JAR" ] && echo "✓ tla2tools.jar found" || (echo "✗ tla2tools.jar MISSING" >&2 && exit 1)
+
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # Justfile prerequisite — the proof recipes are in build/just/proofs.just
+      # and imported conditionally; ensure just is available.
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+      - name: Install just
+        uses: casey/just@319e28279bf72477318d81be8622074180483961 # v2.3.0
+        with:
+          version: 1.21.0
+
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # Run the honest proof gate: proof-check-all runs ALL prover checks + scan.
+      # From build/just/proofs.just:
+      #   proof-check-idris2, proof-check-lean4, proof-check-agda, proof-check-coq,
+      #   proof-check-tla, proof-scan-dangerous
+      # Each missing prover is FATAL (exits non-zero, does not skip).
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+      - name: Run proof-check-all
+        id: proof_check
+        run: |
+          echo "════════════════════════════════════════════════════════════"
+          echo "  HONEST PROOF GATE — verification/proofs/"
+          echo "════════════════════════════════════════════════════════════"
+          just proof-check-all
+
+      - name: Upload proof logs on failure
+        if: always() && steps.proof_check.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: proof-gate-logs
+          path: |
+            verification/proofs/
+            build/
+          retention-days: 14
