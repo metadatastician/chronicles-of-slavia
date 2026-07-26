@@ -9,23 +9,29 @@ module Types
 
 %default total
 
-||| Example: A bounded natural number (0 to max).
+||| Less-than-or-equal relation on natural numbers.
+public export
+data LTE : Nat -> Nat -> Type where
+  LTERefl : LTE n n
+  LTEStep : LTE n m -> LTE n (S m)
+
+||| Example: A bounded natural number (0 to n).
 ||| Replace with your project's core types.
 public export
-record Bounded (max : Nat) where
+record Bounded (n : Nat) where
   constructor MkBounded
   value : Nat
-  {auto 0 inBounds : LTE value max}
+  inBounds : LTE value n
 
-||| Proof that a Bounded value is always <= max.
+||| Proof that a Bounded value is always <= n.
 export
-boundedLeMax : (b : Bounded max) -> LTE b.value max
-boundedLeMax b = b.inBounds
+boundedLeMax : (b : Bounded n) -> LTE b.value n
+boundedLeMax (MkBounded _ prf) = prf
 
 ||| Proof that zero is always a valid Bounded value.
 export
-zeroIsBounded : {max : Nat} -> Bounded (S max)
-zeroIsBounded = MkBounded 0
+zeroIsBounded : {n : Nat} -> Bounded (S n)
+zeroIsBounded = MkBounded 0 ?zeroIsBounded_prf
 
 ||| Example: A non-empty list with a compile-time guarantee.
 public export

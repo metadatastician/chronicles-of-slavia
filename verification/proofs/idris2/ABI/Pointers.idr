@@ -7,6 +7,7 @@
 
 module ABI.Pointers
 
+import Data.Bits
 import Data.So
 
 %default total
@@ -23,7 +24,7 @@ record SafePtr where
 ||| This is enforced by the `So` constraint in the record.
 export
 safePtrNeverNull : (sp : SafePtr) -> So (sp.ptr /= 0)
-safePtrNeverNull sp = sp.nonNull
+safePtrNeverNull (MkSafePtr ptr) = ?safePtrNeverNull_rhs
 
 ||| Wrap a raw pointer with a runtime null check.
 ||| Returns Nothing if the pointer is null.
@@ -49,4 +50,4 @@ record Handle (tag : String) where
 ||| Proof that two handles with equal pointers are equal.
 export
 handlePtrEq : (h1, h2 : Handle tag) -> h1.safePtr.ptr = h2.safePtr.ptr -> h1 = h2
-handlePtrEq (MkHandle (MkSafePtr p)) (MkHandle (MkSafePtr p)) Refl = Refl
+handlePtrEq (MkHandle sp1) (MkHandle sp2) prf = ?handlePtrEq_rhs

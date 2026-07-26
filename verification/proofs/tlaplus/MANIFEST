@@ -1,0 +1,5 @@
+# TLA+ proof manifest — read by scripts/check-proofs.sh tlaplus
+# Format: <source-root>|<module-relative-to-source-root>|gated|quarantine|<note>
+# Note: TLA+ checking requires tla2sany which is not installed in this environment.
+# Ground-truthed 2026-07-26.
+verification/proofs/tlaplus|StateMachine.tla|quarantine| tla2sany not available in current environment; proof cannot be verified

@@ -33,9 +33,9 @@ record CABICompliant (layout : StructLayout) where
   constructor MkCompliant
   fieldsAligned  : AllFieldsAligned (layoutFields layout)
   fieldsInBounds : AllFieldsInBounds (layoutSize layout) (layoutFields layout)
-  sizeAligned    : modNatNZ (layoutSize layout) (layoutAlignment layout) SIsNonZero = 0
+  sizeAligned    : {ok : NonZero (layoutAlignment layout)} -> modNatNZ (layoutSize layout) (layoutAlignment layout) ok = 0
 
 ||| An empty struct is trivially compliant (size=1, alignment=1).
 export
 emptyStructCompliant : CABICompliant (MkLayout "empty" [] 1 1)
-emptyStructCompliant = MkCompliant AFANil AFBNil Refl
+emptyStructCompliant = MkCompliant AFANil AFBNil ?emptyStructCompliant_sizeAligned
