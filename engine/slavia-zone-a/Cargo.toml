@@ -27,6 +27,15 @@ bevy = { version = "0.15", default-features = false, features = [
     "bevy_render",
     "bevy_core_pipeline",
     "bevy_sprite",
+    # UI stack for the startup interface (menu/): layout+widgets, text
+    # rendering, the app-state machine, and the picking backend UI's
+    # Interaction component needs to update on hover/click in 0.15+.
+    "bevy_ui",
+    "bevy_text",
+    "bevy_state",
+    "bevy_picking",
+    "bevy_ui_picking_backend",
+    "default_font", # bootstrap font; swap for a sourced/licensed serif later
     "x11",
     "multi_threaded",
 ], optional = true }
