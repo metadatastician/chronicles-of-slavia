@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # scan-dangerous.sh — flag dangerous/unsafe constructs USED in proof code.
@@ -31,14 +31,19 @@ dangerous=0
 
 # Blank comment content while preserving line count (so grep -n stays accurate).
 strip_comments() {
-  local ext="${1##*.}" lc bo bc
+  local ext="${1##*.}" lc lc2 bo bc
+  # lc2 is a second line-comment token. Idris2 documentation comments start
+  # `|||`, which is a comment but does not start with `--`, so without this a
+  # doc comment explaining *why* a construct was avoided is flagged as using
+  # it. Matched as the full three characters, so `data X = A | B` is untouched.
   case "$ext" in
-    idr|lean|agda) lc='--'; bo='{-'; bc='-}' ;;   # line + block comments
-    v)             lc='';   bo='(*'; bc='*)' ;;   # Coq block comments only
-    tla)           lc='\\*'; bo='(*'; bc='*)' ;;  # TLA+ line + block comments
-    *)             lc='';   bo='';   bc=''   ;;
+    idr)           lc='--'; lc2='|||'; bo='{-'; bc='-}' ;;
+    lean|agda)     lc='--'; lc2='';    bo='{-'; bc='-}' ;;
+    v)             lc='';   lc2='';    bo='(*'; bc='*)' ;;   # Coq block only
+    tla)           lc='\\*'; lc2='';   bo='(*'; bc='*)' ;;   # TLA+ line + block
+    *)             lc='';   lc2='';    bo='';   bc=''   ;;
   esac
-  awk -v lc="$lc" -v bo="$bo" -v bc="$bc" '
+  awk -v lc="$lc" -v lc2="$lc2" -v bo="$bo" -v bc="$bc" '
     BEGIN { inblk = 0 }
     {
       line = $0; out = ""; i = 1; n = length(line)
@@ -50,6 +55,8 @@ strip_comments() {
           inblk = 1; i += length(bo)
         } else if (lc != "" && substr(line,i,length(lc)) == lc) {
           break                       # rest of the line is a line-comment
+        } else if (lc2 != "" && substr(line,i,length(lc2)) == lc2) {
+          break                       # rest of the line is a doc comment
         } else {
           out = out substr(line,i,1); i++
         }

@@ -23,7 +23,7 @@ Per-tool config files (.cursorrules, .clinerules, etc.) reference this document.
 
 Per estate policy (hyperpolymath/standards `LICENCE-POLICY.adoc` Rule 1 + Addendum A8):
 
-- Code / config / scripts: `SPDX-License-Identifier: MPL-2.0`.
+- Code / config / scripts: `SPDX-License-Identifier: AGPL-3.0-or-later`.
 - Prose docs (`*.adoc`, `*.md` narrative): `SPDX-License-Identifier: CC-BY-SA-4.0`.
 - GitHub shows only one repo licence: the root `LICENSE` is MPL-2.0 (so the
   sidebar reads MPL-2.0); **both** canonical texts live in `LICENSES/`

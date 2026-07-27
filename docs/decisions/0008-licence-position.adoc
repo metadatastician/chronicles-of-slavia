@@ -1,0 +1,101 @@
+= ADR-0008: Licence position
+:status: accepted
+:date: 2026-07-27
+
+== Context
+
+This repository currently contradicts itself about licensing, and the
+contradiction is in the metadata rather than in the intent.
+
+* `LICENSE-INTENT.md` says: *"No open-source or Creative Commons licence has
+  been granted yet. All rights are reserved unless and until a licence is
+  explicitly added."* This is stale.
+* `LICENSE` at the repository root is the Mozilla Public License 2.0 text.
+* `LICENSES/` vendors all three of `AGPL-3.0-or-later.txt`, `CC-BY-SA-4.0.txt`
+  and `MPL-2.0.txt` — which is the correct set.
+* `engine/slavia-core/Cargo.toml` and `engine/slavia-zone-a/Cargo.toml` both
+  declare `license = "MPL-2.0"`.
+
+The estate position is already settled and already written down in IDApTIK's
+README: engine and code are AGPL-3.0-or-later, content and documents are
+CC-BY-SA-4.0, names and marks are reserved. Chronicles of Slavia is the same
+kind of thing and takes the same position.
+
+There is no compatibility problem to solve. MPL-2.0 §3.3 explicitly permits
+distributing covered software as part of a Larger Work under a **Secondary
+License**, and names GPL 2.0, LGPL 2.1 and **AGPL 3.0** as those licences. That
+compatibility is deliberate in MPL-2.0's design. Incorporating MPL components
+into an AGPL product is the intended arrangement, not an exception to be argued
+for.
+
+== Decision
+
+Chronicles of Slavia is licensed as:
+
+|===
+| Layer | Licence
+
+| Engine and code
+| AGPL-3.0-or-later
+
+| Content — design notes, lore, writing, worldbuilding, art
+| CC-BY-SA-4.0
+
+| Names, characters, branding and marks
+| Reserved
+|===
+
+**MPL-2.0 components remain MPL-2.0.** Third-party and sibling components —
+gossamer, burble and anything else carrying MPL-2.0 — keep their own licence and
+are incorporated under MPL-2.0 §3.3. This needs no per-component decision and no
+dual-licensing arrangement.
+
+The engine being strong copyleft is the point, not a side effect: anyone
+building on it, including as a hosted service, shares their derivative source.
+
+=== Consequent corrections
+
+These are mechanical, and follow from the decision rather than extending it.
+
+. `LICENSE-INTENT.md` is stale and is either rewritten to state the position
+  above or removed in favour of the licence table in the README.
+. `engine/slavia-core/Cargo.toml` and `engine/slavia-zone-a/Cargo.toml` declare
+  `license = "MPL-2.0"`. This is the project's own code, so it is
+  `AGPL-3.0-or-later`. IDApTIK pins the equivalent with a release-blocking
+  invariant (`engine-license-agpl`) and this repository should match.
+. `LICENSE` at the root is the MPL text where it should be the AGPL text. The
+  MPL text stays in `LICENSES/` for the components that use it.
+. SPDX headers on files this project authored follow the layer they belong to.
+
+None of this affects the estate architecture. Slavia may consume the shared
+AGPL kernel, and the kernel may absorb Slavia's cognition code, in both
+directions, once the metadata is consistent.
+
+=== Determinism, which is independent of licensing
+
+`engine/slavia-core/src/esm/` is float-free by contract, not by accident, and a
+release-blocking invariant now pins it:
+
+[source]
+----
+### esm-is-float-free
+- run: ! grep -rqE '\b(f32|f64)\b' engine/slavia-core/src/esm/
+- severity: critical
+----
+
+Confidence in this layer is the number of solutions a query returns. There is no
+suspicion float, no tuned heuristic and no distance threshold, and that is the
+property which makes this code a candidate for the shared kernel at all.
+
+Slavia publishes `slavia/esm/v1` as a profile over the shared kernel, per
+Enaction Engine `CAC-KERNEL.adoc` §5.
+
+== Consequences
+
+* The repository stops saying two different things about its own licence.
+* No blocker exists between this repository and the shared kernel. An earlier
+  draft of this ADR framed the MPL/AGPL relationship as a one-way door requiring
+  a choice between three options. That was wrong: MPL-2.0 §3.3 settles it, and
+  the estate position was already decided.
+* The corrections above are metadata changes and can be made at any time. They
+  do not need to precede design work.

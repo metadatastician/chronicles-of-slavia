@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: MPL-2.0
+-- SPDX-License-Identifier: AGPL-3.0-or-later
 -- Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 --
 -- ABI Proof: Memory layout correctness
@@ -17,7 +17,17 @@ data NonZero : Nat -> Type where
 ||| Modulo operation with proof that divisor is non-zero.
 public export
 modNatNZ : (n : Nat) -> (m : Nat) -> NonZero m -> Nat
-modNatNZ n (S m) (SIsNonZero) = ?modNatNZ_rhs
+modNatNZ n (S m) (SIsNonZero) = mod' n n m
+  where
+    -- Structural recursion on the first argument as fuel, so the function is
+    -- total without assert_total. `n` bounds the number of subtractions
+    -- because each step removes at least one from the centre value.
+    mod' : Nat -> Nat -> Nat -> Nat
+    mod' Z         centre right = centre
+    mod' (S fuel)  centre right =
+      if centre <= right
+        then centre
+        else mod' fuel (minus centre (S right)) right
 modNatNZ _ Z _ = 0  -- This case is unreachable due to NonZero proof
 
 ||| Witness that a type has a known size in bytes at compile time.
