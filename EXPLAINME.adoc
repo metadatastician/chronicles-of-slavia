@@ -19,7 +19,7 @@ How this is implemented:
 * The sibling UMS repository owns
   `profiles/slavia/v1/profile.json` and the Zone A / Border Path fixture.
 * `just slavia-profile-check` runs a generic profile validator.
-* `docs/decisions/0004-ums-profile-before-runtime-integration.adoc` records why
+* `docs/decisions/0007-ums-profile-before-runtime-integration.adoc` records why
   no loader is added in this pass.
 
 Caveat:

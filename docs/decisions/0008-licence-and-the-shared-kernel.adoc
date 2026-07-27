@@ -1,0 +1,101 @@
+= ADR-0008: Licence position for consuming the shared kernel
+:status: proposed
+:date: 2026-07-27
+
+IMPORTANT: **Proposed, not accepted.** This ADR sets out a blocker and three
+options. The choice is the author's and has commercial consequences that cannot
+be made on technical grounds alone. It is written now because the choice is free
+today and stops being free at first publication or first outside contributor.
+
+== Context
+
+The estate has settled a two-layer shape (Enaction Engine ADR-0013): the
+Enaction Engine is the runtime kernel a game links, and Chronicles of Slavia is
+one of the games. Slavia's `esm/` module is also the estate's best cognition
+implementation and a strong candidate to be absorbed into that kernel.
+
+Both directions are currently blocked by a licence contradiction inside this
+repository.
+
+* `LICENSE-INTENT.md` says: *"No open-source or Creative Commons licence has
+  been granted yet. All rights are reserved unless and until a licence is
+  explicitly added."*
+* Every file under `engine/slavia-core/src/` carries
+  `SPDX-License-Identifier: MPL-2.0`.
+
+These cannot both be true. The repository states in one place that no licence
+has been granted and asserts a specific licence in every source file.
+
+Meanwhile `enaction-engine/crates/enaction-time/src/lib.rs` carries
+`AGPL-3.0-or-later`, and its AGENTS.md records that the AGPL choice was
+deliberate at mint, specifically so code could move freely to and from IDApTIK.
+
+**MPL to AGPL is a one-way door.** Slavia's `kanren.rs` may be absorbed into an
+AGPL kernel. But an MPL-licensed Slavia **cannot link the AGPL kernel** without
+becoming AGPL itself. And AGPL on a shipped game carries network-copyleft
+consequences that should be chosen deliberately rather than discovered at
+release.
+
+The good news is in the contradiction. Because `LICENSE-INTENT.md` says no
+licence has actually been granted, **the choice is free right now**. It stops
+being free the moment anything is published or a second contributor commits.
+
+== Options
+
+**A — Relicense `slavia-core` as AGPL-3.0-or-later.** Slavia links the kernel
+directly; code moves freely in both directions; the estate is consistent with
+IDApTIK, which is already AGPL. Cost: closes the door on a non-copyleft
+commercial build of Slavia, permanently. This is the option that makes "three
+games, one kernel" work as literally stated.
+
+**B — Dual-licence the kernel.** The Enaction Engine offers AGPL and a second
+licence compatible with MPL consumers. Keeps Slavia's options open. Cost: every
+future contribution to the kernel needs the rights to dual-licence it, which is
+easy while the author is the sole contributor and awkward afterwards.
+
+**C — Keep the shared crates zero-dependency and separately licensable.** The
+relational solver in particular is designed to depend on nothing at all, partly
+for wasm cleanliness and partly for exactly this reason. Licence the genuinely
+shared, dependency-free crates permissively; keep the rest AGPL. Cost: an
+ongoing judgement about which side of the line each new crate falls, and a
+smaller shared surface than options A or B.
+
+There is no technically neutral option. Deferring is a choice for A by default,
+because the longer Slavia consumes kernel ideas the harder any other answer
+becomes.
+
+== Decision
+
+Deferred, pending the author's choice among A, B and C.
+
+Whichever is chosen, two things follow immediately and are not contingent on it:
+
+. **Resolve the contradiction.** Either `LICENSE-INTENT.md` is wrong and MPL-2.0
+  has been granted, or the SPDX headers are wrong. Both cannot stand.
+. **Bind the determinism contract regardless.** `slavia-core/src/esm/` is
+  float-free by contract, not by accident, and stays that way independently of
+  licensing:
++
+[source]
+----
+### esm-is-float-free
+- description: The cognition layer carries no IEEE floats (Enaction ADR-0015)
+- run: ! grep -rqE '\b(f32|f64)\b' engine/slavia-core/src/esm/
+- severity: critical
+----
++
+This passes today. Pinning it costs one line and protects the property that
+makes this code a kernel candidate at all: confidence is a solution count, and
+there is no suspicion float anywhere in it.
+
+Slavia publishes `slavia/esm/v1` as a profile over the shared kernel when the
+licence position allows it, per Enaction Engine `CAC-KERNEL.adoc` §5.
+
+== Consequences
+
+* Until this is settled, no code moves in either direction between this
+  repository and the kernel. Design conversation is unaffected.
+* The float-free invariant lands now, so the property does not quietly erode
+  while the licence question is open.
+* If option A is chosen, it should be chosen explicitly and early. Relicensing
+  after publication requires the agreement of every contributor.
