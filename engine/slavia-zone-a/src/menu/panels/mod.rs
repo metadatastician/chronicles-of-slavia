@@ -1,0 +1,155 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+//! Panel dispatch: when [`CurrentPanel`] changes, despawn whatever was
+//! mounted in [`ContextPanelRoot`] and spawn the new panel's content. Also
+//! houses `continue`/`ums`, each under 15 lines of static text — not worth
+//! their own file.
+
+mod bond;
+mod chapters;
+mod credits;
+mod new_chronicle;
+pub mod settings;
+mod world_book;
+
+use crate::menu::nav::{CurrentPanel, MenuView, UiSettings};
+use crate::menu::shell::ContextPanelRoot;
+use crate::menu::theme;
+use crate::state::AppState;
+use bevy::prelude::*;
+
+/// Shared small heading widget every panel opens with, so the eight panel
+/// modules don't each re-derive the same `Text`/`TextFont`/`TextColor` bundle.
+pub fn heading(p: &mut ChildBuilder, title: &str) {
+    p.spawn((
+        Text::new(title.to_string()),
+        TextFont {
+            font_size: 22.0,
+            ..default()
+        },
+        TextColor(theme::ink()),
+    ));
+}
+
+/// Shared body-text widget for a panel's ordinary paragraphs.
+pub fn body(p: &mut ChildBuilder, text: &str) {
+    p.spawn((
+        Text::new(text.to_string()),
+        TextFont {
+            font_size: 14.0,
+            ..default()
+        },
+        TextColor(theme::muted()),
+    ));
+}
+
+/// One "pillar"/"tag" style small card: a bold label + a short description,
+/// the shape the mock-up reuses across the World Book, Chapter Map, and
+/// New Chronicle panels.
+pub fn card(p: &mut ChildBuilder, label: &str, desc: &str) {
+    p.spawn(Node {
+        flex_direction: FlexDirection::Column,
+        padding: UiRect::all(Val::Px(10.0)),
+        margin: UiRect::top(Val::Px(6.0)),
+        border: UiRect::all(Val::Px(1.0)),
+        ..default()
+    })
+    .insert(BorderColor(theme::line()))
+    .with_children(|c| {
+        c.spawn((
+            Text::new(label.to_string()),
+            TextFont {
+                font_size: 15.0,
+                ..default()
+            },
+            TextColor(theme::gold()),
+        ));
+        c.spawn((
+            Text::new(desc.to_string()),
+            TextFont {
+                font_size: 13.0,
+                ..default()
+            },
+            TextColor(theme::muted()),
+        ));
+    });
+}
+
+pub fn dispatch(
+    mut commands: Commands,
+    current: Res<CurrentPanel>,
+    settings: Res<UiSettings>,
+    root: Query<Entity, With<ContextPanelRoot>>,
+    children: Query<&Children>,
+) {
+    if !current.is_changed() {
+        return;
+    }
+    let Some(root_entity) = root.iter().next() else {
+        return;
+    };
+    if let Ok(kids) = children.get(root_entity) {
+        for kid in kids.iter() {
+            commands.entity(*kid).despawn_recursive();
+        }
+    }
+    let view = current.0;
+    let settings = *settings;
+    commands.entity(root_entity).with_children(|p| match view {
+        MenuView::Continue => continue_panel(p),
+        MenuView::NewChronicle => new_chronicle::build(p),
+        MenuView::Chapters => chapters::build(p),
+        MenuView::WorldBook => world_book::build(p),
+        MenuView::Bond => bond::build(p),
+        MenuView::Ums => ums_panel(p),
+        MenuView::Settings => settings::build(p, &settings),
+        MenuView::Credits => credits::build(p),
+    });
+}
+
+/// Honestly disabled — there is no save system anywhere in this codebase yet
+/// (see `menu/mod.rs`'s doc comment). No fabricated "18 minutes played"
+/// progress card.
+fn continue_panel(p: &mut ChildBuilder) {
+    heading(p, "Continue the Chronicle");
+    body(
+        p,
+        "No saved chronicle yet. Saving isn't built - begin a new one below.",
+    );
+}
+
+/// Static stub only. `docs/design/20-startup-interface-mockup.md` is explicit
+/// that a real implementation "must not move Slavia-specific ontology into
+/// Universal Modding Studio Core" — UMS is a separate external platform
+/// (`ECOSYSTEM.a2ml` lists it as a prospective-consumer), not integrated here.
+fn ums_panel(p: &mut ChildBuilder) {
+    heading(p, "Universal Modding Studio");
+    body(
+        p,
+        "Chronicles of Slavia is authored as a profile within the separate \
+         Universal Modding Studio platform. That authoring surface isn't part \
+         of this build - this panel is a placeholder for the portal, not the \
+         portal itself.",
+    );
+}
+
+/// The one real transition in the whole menu: "Begin New Chronicle" ->
+/// [`AppState::Playing`]. Zone A's own `setup` (`crate::render`) constructs
+/// a fresh [`crate::session::Session`] on `OnEnter(Playing)`.
+pub fn begin_chronicle(
+    q: Query<
+        &Interaction,
+        (
+            Changed<Interaction>,
+            With<new_chronicle::BeginChronicleButton>,
+        ),
+    >,
+    mut next: ResMut<NextState<AppState>>,
+) {
+    for interaction in &q {
+        if *interaction == Interaction::Pressed {
+            next.set(AppState::Playing);
+        }
+    }
+}
