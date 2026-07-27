@@ -102,10 +102,15 @@ jobs:
       # and imported conditionally; ensure just is available.
       # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+      # `casey/just` is the just source repository, not a GitHub Action -- it has
+      # no action.yml -- and the SHA previously pinned here exists in no
+      # repository (the API returns 422). GitHub could not build the run graph,
+      # so this workflow reported startup_failure in 0 seconds on every run since
+      # it was created, and never executed a single proof check.
       - name: Install just
-        uses: casey/just@319e28279bf72477318d81be8622074180483961 # v2.3.0
+        uses: extractions/setup-just@4a174aa1487e2bcb3f86a8fe24a05361a4f4fff1 # v1
         with:
-          version: 1.21.0
+          just-version: 1.21.0
 
       # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       # Run the honest proof gate: proof-check-all runs ALL prover checks + scan.

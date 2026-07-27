@@ -5,7 +5,7 @@
 # Updated 2026-07-26: Fixed missing imports and definitions in ABI proofs.
 verification/proofs/idris2|ABI/Foreign.idr|gated| the one shipped Idris2 module that compiles — real content, not a stub
 verification/proofs/idris2|Types.idr|gated| Fixed: added LTE definition, made inBounds explicit
-verification/proofs/idris2|ABI/Layout.idr|gated| Fixed: added NonZero, modNatNZ, LTE definitions
-verification/proofs/idris2|ABI/Platform.idr|gated| Fixed: added LTE type usage
-verification/proofs/idris2|ABI/Pointers.idr|gated| Fixed: added Data.Bits import, adjusted So constraint handling
-verification/proofs/idris2|ABI/Compliance.idr|gated| Fixed: updated to use local NonZero and modNatNZ
+verification/proofs/idris2|ABI/Layout.idr|holes| 1 typed hole. Compilation imports resolved; the obligation is not discharged.
+verification/proofs/idris2|ABI/Platform.idr|holes| 7 typed holes, one per platform in ptrSizeAtLeast4. Not discharged.
+verification/proofs/idris2|ABI/Pointers.idr|holes| 2 typed holes (safePtrNeverNull_rhs, handlePtrEq_rhs). Not discharged.
+verification/proofs/idris2|ABI/Compliance.idr|holes| 1 typed hole (emptyStructCompliant_sizeAligned) at line 41. Not discharged.
