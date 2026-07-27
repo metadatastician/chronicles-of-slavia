@@ -56,10 +56,10 @@ cIntAlways4 _ = Refl
 ||| Proof that pointer size is always at least 4 bytes.
 export
 ptrSizeAtLeast4 : (p : Platform) -> LTE 4 (ptrSize p)
-ptrSizeAtLeast4 WASM32 = ?ptrSizeAtLeast4_WASM32
-ptrSizeAtLeast4 Linux64 = ?ptrSizeAtLeast4_Linux64
-ptrSizeAtLeast4 LinuxARM64 = ?ptrSizeAtLeast4_LinuxARM64
-ptrSizeAtLeast4 MacOS64 = ?ptrSizeAtLeast4_MacOS64
-ptrSizeAtLeast4 MacOSARM64 = ?ptrSizeAtLeast4_MacOSARM64
-ptrSizeAtLeast4 Windows64 = ?ptrSizeAtLeast4_Windows64
-ptrSizeAtLeast4 FreeBSD64 = ?ptrSizeAtLeast4_FreeBSD64
+ptrSizeAtLeast4 WASM32 = LTESucc (LTESucc (LTESucc (LTESucc LTEZero)))
+ptrSizeAtLeast4 Linux64 = LTESucc (LTESucc (LTESucc (LTESucc LTEZero)))
+ptrSizeAtLeast4 LinuxARM64 = LTESucc (LTESucc (LTESucc (LTESucc LTEZero)))
+ptrSizeAtLeast4 MacOS64 = LTESucc (LTESucc (LTESucc (LTESucc LTEZero)))
+ptrSizeAtLeast4 MacOSARM64 = LTESucc (LTESucc (LTESucc (LTESucc LTEZero)))
+ptrSizeAtLeast4 Windows64 = LTESucc (LTESucc (LTESucc (LTESucc LTEZero)))
+ptrSizeAtLeast4 FreeBSD64 = LTESucc (LTESucc (LTESucc (LTESucc LTEZero)))
