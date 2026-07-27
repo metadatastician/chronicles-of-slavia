@@ -71,3 +71,19 @@ affinescript/              # AffineScript source subtree consumed by this templa
 tools/                     # TODO: consolidate with scripts/ or document the split (pending decision)
 .hypatia-ignore
 CLAUDE.md
+
+# ─── chronicles-of-slavia project-specific (real, not template-mandated) ─────
+.oikos.yml                 # OikosBot config, read from repo root by oikosbot.yml
+ARCHITECTURE.md            # project architecture overview
+CODE_OF_CONDUCT.md         # community health file (org-inherited elsewhere; kept at root here)
+GOVERNANCE.md              # this repo's own variant of GOVERNANCE.adoc
+LICENSE-INTENT.md          # licence-per-layer explanation (code/docs/vendored) alongside LICENSE/LICENSES/
+MAINTAINERS                # this repo's own variant of MAINTAINERS.adoc (no extension)
+RSR-PHILOSOPHY.adoc        # RSR working-method documentation
+SECURITY_FIXES_20260726.md # dated incident/fix record
+assets/                    # game/site assets
+chronicles-of-slavia-launcher.sh   # game launcher script
+chronicles-of-slavia.launcher.a2ml # launcher config manifest
+engine/                    # Rust workspace (slavia-core, slavia-zone-a)
+mise.toml                  # mise (asdf-compatible) toolchain pins
+prototype/                 # JS prototype the Bevy renderer's rig was ported from

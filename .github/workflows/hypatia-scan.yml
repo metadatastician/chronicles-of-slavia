@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Standalone Hypatia security scan (push / PR / weekly). This is NOT a duplicate
 # of the `hypatia-scan` job in `static-analysis-gate.yml`: that job exists to
