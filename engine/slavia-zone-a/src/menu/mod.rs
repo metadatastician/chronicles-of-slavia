@@ -16,6 +16,7 @@
 //! [`crate::render::ZoneAPlugin`]'s `AppState::Playing`, driven entirely by
 //! `crate::state::AppState` — this plugin never touches `render.rs` directly.
 
+pub mod fonts;
 pub mod nav;
 mod opening;
 mod panels;
@@ -30,7 +31,14 @@ pub struct MenuPlugin;
 
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<CurrentPanel>()
+        // Loaded synchronously here, not as a `Startup` system — see
+        // `fonts::load`'s doc comment for why.
+        let font = {
+            let assets = app.world().resource::<AssetServer>();
+            fonts::load(assets)
+        };
+        app.insert_resource(font)
+            .init_resource::<CurrentPanel>()
             .init_resource::<UiSettings>()
             .add_systems(OnEnter(AppState::Opening), opening::spawn_opening)
             .add_systems(OnExit(AppState::Opening), opening::despawn_opening)

@@ -21,7 +21,19 @@ permits distributing covered software as part of a Larger Work under a Secondary
 License, and names AGPL 3.0 as one of them. Incorporating MPL components into an
 AGPL product is the intended arrangement, not a special case.
 
-Licence texts for all three are vendored under `LICENSES/`.
+## OFL-1.1 font assets
+
+The startup interface uses PT Serif
+(`engine/slavia-zone-a/assets/fonts/PT-Serif/`), copyright ParaType Ltd.,
+under the [SIL Open Font License 1.1](https://scripts.sil.org/OFL). Same
+arrangement as the MPL-2.0 components above: the font keeps its own licence
+and Reserved Font Names ("PT Sans", "PT Serif", "ParaType"), vendored
+alongside the font files themselves
+(`engine/slavia-zone-a/assets/fonts/PT-Serif/OFL.txt`) rather than
+duplicated into `LICENSES/`, matching upstream's own convention for where an
+OFL font's licence travels.
+
+Licence texts for the top-level three are vendored under `LICENSES/`.
 
 See [ADR-0008](docs/decisions/0008-licence-position.adoc) for the decision and
 the metadata corrections that follow from it.

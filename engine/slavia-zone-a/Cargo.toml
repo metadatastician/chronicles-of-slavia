@@ -35,7 +35,7 @@ bevy = { version = "0.15", default-features = false, features = [
     "bevy_state",
     "bevy_picking",
     "bevy_ui_picking_backend",
-    "default_font", # bootstrap font; swap for a sourced/licensed serif later
+    "default_font", # fallback only now — every Text uses MenuFont explicitly
     "x11",
     "multi_threaded",
 ], optional = true }

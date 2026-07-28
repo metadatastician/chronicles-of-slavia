@@ -6,6 +6,7 @@
 //! nothing else in this codebase has motion/contrast/text-size/caption
 //! systems yet to wire them to. Not persisted (no save system).
 
+use crate::menu::fonts::MenuFont;
 use crate::menu::nav::UiSettings;
 use crate::menu::theme;
 use bevy::prelude::*;
@@ -40,8 +41,9 @@ fn flip(s: &mut UiSettings, which: Setting) {
     *target = !*target;
 }
 
-fn row(p: &mut ChildBuilder, settings: &UiSettings, which: Setting, label: &str) {
+fn row(p: &mut ChildBuilder, font: &MenuFont, settings: &UiSettings, which: Setting, label: &str) {
     let on = is_on(settings, which);
+    let regular = font.regular.clone();
     p.spawn(Node {
         flex_direction: FlexDirection::Row,
         align_items: AlignItems::Center,
@@ -65,6 +67,7 @@ fn row(p: &mut ChildBuilder, settings: &UiSettings, which: Setting, label: &str)
         row.spawn((
             Text::new(label.to_string()),
             TextFont {
+                font: regular,
                 font_size: 14.0,
                 ..default()
             },
@@ -73,17 +76,18 @@ fn row(p: &mut ChildBuilder, settings: &UiSettings, which: Setting, label: &str)
     });
 }
 
-pub fn build(p: &mut ChildBuilder, settings: &UiSettings) {
-    super::heading(p, "Settings & Accessibility");
+pub fn build(p: &mut ChildBuilder, font: &MenuFont, settings: &UiSettings) {
+    super::heading(p, font, "Settings & Accessibility");
     super::body(
         p,
+        font,
         "These toggles work, but nothing downstream reads them yet - no \
          motion, contrast, text-size or caption system exists in this build.",
     );
-    row(p, settings, Setting::ReducedMotion, "Reduced motion");
-    row(p, settings, Setting::HighContrast, "High contrast");
-    row(p, settings, Setting::LargeText, "Large text");
-    row(p, settings, Setting::Captions, "Captions");
+    row(p, font, settings, Setting::ReducedMotion, "Reduced motion");
+    row(p, font, settings, Setting::HighContrast, "High contrast");
+    row(p, font, settings, Setting::LargeText, "Large text");
+    row(p, font, settings, Setting::Captions, "Captions");
 }
 
 /// Flips the backing `UiSettings` bool and repaints the toggle pill.

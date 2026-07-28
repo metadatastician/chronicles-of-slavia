@@ -6,6 +6,7 @@
 //! it. Ported from `docs/design/chronicles-landing-page.html`'s `.topbar`/
 //! `.menu-panel`/`.footer`.
 
+use crate::menu::fonts::MenuFont;
 use crate::menu::nav::{label, CurrentPanel, MenuView, NavButton};
 use crate::menu::theme;
 use bevy::prelude::*;
@@ -30,7 +31,9 @@ const NAV_ORDER: [(MenuView, bool); 8] = [
     (MenuView::Credits, true),
 ];
 
-pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>) {
+pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>, font: Res<MenuFont>) {
+    let regular = font.regular.clone();
+    let bold = font.bold.clone();
     // Force a change signal even if the panel selection is unchanged from
     // last time — `panels::dispatch` only (re)populates `ContextPanelRoot`
     // on `CurrentPanel::is_changed()`, and re-entering the menu (e.g. Esc
@@ -63,6 +66,7 @@ pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>) {
                 top.spawn((
                     Text::new("Chronicles of Slavia"),
                     TextFont {
+                        font: bold.clone(),
                         font_size: 22.0,
                         ..default()
                     },
@@ -71,6 +75,7 @@ pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>) {
                 top.spawn((
                     Text::new("The First Tear - Border Path"),
                     TextFont {
+                        font: regular.clone(),
                         font_size: 14.0,
                         ..default()
                     },
@@ -125,6 +130,7 @@ pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>) {
                             b.spawn((
                                 Text::new(format!("{title}  [{key}]")),
                                 TextFont {
+                                    font: bold.clone(),
                                     font_size: 15.0,
                                     ..default()
                                 },
@@ -137,6 +143,7 @@ pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>) {
                                     format!("{sub} - no saved chronicle yet")
                                 }),
                                 TextFont {
+                                    font: regular.clone(),
                                     font_size: 12.0,
                                     ..default()
                                 },
@@ -172,6 +179,7 @@ pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>) {
                 footer.spawn((
                     Text::new("Slavia is memory, medicine, folklore and moral choice."),
                     TextFont {
+                        font: regular.clone(),
                         font_size: 12.0,
                         ..default()
                     },

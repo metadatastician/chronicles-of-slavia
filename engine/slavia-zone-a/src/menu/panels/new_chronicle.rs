@@ -7,6 +7,7 @@
 //! mock-up's misleading "Reflective"/"Exploratory" labels.
 
 use super::{body, card, heading};
+use crate::menu::fonts::MenuFont;
 use crate::menu::theme;
 use bevy::prelude::*;
 
@@ -15,15 +16,16 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct BeginChronicleButton;
 
-pub fn build(p: &mut ChildBuilder) {
-    heading(p, "Begin a New Chronicle");
+pub fn build(p: &mut ChildBuilder, font: &MenuFont) {
+    heading(p, font, "Begin a New Chronicle");
     card(
         p,
+        font,
         "Story Chronicle",
         "The authored journey of Anya, Donna and the first tear.",
     );
-    card(p, "Memory Walk - Not implemented", "");
-    card(p, "Living World Study - Not implemented", "");
+    card(p, font, "Memory Walk - Not implemented", "");
+    card(p, font, "Living World Study - Not implemented", "");
 
     p.spawn((
         Button,
@@ -41,6 +43,7 @@ pub fn build(p: &mut ChildBuilder) {
         b.spawn((
             Text::new("Begin New Chronicle"),
             TextFont {
+                font: font.bold.clone(),
                 font_size: 15.0,
                 ..default()
             },
@@ -48,5 +51,9 @@ pub fn build(p: &mut ChildBuilder) {
         ));
     });
 
-    body(p, "Zone A: Border Path. Shrine, birds, unstable bridge.");
+    body(
+        p,
+        font,
+        "Zone A: Border Path. Shrine, birds, unstable bridge.",
+    );
 }

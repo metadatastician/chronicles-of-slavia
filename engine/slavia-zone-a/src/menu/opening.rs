@@ -4,6 +4,7 @@
 //! The title card: "Invisible Door presents / Chronicles of Slavia / [motto]
 //! / Enter the Chronicle". Ported from the mock-up's `#opening` section.
 
+use crate::menu::fonts::MenuFont;
 use crate::menu::theme;
 use crate::state::AppState;
 use bevy::prelude::*;
@@ -14,7 +15,8 @@ pub struct OpeningRoot;
 #[derive(Component)]
 pub(super) struct EnterButton;
 
-pub fn spawn_opening(mut commands: Commands) {
+pub fn spawn_opening(mut commands: Commands, font: Res<MenuFont>) {
+    let regular = font.regular.clone();
     commands
         .spawn((
             OpeningRoot,
@@ -33,6 +35,7 @@ pub fn spawn_opening(mut commands: Commands) {
             p.spawn((
                 Text::new("Invisible Door presents"),
                 TextFont {
+                    font: regular.clone(),
                     font_size: 14.0,
                     ..default()
                 },
@@ -41,6 +44,7 @@ pub fn spawn_opening(mut commands: Commands) {
             p.spawn((
                 Text::new("Chronicles of Slavia"),
                 TextFont {
+                    font: font.bold.clone(),
                     font_size: 48.0,
                     ..default()
                 },
@@ -49,6 +53,7 @@ pub fn spawn_opening(mut commands: Commands) {
             p.spawn((
                 Text::new("\"What do you become when the world breaks?\""),
                 TextFont {
+                    font: regular.clone(),
                     font_size: 16.0,
                     ..default()
                 },
@@ -70,6 +75,7 @@ pub fn spawn_opening(mut commands: Commands) {
                 b.spawn((
                     Text::new("Enter the Chronicle"),
                     TextFont {
+                        font: regular.clone(),
                         font_size: 16.0,
                         ..default()
                     },
