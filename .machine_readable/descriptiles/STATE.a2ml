@@ -73,7 +73,7 @@ command = "cd engine && cargo test"
 items = [
   { id = "ignored-tests", notes = "2 tests are #[ignore]d somewhere in the workspace. Ignored tests are debt: they are green by not running. Identify and either fix or delete." },
   { id = "esm-unwired", notes = "Deliberate, not accidental (ADR-0004) — but 'unwired is not done' (doctrine 8). The ESM is proven headless against a synthetic cast and has never touched a real scene." },
-  { id = "template-residue", notes = "~150 files still carry rsr-template-repo strings or unsubstituted {{PLACEHOLDER}} tokens. The descriptiles and the arrival pack were corrected 2026-07-16; the wider residue is not yet swept." },
+  { id = "template-residue", notes = "~150 files still carry rsr-template-repo strings or unsubstituted placeholder tokens. The descriptiles and the arrival pack were corrected 2026-07-16; the wider residue is not yet swept." },
 ]
 
 [maintenance-status]
