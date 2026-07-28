@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # dogfood-gate.yml — Hyperpolymath Dogfooding Quality Gate
@@ -43,10 +43,34 @@ jobs:
 
       - name: Validate A2ML manifests
         if: steps.detect.outputs.count > 0
-        uses: hyperpolymath/a2ml-validate-action@0f8081cdfa293663ec6b204274b4272da302e564 # main
-        with:
-          path: '.'
-          strict: 'false'
+        run: |
+          # `hyperpolymath/a2ml-validate-action` does not exist under any known
+          # estate owner (confirmed via the GitHub API, both hyperpolymath and
+          # metadatastician 404) — every run of this step failed at Action
+          # resolution before a single file was ever read.
+          #
+          # Deliberately minimal inline check, not a reimplementation of a
+          # schema validator: this repo alone uses at least four distinct
+          # legitimate .a2ml content shapes (TOML-style [section], markdown-
+          # heading `### [SECTION]`, Lisp-style `(section ...)`, and plain
+          # single-line stub comments), so "has a [section] header" is not
+          # actually a real cross-format requirement — claiming to validate
+          # structure this check doesn't understand would just be a
+          # different-shaped fake gate. Checks only what's honestly
+          # checkable: the file exists and isn't empty/truncated. Real A2ML
+          # schema validation is a2mliser's own job, not this gate's.
+          err=0
+          while IFS= read -r -d '' f; do
+            if [ ! -s "$f" ]; then
+              echo "::error file=$f::empty .a2ml file"
+              err=1
+            fi
+          done < <(find . -name '*.a2ml' -not -path './.git/*' -print0)
+          if [ "$err" -ne 0 ]; then
+            echo "::error::one or more .a2ml files are empty"
+            exit 1
+          fi
+          echo "Structural check OK: every .a2ml file exists and is non-empty"
 
       - name: Write summary
         run: |
@@ -92,10 +116,35 @@ jobs:
 
       - name: Validate K9 contracts
         if: steps.detect.outputs.k9_count > 0
-        uses: hyperpolymath/k9-validate-action@b4b4bd64851e55e003fc756ca706c19f3442e999 # main
-        with:
-          path: '.'
-          strict: 'false'
+        run: |
+          # `hyperpolymath/k9-validate-action` does not exist under any known
+          # estate owner (confirmed via the GitHub API, both hyperpolymath and
+          # metadatastician 404) — every run of this step failed at Action
+          # resolution before a single file was ever read. Inline structural
+          # checks instead (NO Python per estate policy): K9 contracts are
+          # Nickel (.k9.ncl) or plain (.k9) — brace-balance and non-empty
+          # only, since full Nickel typechecking needs the `nickel` binary,
+          # which this runner does not install. Deep contract validation is
+          # k9iser's own job, not this gate's.
+          err=0
+          while IFS= read -r -d '' f; do
+            if [ ! -s "$f" ]; then
+              echo "::error file=$f::empty K9 contract file"
+              err=1
+              continue
+            fi
+            OPEN=$(grep -o '{' "$f" | wc -l)
+            CLOSE=$(grep -o '}' "$f" | wc -l)
+            if [ "$OPEN" -ne "$CLOSE" ]; then
+              echo "::error file=$f::unbalanced braces ({=$OPEN }=$CLOSE) — not valid Nickel/K9 shape"
+              err=1
+            fi
+          done < <(find . \( -name '*.k9' -o -name '*.k9.ncl' \) -not -path './.git/*' -print0)
+          if [ "$err" -ne 0 ]; then
+            echo "::error::one or more K9 contract files failed structural validation"
+            exit 1
+          fi
+          echo "Structural check OK: every K9 contract file is non-empty with balanced braces"
 
       - name: Write summary
         run: |

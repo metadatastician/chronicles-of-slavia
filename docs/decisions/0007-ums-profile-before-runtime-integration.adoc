@@ -1,6 +1,11 @@
-= ADR-0004: Validate the Slavia UMS profile before adding a runtime loader
+= ADR-0007: Validate the Slavia UMS profile before adding a runtime loader
 :status: accepted
 :date: 2026-07-25
+:renumbered: 2026-07-27, from 0004, which was issued twice
+
+NOTE: This decision was originally filed as ADR-0004, a number already held by
+the hybrid FSM/ESM mind-body architecture. Renumbered to 0007 under the
+uniqueness rule; the content is unchanged and the original date stands.
 
 == Context
 

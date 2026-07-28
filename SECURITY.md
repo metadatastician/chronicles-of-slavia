@@ -330,7 +330,7 @@ To stay informed about security updates:
 
 ## Security Best Practices
 
-When using Chronicles Of Slavia, we recommend:
+When using Chronicles of Slavia, we recommend:
 
 ### General
 
@@ -381,7 +381,7 @@ This security policy may be updated from time to time. Significant changes will 
 
 ---
 
-*Thank you for helping keep Chronicles Of Slavia and its users safe.* 🛡️
+*Thank you for helping keep Chronicles of Slavia and its users safe.* 🛡️
 
 ---
 

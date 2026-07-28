@@ -44,8 +44,20 @@ If you cannot use GitHub Security Advisories, you may email us directly:
 
 | | |
 |---|---|
-| **Email** | jonathan.jewell@gmail.com |
+| **Email** | j.d.a.jewell@open.ac.uk |
+| **PGP Key** | [Download Public Key](https://github.com/hyperpolymath.gpg) |
+| **Fingerprint** | `TBD` |
 
+```bash
+# Import our PGP key
+curl -sSL https://github.com/hyperpolymath.gpg | gpg --import
+
+# Verify fingerprint
+gpg --fingerprint j.d.a.jewell@open.ac.uk
+
+# Encrypt your report
+gpg --armor --encrypt --recipient j.d.a.jewell@open.ac.uk report.txt
+```
 
 > **⚠️ Important:** Do not report security vulnerabilities through public GitHub issues, pull requests, discussions, or social media.
 
@@ -322,7 +334,7 @@ To stay informed about security updates:
 
 ## Security Best Practices
 
-When using chronicles-of-slavia, we recommend:
+When using Chronicles of Slavia, we recommend:
 
 ### General
 
@@ -344,6 +356,7 @@ When using chronicles-of-slavia, we recommend:
 
 ## Additional Resources
 
+- [Our PGP Public Key](https://github.com/hyperpolymath.gpg)
 - [Security Advisories](https://github.com/metadatastician/chronicles-of-slavia/security/advisories)
 - [Changelog](../CHANGELOG.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
@@ -356,7 +369,7 @@ When using chronicles-of-slavia, we recommend:
 
 | Purpose | Contact |
 |---------|---------|
-| **Security issues** | [Report via GitHub](https://github.com/metadatastician/chronicles-of-slavia/security/advisories/new) or jonathan.jewell@gmail.com |
+| **Security issues** | [Report via GitHub](https://github.com/metadatastician/chronicles-of-slavia/security/advisories/new) or j.d.a.jewell@open.ac.uk |
 | **General questions** | [GitHub Discussions](https://github.com/metadatastician/chronicles-of-slavia/discussions) |
 | **Other enquiries** | See [README](../README.adoc) for contact information |
 
@@ -372,7 +385,7 @@ This security policy may be updated from time to time. Significant changes will 
 
 ---
 
-*Thank you for helping keep chronicles-of-slavia and its users safe.* 🛡️
+*Thank you for helping keep Chronicles of Slavia and its users safe.* 🛡️
 
 ---
 

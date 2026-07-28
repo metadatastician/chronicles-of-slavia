@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: MPL-2.0
+-- SPDX-License-Identifier: AGPL-3.0-or-later
 -- Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 --
 -- Typing Proof: Core data type well-formedness
@@ -28,10 +28,20 @@ export
 boundedLeMax : (b : Bounded n) -> LTE b.value n
 boundedLeMax (MkBounded _ prf) = prf
 
+||| Zero is below or equal to every natural.
+|||
+||| This module defines its own LTE as LTERefl/LTEStep rather than the
+||| stdlib's LTEZero/LTESucc, so there is no constructor giving `LTE 0 n`
+||| directly -- it has to be built by induction on n.
+export
+zeroLTE : (n : Nat) -> LTE 0 n
+zeroLTE Z     = LTERefl
+zeroLTE (S k) = LTEStep (zeroLTE k)
+
 ||| Proof that zero is always a valid Bounded value.
 export
 zeroIsBounded : {n : Nat} -> Bounded (S n)
-zeroIsBounded = MkBounded 0 ?zeroIsBounded_prf
+zeroIsBounded {n} = MkBounded 0 (zeroLTE (S n))
 
 ||| Example: A non-empty list with a compile-time guarantee.
 public export

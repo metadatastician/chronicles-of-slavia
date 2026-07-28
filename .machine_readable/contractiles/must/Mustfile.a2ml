@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Mustfile — Physical state contract for chronicles-of-slavia
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
@@ -138,6 +138,24 @@ a single failure is intended to block release once a runner exists.
 - run: grep -q 'cargo test -p slavia-core' Justfile
 - severity: critical
 - notes: Guards the fix in PR #7. Until 2026-07-17 the test/lint/fmt/fmt-check recipes were stubs that printed "Tests passed!" and ran nothing, so `just quality` was three no-ops reporting success while ANCHOR.a2ml declared that same path verifies Zone A's five beats, the ESM testbed and L2 determinism. A grep is a weak assertion — it catches reversion to a stub, not a suite that has rotted — but it is honest about what it checks, which the recipe it guards was not.
+
+## Determinism
+
+### esm-is-float-free
+- description: The cognition layer carries no IEEE floats (Enaction ADR-0015)
+- run: ! grep -rqE '\b(f32|f64)\b' engine/slavia-core/src/esm/
+- severity: critical
+- notes: |
+  Confidence here is the number of solutions a query returns, not a scalar.
+  There is no suspicion float, no tuned heuristic, and no distance threshold
+  in this layer, and that is the property which makes it a candidate for the
+  shared kernel at all.
+
+  A comparison against a float threshold turns a float into a discrete
+  decision, which is where a one-ULP difference becomes a divergent replay.
+  L2 must also stay provable and wasm32-clean.
+
+  Scope is engine/slavia-core/src/esm/ only. The render layer is unaffected.
 
 ## Git State
 
