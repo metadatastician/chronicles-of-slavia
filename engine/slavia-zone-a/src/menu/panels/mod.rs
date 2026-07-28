@@ -13,6 +13,7 @@ mod new_chronicle;
 pub mod settings;
 mod world_book;
 
+use crate::menu::fonts::MenuFont;
 use crate::menu::nav::{CurrentPanel, MenuView, UiSettings};
 use crate::menu::shell::ContextPanelRoot;
 use crate::menu::theme;
@@ -21,10 +22,11 @@ use bevy::prelude::*;
 
 /// Shared small heading widget every panel opens with, so the eight panel
 /// modules don't each re-derive the same `Text`/`TextFont`/`TextColor` bundle.
-pub fn heading(p: &mut ChildBuilder, title: &str) {
+pub fn heading(p: &mut ChildBuilder, font: &MenuFont, title: &str) {
     p.spawn((
         Text::new(title.to_string()),
         TextFont {
+            font: font.bold.clone(),
             font_size: 22.0,
             ..default()
         },
@@ -33,10 +35,11 @@ pub fn heading(p: &mut ChildBuilder, title: &str) {
 }
 
 /// Shared body-text widget for a panel's ordinary paragraphs.
-pub fn body(p: &mut ChildBuilder, text: &str) {
+pub fn body(p: &mut ChildBuilder, font: &MenuFont, text: &str) {
     p.spawn((
         Text::new(text.to_string()),
         TextFont {
+            font: font.regular.clone(),
             font_size: 14.0,
             ..default()
         },
@@ -47,7 +50,7 @@ pub fn body(p: &mut ChildBuilder, text: &str) {
 /// One "pillar"/"tag" style small card: a bold label + a short description,
 /// the shape the mock-up reuses across the World Book, Chapter Map, and
 /// New Chronicle panels.
-pub fn card(p: &mut ChildBuilder, label: &str, desc: &str) {
+pub fn card(p: &mut ChildBuilder, font: &MenuFont, label: &str, desc: &str) {
     p.spawn(Node {
         flex_direction: FlexDirection::Column,
         padding: UiRect::all(Val::Px(10.0)),
@@ -60,6 +63,7 @@ pub fn card(p: &mut ChildBuilder, label: &str, desc: &str) {
         c.spawn((
             Text::new(label.to_string()),
             TextFont {
+                font: font.bold.clone(),
                 font_size: 15.0,
                 ..default()
             },
@@ -68,6 +72,7 @@ pub fn card(p: &mut ChildBuilder, label: &str, desc: &str) {
         c.spawn((
             Text::new(desc.to_string()),
             TextFont {
+                font: font.regular.clone(),
                 font_size: 13.0,
                 ..default()
             },
@@ -80,6 +85,7 @@ pub fn dispatch(
     mut commands: Commands,
     current: Res<CurrentPanel>,
     settings: Res<UiSettings>,
+    font: Res<MenuFont>,
     root: Query<Entity, With<ContextPanelRoot>>,
     children: Query<&Children>,
 ) {
@@ -96,25 +102,27 @@ pub fn dispatch(
     }
     let view = current.0;
     let settings = *settings;
+    let font = font.clone();
     commands.entity(root_entity).with_children(|p| match view {
-        MenuView::Continue => continue_panel(p),
-        MenuView::NewChronicle => new_chronicle::build(p),
-        MenuView::Chapters => chapters::build(p),
-        MenuView::WorldBook => world_book::build(p),
-        MenuView::Bond => bond::build(p),
-        MenuView::Ums => ums_panel(p),
-        MenuView::Settings => settings::build(p, &settings),
-        MenuView::Credits => credits::build(p),
+        MenuView::Continue => continue_panel(p, &font),
+        MenuView::NewChronicle => new_chronicle::build(p, &font),
+        MenuView::Chapters => chapters::build(p, &font),
+        MenuView::WorldBook => world_book::build(p, &font),
+        MenuView::Bond => bond::build(p, &font),
+        MenuView::Ums => ums_panel(p, &font),
+        MenuView::Settings => settings::build(p, &font, &settings),
+        MenuView::Credits => credits::build(p, &font),
     });
 }
 
 /// Honestly disabled — there is no save system anywhere in this codebase yet
 /// (see `menu/mod.rs`'s doc comment). No fabricated "18 minutes played"
 /// progress card.
-fn continue_panel(p: &mut ChildBuilder) {
-    heading(p, "Continue the Chronicle");
+fn continue_panel(p: &mut ChildBuilder, font: &MenuFont) {
+    heading(p, font, "Continue the Chronicle");
     body(
         p,
+        font,
         "No saved chronicle yet. Saving isn't built - begin a new one below.",
     );
 }
@@ -123,10 +131,11 @@ fn continue_panel(p: &mut ChildBuilder) {
 /// that a real implementation "must not move Slavia-specific ontology into
 /// Universal Modding Studio Core" — UMS is a separate external platform
 /// (`ECOSYSTEM.a2ml` lists it as a prospective-consumer), not integrated here.
-fn ums_panel(p: &mut ChildBuilder) {
-    heading(p, "Universal Modding Studio");
+fn ums_panel(p: &mut ChildBuilder, font: &MenuFont) {
+    heading(p, font, "Universal Modding Studio");
     body(
         p,
+        font,
         "Chronicles of Slavia is authored as a profile within the separate \
          Universal Modding Studio platform. That authoring surface isn't part \
          of this build - this panel is a placeholder for the portal, not the \

@@ -7,23 +7,27 @@
 //! gameplay already demonstrates the grammar; text only here.
 
 use super::{body, card, heading};
+use crate::menu::fonts::MenuFont;
 use bevy::prelude::*;
 
-pub fn build(p: &mut ChildBuilder) {
-    heading(p, "Anya & Donna");
+pub fn build(p: &mut ChildBuilder, font: &MenuFont) {
+    heading(p, font, "Anya & Donna");
     body(
         p,
+        font,
         "Two lands, one heart - each girl can only do her own half of the \
          world's grammar. Neither can do the other's act.",
     );
     card(
         p,
+        font,
         "Anya - chaos, movement, courage, quickening",
         "\"It saw her chaos. It needed her chaos.\" She stirs the world; her \
          chaos is not destructive, it is transformative.",
     );
     card(
         p,
+        font,
         "Donna - order, care, structure, settling",
         "\"It saw her order. It needed her order.\" She settles the world; her \
          order is not rigid, it is protective.",
