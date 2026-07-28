@@ -18,6 +18,10 @@ render = ["dep:bevy"]
 
 [dependencies]
 slavia-core = { path = "../slavia-core" }
+# Save/load (native-only, unconditional — matches slavia-core's own use of
+# these for its SGS loader, not gated behind `render`).
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
 # x11 only (no `wayland`): wayland-sys needs libwayland-dev at build time, which
 # isn't guaranteed present. x11 loads at runtime (no build-time system lib) and
 # runs fine under WSLg via XWayland. Add "wayland" back if libwayland-dev is

@@ -39,3 +39,21 @@ pub fn gold() -> Color {
 pub fn gold_soft() -> Color {
     Color::srgb_u8(0x9c, 0x79, 0x48)
 }
+/// The Rift's seam — pulses between these two in `background::animate_rift`.
+pub fn rift() -> Color {
+    Color::srgb_u8(0xad, 0x70, 0xe7)
+}
+pub fn rift_hot() -> Color {
+    Color::srgb_u8(0xe8, 0x8b, 0xd7)
+}
+/// Heroine costume colors, shared between `background`/`heroine` (the
+/// centre-stage figures) — one-off world/scene colors (ridge, moon, birds,
+/// bridge, ...) live as local helpers in `background.rs`/`heroine.rs`
+/// themselves, matching `render.rs`'s own convention of colocating
+/// gameplay-scene colors rather than centralizing every hue here.
+pub fn anya() -> Color {
+    Color::srgb_u8(0xe8, 0x57, 0x4f)
+}
+pub fn donna() -> Color {
+    Color::srgb_u8(0x65, 0xa9, 0x6b)
+}
