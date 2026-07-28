@@ -3300,7 +3300,9 @@ name = "slavia-zone-a"
 version = "0.0.0"
 dependencies = [
  "bevy",
+ "serde",
  "slavia-core",
+ "toml",
 ]
 
 [[package]]

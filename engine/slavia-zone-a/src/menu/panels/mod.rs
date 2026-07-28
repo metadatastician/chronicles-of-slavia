@@ -8,6 +8,7 @@
 
 mod bond;
 mod chapters;
+mod continue_chronicle;
 mod credits;
 mod new_chronicle;
 pub mod settings;
@@ -16,7 +17,7 @@ mod world_book;
 use crate::menu::fonts::MenuFont;
 use crate::menu::nav::{CurrentPanel, MenuView, UiSettings};
 use crate::menu::shell::ContextPanelRoot;
-use crate::menu::theme;
+use crate::menu::{theme, LaunchMode, SaveSlot};
 use crate::state::AppState;
 use bevy::prelude::*;
 
@@ -85,6 +86,7 @@ pub fn dispatch(
     mut commands: Commands,
     current: Res<CurrentPanel>,
     settings: Res<UiSettings>,
+    save_slot: Res<SaveSlot>,
     font: Res<MenuFont>,
     root: Query<Entity, With<ContextPanelRoot>>,
     children: Query<&Children>,
@@ -104,7 +106,7 @@ pub fn dispatch(
     let settings = *settings;
     let font = font.clone();
     commands.entity(root_entity).with_children(|p| match view {
-        MenuView::Continue => continue_panel(p, &font),
+        MenuView::Continue => continue_chronicle::build(p, &font, save_slot.0.as_ref()),
         MenuView::NewChronicle => new_chronicle::build(p, &font),
         MenuView::Chapters => chapters::build(p, &font),
         MenuView::WorldBook => world_book::build(p, &font),
@@ -113,18 +115,6 @@ pub fn dispatch(
         MenuView::Settings => settings::build(p, &font, &settings),
         MenuView::Credits => credits::build(p, &font),
     });
-}
-
-/// Honestly disabled — there is no save system anywhere in this codebase yet
-/// (see `menu/mod.rs`'s doc comment). No fabricated "18 minutes played"
-/// progress card.
-fn continue_panel(p: &mut ChildBuilder, font: &MenuFont) {
-    heading(p, font, "Continue the Chronicle");
-    body(
-        p,
-        font,
-        "No saved chronicle yet. Saving isn't built - begin a new one below.",
-    );
 }
 
 /// Static stub only. `docs/design/20-startup-interface-mockup.md` is explicit
@@ -143,9 +133,9 @@ fn ums_panel(p: &mut ChildBuilder, font: &MenuFont) {
     );
 }
 
-/// The one real transition in the whole menu: "Begin New Chronicle" ->
-/// [`AppState::Playing`]. Zone A's own `setup` (`crate::render`) constructs
-/// a fresh [`crate::session::Session`] on `OnEnter(Playing)`.
+/// "Begin New Chronicle" -> [`AppState::Playing`] with a fresh
+/// [`crate::session::Session`] (`crate::render::setup` reads [`LaunchMode`]
+/// to decide `Session::new()` vs restoring a save).
 pub fn begin_chronicle(
     q: Query<
         &Interaction,
@@ -154,10 +144,34 @@ pub fn begin_chronicle(
             With<new_chronicle::BeginChronicleButton>,
         ),
     >,
+    mut launch: ResMut<LaunchMode>,
     mut next: ResMut<NextState<AppState>>,
 ) {
     for interaction in &q {
         if *interaction == Interaction::Pressed {
+            *launch = LaunchMode::New;
+            next.set(AppState::Playing);
+        }
+    }
+}
+
+/// "Continue the Chronicle" -> [`AppState::Playing`], restoring the last
+/// save (`crate::render::setup` does the actual restore, reading
+/// [`LaunchMode`] and [`SaveSlot`]).
+pub fn continue_chronicle(
+    q: Query<
+        &Interaction,
+        (
+            Changed<Interaction>,
+            With<continue_chronicle::ContinueButton>,
+        ),
+    >,
+    mut launch: ResMut<LaunchMode>,
+    mut next: ResMut<NextState<AppState>>,
+) {
+    for interaction in &q {
+        if *interaction == Interaction::Pressed {
+            *launch = LaunchMode::Continue;
             next.set(AppState::Playing);
         }
     }

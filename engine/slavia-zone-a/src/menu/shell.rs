@@ -8,7 +8,7 @@
 
 use crate::menu::fonts::MenuFont;
 use crate::menu::nav::{label, CurrentPanel, MenuView, NavButton};
-use crate::menu::theme;
+use crate::menu::{theme, SaveSlot};
 use bevy::prelude::*;
 
 /// Everything `spawn_shell` creates — despawned wholesale on `OnExit`.
@@ -20,18 +20,30 @@ pub struct MenuShellRoot;
 #[derive(Component)]
 pub struct ContextPanelRoot;
 
-const NAV_ORDER: [(MenuView, bool); 8] = [
-    (MenuView::Continue, false), // no save system yet — see menu/mod.rs doc comment
-    (MenuView::NewChronicle, true),
-    (MenuView::Chapters, true),
-    (MenuView::WorldBook, true),
-    (MenuView::Bond, true),
-    (MenuView::Ums, true),
-    (MenuView::Settings, true),
-    (MenuView::Credits, true),
+/// An empty UI mount point — reserves layout space over the world-space
+/// centre column so the nav/context "glass" panels either side don't
+/// visually overlap where `crate::menu::heroine` draws Anya & Donna
+/// underneath. Carries no content of its own.
+#[derive(Component)]
+pub struct CentreStageRoot;
+
+const NAV_ORDER: [MenuView; 8] = [
+    MenuView::Continue,
+    MenuView::NewChronicle,
+    MenuView::Chapters,
+    MenuView::WorldBook,
+    MenuView::Bond,
+    MenuView::Ums,
+    MenuView::Settings,
+    MenuView::Credits,
 ];
 
-pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>, font: Res<MenuFont>) {
+pub fn spawn_shell(
+    mut commands: Commands,
+    mut current: ResMut<CurrentPanel>,
+    font: Res<MenuFont>,
+    save_slot: Res<SaveSlot>,
+) {
     let regular = font.regular.clone();
     let bold = font.bold.clone();
     // Force a change signal even if the panel selection is unchanged from
@@ -49,7 +61,10 @@ pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>, fo
                 flex_direction: FlexDirection::Column,
                 ..default()
             },
-            BackgroundColor(theme::night()),
+            // Transparent: the world layer (`crate::menu::background`/
+            // `heroine`) shows through behind the UI; only the topbar/nav/
+            // context "glass" panels below keep their own backgrounds.
+            BackgroundColor(Color::NONE),
         ))
         .with_children(|root| {
             // topbar
@@ -102,7 +117,11 @@ pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>, fo
                 })
                 .insert(BorderColor(theme::line()))
                 .with_children(|nav| {
-                    for (view, enabled) in NAV_ORDER {
+                    for view in NAV_ORDER {
+                        let enabled = match view {
+                            MenuView::Continue => save_slot.0.is_some(),
+                            _ => true,
+                        };
                         let (title, sub, key) = label(view);
                         let border = if current.0 == view {
                             theme::gold()
@@ -137,10 +156,16 @@ pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>, fo
                                 TextColor(title_color),
                             ));
                             b.spawn((
-                                Text::new(if enabled {
-                                    sub.to_string()
-                                } else {
+                                Text::new(if !enabled {
                                     format!("{sub} - no saved chronicle yet")
+                                } else if view == MenuView::Continue {
+                                    save_slot
+                                        .0
+                                        .as_ref()
+                                        .map(|d| d.summary.clone())
+                                        .unwrap_or_else(|| sub.to_string())
+                                } else {
+                                    sub.to_string()
                                 }),
                                 TextFont {
                                     font: regular.clone(),
@@ -153,11 +178,22 @@ pub fn spawn_shell(mut commands: Commands, mut current: ResMut<CurrentPanel>, fo
                     }
                 });
 
+                // centre stage: reserves layout space over the world-space
+                // heroine figures (`crate::menu::heroine`) — no content of
+                // its own, so nothing renders here but the world behind it.
+                body.spawn((
+                    CentreStageRoot,
+                    Node {
+                        flex_grow: 1.0,
+                        ..default()
+                    },
+                ));
+
                 // panel mount point
                 body.spawn((
                     ContextPanelRoot,
                     Node {
-                        flex_grow: 1.0,
+                        width: Val::Px(360.0),
                         padding: UiRect::all(Val::Px(24.0)),
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(10.0),

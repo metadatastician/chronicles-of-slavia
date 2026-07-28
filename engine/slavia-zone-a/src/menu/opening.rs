@@ -29,7 +29,10 @@ pub fn spawn_opening(mut commands: Commands, font: Res<MenuFont>) {
                 row_gap: Val::Px(14.0),
                 ..default()
             },
-            BackgroundColor(theme::night()),
+            // Transparent: the world layer (`crate::menu::background`) shows
+            // through behind the title card, matching the mock-up's own
+            // veil-over-world framing.
+            BackgroundColor(Color::NONE),
         ))
         .with_children(|p| {
             p.spawn((

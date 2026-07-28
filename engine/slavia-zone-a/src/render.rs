@@ -22,6 +22,8 @@
 //! single `Camera2d` is spawned once, for the app's whole lifetime, in
 //! `main.rs` — not here — since both the menu and Zone A render through it.
 
+use crate::menu::{LaunchMode, SaveSlot};
+use crate::save;
 use crate::session::{BirdState, Crossing, Session, Settle};
 use crate::state::AppState;
 use bevy::prelude::*;
@@ -212,8 +214,15 @@ fn print_controls() {
     );
 }
 
-fn setup(mut commands: Commands) {
-    let session = Session::new();
+fn setup(mut commands: Commands, launch: Res<LaunchMode>, save_slot: Res<SaveSlot>) {
+    let session = match *launch {
+        LaunchMode::Continue => save_slot
+            .0
+            .as_ref()
+            .map(Session::restore)
+            .unwrap_or_default(),
+        LaunchMode::New => Session::new(),
+    };
 
     // lands: forest (left), mountains (right)
     commands.spawn((
@@ -487,13 +496,24 @@ fn setup(mut commands: Commands) {
     });
 }
 
-/// Leaving [`AppState::Playing`]: despawn the whole Zone A scene and drop its
-/// [`Game`] resource, so re-entering later starts a genuinely fresh
-/// [`Session`] rather than resuming stale state.
-fn teardown(mut commands: Commands, q: Query<Entity, With<ZoneAEntity>>) {
+/// Leaving [`AppState::Playing`]: despawn the whole Zone A scene, autosave
+/// the session that's ending (so "Continue the Chronicle" reflects it
+/// immediately, without a re-read from disk), and drop the [`Game`]
+/// resource.
+fn teardown(
+    mut commands: Commands,
+    q: Query<Entity, With<ZoneAEntity>>,
+    game: Res<Game>,
+    mut save_slot: ResMut<SaveSlot>,
+) {
     for e in &q {
         commands.entity(e).despawn_recursive();
     }
+    let data = game.session.to_save_data();
+    if let Err(e) = save::write(&data) {
+        eprintln!("(could not save: {e})");
+    }
+    save_slot.0 = Some(data);
     commands.remove_resource::<Game>();
 }
 
@@ -784,13 +804,18 @@ fn sync(
 }
 
 /// Narrate as Zone A's five understanding-beats (`docs/design/00-start-here.md`)
-/// come in, once per beat rather than once per frame.
+/// come in, once per beat rather than once per frame. Also autosaves at the
+/// same cadence — crash resilience beyond "only saves on a clean Esc"
+/// (`teardown` handles that path).
 fn announce_progress(mut game: ResMut<Game>) {
     let count = game.session.beats.count();
     if count == game.last_beat_count {
         return;
     }
     game.last_beat_count = count;
+    if let Err(e) = save::write(&game.session.to_save_data()) {
+        eprintln!("(could not save: {e})");
+    }
     if game.session.beats.all() {
         println!("Two lands, one heart — Zone A's answer is complete.");
     } else if game.session.beats.nature_answered() {
