@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
 //! M2.1 Bevy renderer — free-roam Zone A over `slavia-core` (the real foundation,
@@ -15,8 +15,17 @@
 //! (`beat_units_for_x`) and fed back into `Session`, so interaction gating
 //! (bird approach, bridge crossing, the Rift) is answered by the rules core,
 //! not by ad hoc pixel-proximity checks.
+//!
+//! Lives behind [`AppState::Playing`] (`crate::state`) — [`ZoneAPlugin`] only
+//! runs its systems in that state, so the menu (`crate::menu`) can sit in
+//! front of it in the same `App`/binary without the two ever colliding. The
+//! single `Camera2d` is spawned once, for the app's whole lifetime, in
+//! `main.rs` — not here — since both the menu and Zone A render through it.
 
+use crate::menu::{LaunchMode, SaveSlot};
+use crate::save;
 use crate::session::{BirdState, Crossing, Session, Settle};
+use crate::state::AppState;
 use bevy::prelude::*;
 
 const GROUND_Y: f32 = -140.0; // feet level
@@ -124,6 +133,12 @@ struct Girl {
     hair_y: f32,
 }
 
+/// Marks every entity `setup` spawns (except the persistent camera, owned by
+/// `main.rs`), so `teardown` can despawn exactly the Zone A scene and nothing
+/// else when leaving [`AppState::Playing`].
+#[derive(Component)]
+struct ZoneAEntity;
+
 #[derive(Component)]
 struct BirdSprite;
 #[derive(Component)]
@@ -167,28 +182,22 @@ struct BodyPart(&'static str, Part);
 #[derive(Component)]
 struct HairSprite(&'static str);
 
-pub fn run() {
-    print_controls();
-    App::new()
-        .insert_resource(ClearColor(sky(false)))
-        .insert_resource(Game {
-            session: Session::new(),
-            last_beat_count: 0,
-        })
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "Chronicles of Slavia — Zone A (Bevy · M2.1)".into(),
-                resolution: (1180.0_f32, 640.0_f32).into(),
-                ..default()
-            }),
-            ..default()
-        }))
-        .add_systems(Startup, setup)
-        .add_systems(
-            Update,
-            (input, physics, reactive_rig, sync, announce_progress, quit).chain(),
-        )
-        .run();
+/// Real Zone A gameplay, gated to [`AppState::Playing`]. `main.rs` owns the
+/// `App`, the window, and the one persistent `Camera2d`; this plugin owns
+/// only the scene and its systems.
+pub struct ZoneAPlugin;
+
+impl Plugin for ZoneAPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(OnEnter(AppState::Playing), (print_controls, setup))
+            .add_systems(OnExit(AppState::Playing), teardown)
+            .add_systems(
+                Update,
+                (input, physics, reactive_rig, sync, announce_progress, quit)
+                    .chain()
+                    .run_if(in_state(AppState::Playing)),
+            );
+    }
 }
 
 fn print_controls() {
@@ -205,8 +214,15 @@ fn print_controls() {
     );
 }
 
-fn setup(mut commands: Commands, game: Res<Game>) {
-    commands.spawn(Camera2d);
+fn setup(mut commands: Commands, launch: Res<LaunchMode>, save_slot: Res<SaveSlot>) {
+    let session = match *launch {
+        LaunchMode::Continue => save_slot
+            .0
+            .as_ref()
+            .map(Session::restore)
+            .unwrap_or_default(),
+        LaunchMode::New => Session::new(),
+    };
 
     // lands: forest (left), mountains (right)
     commands.spawn((
@@ -216,6 +232,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
             ..default()
         },
         Transform::from_xyz(-360.0, GROUND_Y - 40.0, -20.0),
+        ZoneAEntity,
     ));
     commands.spawn((
         Sprite {
@@ -224,6 +241,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
             ..default()
         },
         Transform::from_xyz(360.0, GROUND_Y - 40.0, -20.0),
+        ZoneAEntity,
     ));
 
     // ground either side of the gorge
@@ -235,6 +253,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
             ..default()
         },
         Transform::from_xyz(-640.0 + left_w / 2.0, GROUND_Y - 60.0, -10.0),
+        ZoneAEntity,
     ));
     let right_w = 640.0 - (BRIDGE_X + GORGE_HALF);
     commands.spawn((
@@ -248,6 +267,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
             GROUND_Y - 60.0,
             -10.0,
         ),
+        ZoneAEntity,
     ));
 
     // water tiers: light wade bands at the banks, dark abyss in the middle
@@ -263,6 +283,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
                 GROUND_Y - 90.0,
                 -12.0,
             ),
+            ZoneAEntity,
         ));
     }
     let abyss_w = (GORGE_HALF - WADE) * 2.0;
@@ -273,6 +294,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
             ..default()
         },
         Transform::from_xyz(BRIDGE_X, GROUND_Y - 110.0, -12.0),
+        ZoneAEntity,
     ));
 
     // grove birds
@@ -289,6 +311,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
                 0.0,
             ),
             BirdSprite,
+            ZoneAEntity,
         ));
     }
 
@@ -297,7 +320,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
     // as Bevy children, so the group transform composes onto every part for
     // free. Colors ported from the JS prototype's own costume palette
     // (`prototype/zone-a/index.html`), not invented fresh.
-    for c in game.session.characters().iter() {
+    for c in session.characters().iter() {
         let id: &'static str = if c.id == "anya" { "anya" } else { "donna" };
         let x = ENTRANCE_X + if id == "anya" { 22.0 } else { -14.0 };
         let y = GROUND_Y + GIRL_H / 2.0; // physics' own center-referenced y
@@ -307,6 +330,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
             .spawn((
                 Transform::from_xyz(x, y - GIRL_H / 2.0, 1.0),
                 Visibility::default(),
+                ZoneAEntity,
                 Girl {
                     id,
                     x,
@@ -450,6 +474,7 @@ fn setup(mut commands: Commands, game: Res<Game>) {
             },
             Transform::from_xyz(-26.0 + i as f32 * 26.0, 270.0, 2.0),
             PipSprite(i),
+            ZoneAEntity,
         ));
     }
 
@@ -462,7 +487,34 @@ fn setup(mut commands: Commands, game: Res<Game>) {
         },
         Transform::from_xyz(BRIDGE_X, 40.0, 5.0),
         RiftSprite,
+        ZoneAEntity,
     ));
+
+    commands.insert_resource(Game {
+        session,
+        last_beat_count: 0,
+    });
+}
+
+/// Leaving [`AppState::Playing`]: despawn the whole Zone A scene, autosave
+/// the session that's ending (so "Continue the Chronicle" reflects it
+/// immediately, without a re-read from disk), and drop the [`Game`]
+/// resource.
+fn teardown(
+    mut commands: Commands,
+    q: Query<Entity, With<ZoneAEntity>>,
+    game: Res<Game>,
+    mut save_slot: ResMut<SaveSlot>,
+) {
+    for e in &q {
+        commands.entity(e).despawn_recursive();
+    }
+    let data = game.session.to_save_data();
+    if let Err(e) = save::write(&data) {
+        eprintln!("(could not save: {e})");
+    }
+    save_slot.0 = Some(data);
+    commands.remove_resource::<Game>();
 }
 
 fn active_id(game: &Game) -> String {
@@ -752,13 +804,18 @@ fn sync(
 }
 
 /// Narrate as Zone A's five understanding-beats (`docs/design/00-start-here.md`)
-/// come in, once per beat rather than once per frame.
+/// come in, once per beat rather than once per frame. Also autosaves at the
+/// same cadence — crash resilience beyond "only saves on a clean Esc"
+/// (`teardown` handles that path).
 fn announce_progress(mut game: ResMut<Game>) {
     let count = game.session.beats.count();
     if count == game.last_beat_count {
         return;
     }
     game.last_beat_count = count;
+    if let Err(e) = save::write(&game.session.to_save_data()) {
+        eprintln!("(could not save: {e})");
+    }
     if game.session.beats.all() {
         println!("Two lands, one heart — Zone A's answer is complete.");
     } else if game.session.beats.nature_answered() {
@@ -768,26 +825,12 @@ fn announce_progress(mut game: ResMut<Game>) {
     }
 }
 
-/// Narrate as Zone A's five understanding-beats (`docs/design/00-start-here.md`)
-/// come in, once per beat rather than once per frame.
-fn announce_progress(mut game: ResMut<Game>) {
-    let count = game.session.beats.count();
-    if count == game.last_beat_count {
-        return;
-    }
-    game.last_beat_count = count;
-    if game.session.beats.all() {
-        println!("Two lands, one heart — Zone A's answer is complete.");
-    } else if game.session.beats.nature_answered() {
-        println!("Nature has answered ({count}/5 understood).");
-    } else {
-        println!("({count}/5 understood.)");
-    }
-}
-
-fn quit(keys: Res<ButtonInput<KeyCode>>, mut exit: EventWriter<AppExit>) {
+/// Esc returns to the menu (`AppState::MenuShell`), not straight to desktop —
+/// matches the mock-up's own "portal" framing and exercises `teardown` on
+/// every playthrough, not just at process exit.
+fn quit(keys: Res<ButtonInput<KeyCode>>, mut next: ResMut<NextState<AppState>>) {
     if keys.just_pressed(KeyCode::Escape) {
-        exit.send(AppExit::Success);
+        next.set(AppState::MenuShell);
     }
 }
 

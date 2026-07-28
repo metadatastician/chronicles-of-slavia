@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: MPL-2.0
+-- SPDX-License-Identifier: AGPL-3.0-or-later
 -- Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 --
 -- ABI Proof: C ABI compliance
@@ -38,4 +38,14 @@ record CABICompliant (layout : StructLayout) where
 ||| An empty struct is trivially compliant (size=1, alignment=1).
 export
 emptyStructCompliant : CABICompliant (MkLayout "empty" [] 1 1)
-emptyStructCompliant = MkCompliant AFANil AFBNil ?emptyStructCompliant_sizeAligned
+emptyStructCompliant = MkCompliant AFANil AFBNil emptySizeAligned
+  where
+    -- `ok` must be matched, not left abstract: modNatNZ pattern-matches on the
+    -- NonZero witness, so with `ok` opaque the term does not reduce and Refl
+    -- cannot typecheck. NonZero 1 has the single inhabitant SIsNonZero, so the
+    -- match is total.
+    --
+    -- With ok = SIsNonZero: modNatNZ 1 1 SIsNonZero reduces through mod' 1 1 0
+    -- -> (1 <= 0 is False) -> mod' 0 (minus 1 1) 0 -> mod' 0 0 0 -> 0.
+    emptySizeAligned : {ok : NonZero 1} -> modNatNZ 1 1 ok = 0
+    emptySizeAligned {ok = SIsNonZero} = Refl

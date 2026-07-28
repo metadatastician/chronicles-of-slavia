@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # GitHub Pages via casket-ssg (hyperpolymath's pure-Haskell static site generator).
 # Replaces the orphan one-off Pages deployment with a reproducible build.
 name: GitHub Pages

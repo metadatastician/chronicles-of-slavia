@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
 //! The play session — the *only* place the renderer touches the rules.
@@ -10,6 +10,8 @@
 //! types — the whole traversal is testable headlessly, and it survives any
 //! future engine choice (M2) because it is engine-agnostic.
 
+use crate::save::SaveData;
+use serde::{Deserialize, Serialize};
 use slavia_core::{zone_a, Beat, Character, CrossError, Response, World};
 use std::collections::HashMap;
 
@@ -19,7 +21,7 @@ const BIRD_GROVE: &str = "bird-grove";
 const STREAM_BRIDGE: &str = "stream-bridge";
 
 /// The visible mood of the grove birds, from the last time a girl reached them.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BirdState {
     Neutral,
     Stirred,
@@ -40,7 +42,7 @@ impl BirdState {
 
 /// The five things a player should come to understand in Zone A
 /// (`docs/design/00-start-here.md`), tracked as they actually happen.
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 pub struct Beats {
     pub anya_stirred: bool,
     pub donna_settled: bool,
@@ -125,6 +127,38 @@ impl Session {
             beats: Beats::default(),
             pos,
             revealed,
+        }
+    }
+
+    /// Snapshot everything needed to resume this session later.
+    pub fn to_save_data(&self) -> SaveData {
+        SaveData {
+            active_id: self.active_id().to_string(),
+            rift_active: self.world.rift_active,
+            bridge_stable: self.world.bridge_stable,
+            crossed: self.world.crossed,
+            birds: self.birds,
+            beats: self.beats,
+            pos: self.pos.clone(),
+            revealed: self.revealed.clone(),
+            summary: format!("{}, at {}", self.active_name(), self.current_beat().title),
+        }
+    }
+
+    /// Rebuild a session from a save — both girls' positions and the
+    /// world's transition state restored exactly as they were.
+    pub fn restore(data: &SaveData) -> Session {
+        let mut world = World::new(zone_a());
+        world.switch_to(&data.active_id);
+        world.rift_active = data.rift_active;
+        world.bridge_stable = data.bridge_stable;
+        world.crossed = data.crossed;
+        Session {
+            world,
+            birds: data.birds,
+            beats: data.beats,
+            pos: data.pos.clone(),
+            revealed: data.revealed.clone(),
         }
     }
 
@@ -350,6 +384,32 @@ mod tests {
         let mut s = Session::new();
         s.move_active(3.0);
         assert_eq!(s.cross(), Crossing::Unpassable);
+    }
+
+    /// A save round-trips through an actual TOML string (not just the
+    /// struct) and restores an in-progress walk exactly: both girls'
+    /// positions, revealed beats, and world transition state.
+    #[test]
+    fn save_round_trips_through_toml() {
+        let mut s = Session::new();
+        s.move_active(1.0); // Anya to the grove
+        assert_eq!(s.approach_birds(), Some(Response::Stirred));
+        s.toggle_character();
+        s.move_active(3.0); // Donna: entrance(0) -> bridge(3)
+        assert_eq!(s.settle_crossing(), Settle::Settled);
+
+        let data = s.to_save_data();
+        let toml_text = toml::to_string(&data).expect("serializes");
+        let restored: crate::save::SaveData = toml::from_str(&toml_text).expect("deserializes");
+        let s2 = Session::restore(&restored);
+
+        assert_eq!(s2.active_name(), "Donna");
+        assert_eq!(s2.active_pos(), 3.0);
+        assert_eq!(s2.pos_of("anya"), 1.0);
+        assert!(s2.beats.anya_stirred);
+        assert!(s2.crossing_passable());
+        assert!(s2.revealed[1]); // the grove, reached along the way
+        assert_eq!(s2.birds, BirdState::Stirred);
     }
 
     #[test]
