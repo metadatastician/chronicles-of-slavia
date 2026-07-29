@@ -12,7 +12,7 @@
 [metadata]
 project = "chronicles-of-slavia"
 version = "0.0.0"          # both crates are 0.0.0 — pre-release, deliberately
-last-updated = "2026-07-25"
+last-updated = "2026-07-29"
 status = "active"          # active | paused | archived
 
 [project-context]
@@ -38,8 +38,8 @@ milestones = [
   { name = "L2 rules core (slavia-core) — emotional grammar, living taxis, spec parsing", completion = 100, evidence = "29 unit tests green; deps are serde + toml only" },
   { name = "M3.1 ESM — belief, kanren, intent, decay (ADR-0004)", completion = 100, evidence = "10 testbed tests green; headless, deliberately not wired to a zone" },
   { name = "UMS Zone A / Border Path profile", completion = 100, evidence = "Sibling UMS profiles/slavia/v1 validates; descriptive only, no runtime loader" },
-  { name = "L3 renderer (Bevy, ADR-0003)", completion = 0, notes = "Adopted on paper; nothing built. The zero-FFI seam is the point of the choice." },
-  { name = "Zones B–E of Chronicle I", completion = 0, notes = "GATED. 08-level1-five-zone-map.md: 'Do not build Zones B–E until Zone A holds.' Zone B is already designed as the Fracture Line (separation) — it is not an environment sandbox." },
+  { name = "L3 renderer (Bevy, ADR-0003)", completion = 85, evidence = "Zone A is fully playable: paper-doll rig, water/physics, grove birds, bridge, Rift (engine/slavia-zone-a/src/render.rs). Real in-game menu (PRs #49/#50) implementing docs/design/chronicles-landing-page.html, with real save/load/continue and animated visual polish (PR #53). Remaining: Settings toggles are wired but drive nothing downstream (no motion/contrast/subtitle systems exist yet); UMS panel is a static stub by design (doc 20); save file lives next to the executable, not an OS-proper save directory (flagged v1 simplification)." },
+  { name = "Zones B–E of Chronicle I", completion = 0, notes = "GATED. 08-level1-five-zone-map.md: 'Do not build Zones B–E until Zone A holds.' Zone B's first full narrative draft (docs/design/24-zone-b-fracture-line.md, PR #54) is now merged — the Fracture Line beat-by-beat design, with 8 open questions for the owner. Still gated: no Zone B engine/SGS work is authorised until those questions are answered and Zone A's own open issues (below) are settled." },
   { name = "Chronicle II (The Echo Engine)", completion = 0 },
   { name = "Chronicle III (The Two Who Were Needed)", completion = 0 },
 ]
@@ -51,29 +51,34 @@ issues = [
   { id = "co-op-vs-switch-only", severity = "high", notes = "CANON SELF-CONTRADICTION. docs/design/13 lists Chronicle II as 'Dual-Character Simultaneous'; 08-level1-five-zone-map.md confirms switch-only single-active-character and says it 'matches the built engine'. Pre-dates the imported material. Touches the engine — settle before Chronicle II work." },
   { id = "chronicle-i-tone", severity = "low", notes = "docs/design/13 calls Chronicle I 'surreal, dangerous, fast-paced'; the built Zone A is 'calm, folkloric' with 'a foreshadowing tremor, not the rupture itself', and Kishōtenketsu wants grounding. 13's tone line may be out of step." },
   { id = "open-design-questions", severity = "low", notes = "Recorded in docs/design/19 and 22, awaiting owner: Chronicle I geography; the per-Chronicle trial spine; ghost platforms; Chronicle III's centre; birch or pine; Mirror Levels vs chiasmus vocabulary; manpu vs Slavic embroidery symbols." },
+  { id = "zone-b-open-questions", severity = "medium", notes = "8 questions in docs/design/24-zone-b-fracture-line.md awaiting owner ruling before Zone B can be scoped: Chronicle I tone (depends on chronicle-i-tone above), whether the crux is playable-or-authored, which girl lands on which shore, the marauder thread, how legible the Rift's intent should be, Zone B's size/room count, the A3 artefact across the split, and whether the Ten/Ketsu shape is fractal at level scale." },
 ]
 
 [critical-next-actions]
 actions = [
+  "Owner: answer Zone B's 8 open questions (docs/design/24-zone-b-fracture-line.md) — nothing past Zone A is scheduled until they're settled, per 08-level1-five-zone-map.md.",
   "Consolidate the bounded Zone A fixture into the canonical UMS profiles/chronicles-of-slavia layout after the UMS SDK reconciliation.",
   "Settle co-op vs switch-only — it constrains the engine and is currently self-contradictory in canon.",
   "Register chronicles-of-slavia in gv-clade-index. CLADE.a2ml now carries the post-transfer UUID (9a94f798-67f8-517c-b88b-4b27417a0218) derived from github.com/metadatastician/chronicles-of-slavia, but the repo is absent from the registry. Owner's action — registration is outward-facing.",
   "Decide whether the ESM earns a place in a real scene, or stays headless. ADR-0004 deliberately left it unwired.",
   "Resolve the 2 ignored tests in the workspace (see [technical-debt]).",
+  "Fix cliff.toml's undefined `OWNER` template variable so `just changelog` runs again (see [technical-debt]).",
 ]
 
 [test-status]
-# Live `cargo test` at the engine workspace root, 2026-07-16.
-passing = 51               # 29 slavia-core unit + 10 esm_testbed + 7 zone_a + 5 slavia-zone-a
+# Live `cargo test --workspace` at the engine root, 2026-07-29.
+passing = 52               # 29 slavia-core unit + 10 esm_testbed + 7 zone_a + 6 slavia-zone-a
 ignored = 2
 failing = 0
-command = "cd engine && cargo test"
+command = "cd engine && cargo test --workspace"
 
 [technical-debt]
 items = [
   { id = "ignored-tests", notes = "2 tests are #[ignore]d somewhere in the workspace. Ignored tests are debt: they are green by not running. Identify and either fix or delete." },
   { id = "esm-unwired", notes = "Deliberate, not accidental (ADR-0004) — but 'unwired is not done' (doctrine 8). The ESM is proven headless against a synthetic cast and has never touched a real scene." },
   { id = "template-residue", notes = "~150 files still carry rsr-template-repo strings or unsubstituted double-brace template tokens. The descriptiles and the arrival pack were corrected 2026-07-16; the wider residue is not yet swept." },
+  { id = "save-file-location", notes = "The save file (engine/slavia-zone-a/src/save.rs) lives next to the running executable, not an OS-appropriate save directory. Deliberate v1 simplification (avoids a new `dirs`-style dependency for no functional gain yet), not a silent cut — flagged here to be revisited." },
+  { id = "git-cliff-template-broken", notes = "`just changelog`/`changelog-preview` fail: .machine_readable/configs/git-cliff/cliff.toml's template references an undefined `OWNER` variable ('Template render error: Variable `OWNER` not found in context'). Found 2026-07-29; CHANGELOG.md's Unreleased section was hand-written instead of generated. Not fixed — the template bug is unrelated to the change that found it." },
 ]
 
 [maintenance-status]
