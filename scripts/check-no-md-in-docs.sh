@@ -58,6 +58,7 @@ ALLOWED=(
   "docs/design/21-manpu-legibility.md"
   "docs/design/22-narrative-structure-per-chronicle.md"
   "docs/design/23-level-scope-and-pacing.md"
+  "docs/design/24-zone-b-fracture-line.md"
   "docs/prompts/repo-build-prompt.md"
 )
 
