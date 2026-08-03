@@ -102,15 +102,22 @@ jobs:
       # and imported conditionally; ensure just is available.
       # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-      # `casey/just` is the just source repository, not a GitHub Action -- it has
-      # no action.yml -- and the SHA previously pinned here exists in no
-      # repository (the API returns 422). GitHub could not build the run graph,
-      # so this workflow reported startup_failure in 0 seconds on every run since
-      # it was created, and never executed a single proof check.
-      - name: Install just
-        uses: extractions/setup-just@4a174aa1487e2bcb3f86a8fe24a05361a4f4fff1 # v1
-        with:
-          just-version: 1.21.0
+      # No action is used here on purpose. This repo runs with
+      # allowed_actions: "selected", and neither `casey/*` (the previous,
+      # doubly-broken pin: not an action, nonexistent SHA) nor `extractions/*`
+      # is on the allow-list — an action from a non-allowlisted owner makes
+      # GitHub reject the whole run as a 0-second startup_failure before any
+      # job starts, which is why this gate never executed once in 81 runs.
+      # A plain checksum-pinned binary download needs no allow-list entry.
+      - name: Install just (action-free, checksum-pinned)
+        run: |
+          JUST_VERSION="1.21.0"
+          JUST_SHA256="3292fd257f2e2dfd4cb0d5650aa5e47d2c99cee1233446378eb45a7b045f3b30"
+          curl -fsSL "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" -o /tmp/just.tar.gz
+          echo "${JUST_SHA256}  /tmp/just.tar.gz" | sha256sum -c -
+          tar -C /tmp -xzf /tmp/just.tar.gz just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
 
       # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       # Run the honest proof gate: proof-check-all runs ALL prover checks + scan.

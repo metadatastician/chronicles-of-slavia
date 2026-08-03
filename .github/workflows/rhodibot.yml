@@ -63,10 +63,16 @@ jobs:
           if [ -f "README.md" ] && [ -f "README.adoc" ] && [ "$(wc -l < README.md)" -lt 5 ]; then
             warn "stub README.md alongside README.adoc (would be removed)"
           fi
-          # SPDX drift — MANUAL owner-only fix, never auto-edited
+          # SPDX drift — MANUAL owner-only fix, never auto-edited.
+          # Per-repo ruling: ADR-0008 (docs/decisions/0008-licence-position.adoc,
+          # PR #45) settles THIS repo on AGPL-3.0-or-later for code, overriding
+          # the estate default of MPL-2.0. The canary therefore checks the
+          # dotfiles against the RULED licence, not the estate default — a
+          # dotfile that matches neither is still drift.
           for dotfile in .gitignore .gitattributes .editorconfig; do
-            if [ -f "$dotfile" ] && grep -q "AGPL-3.0" "$dotfile" 2>/dev/null; then
-              warn "$dotfile carries an AGPL-3.0 SPDX header; estate policy is MPL-2.0 — fix MANUALLY (owner-only, never auto-edited)"
+            if [ -f "$dotfile" ] && grep -q "SPDX-License-Identifier" "$dotfile" 2>/dev/null \
+               && ! grep -q "AGPL-3.0-or-later" "$dotfile" 2>/dev/null; then
+              warn "$dotfile SPDX header does not match this repo's ruled licence (AGPL-3.0-or-later per ADR-0008) — fix MANUALLY (owner-only, never auto-edited)"
             fi
           done
           # would-CREATE: missing required files
