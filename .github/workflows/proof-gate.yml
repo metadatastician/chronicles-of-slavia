@@ -111,10 +111,16 @@ jobs:
       # GitHub reject the whole run as a 0-second startup_failure before any
       # job starts, which is why this gate never executed once in 81 runs.
       # A plain checksum-pinned binary download needs no allow-list entry.
+      # just >= 1.33 is REQUIRED: the root Justfile uses `import?`, and old
+      # just versions (verified on 1.21.0) run imported recipes with the
+      # import file's directory as cwd, so every `./scripts/*.sh` in
+      # build/just/proofs.just exits 127. 1.56.0 runs them from the root
+      # Justfile's directory — reproduced and verified locally on both
+      # versions. Checksum matches the official 1.56.0 SHA256SUMS.
       - name: Install just (action-free, checksum-pinned)
         run: |
-          JUST_VERSION="1.21.0"
-          JUST_SHA256="3292fd257f2e2dfd4cb0d5650aa5e47d2c99cee1233446378eb45a7b045f3b30"
+          JUST_VERSION="1.56.0"
+          JUST_SHA256="fa2a8ec1015d9df5330941ade12437488fc40d33f9c9f8cd4eb70a26de11b639"
           curl -fsSL "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" -o /tmp/just.tar.gz
           echo "${JUST_SHA256}  /tmp/just.tar.gz" | sha256sum -c -
           tar -C /tmp -xzf /tmp/just.tar.gz just
