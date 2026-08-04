@@ -59,6 +59,7 @@ ALLOWED=(
   "docs/design/22-narrative-structure-per-chronicle.md"
   "docs/design/23-level-scope-and-pacing.md"
   "docs/design/24-zone-b-fracture-line.md"
+  "docs/design/25-zone-b-decision-sheet.md"
   "docs/prompts/repo-build-prompt.md"
 )
 
