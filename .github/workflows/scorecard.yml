@@ -18,7 +18,6 @@ permissions:
 
 jobs:
   scorecard:
-    timeout-minutes: 10
     uses: hyperpolymath/standards/.github/workflows/scorecard-reusable.yml@fcb8669169b4e9f5d9848608df880ae5fae812b4
     permissions:
       contents: read
