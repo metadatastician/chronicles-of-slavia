@@ -68,21 +68,34 @@ jobs:
       - name: Check SHA-Pinned Actions
         run: |
           echo "=== Checking Action Pinning ==="
-          # Find any uses: lines that don't have @SHA format
-          # Pattern: uses: owner/repo@<40-char-hex>
-          unpinned=$(grep -rnE "^[[:space:]]+uses:" .github/workflows/ | \
+          # A ref counts as pinned if EITHER:
+          #   (a) it is an inline 40-char SHA pin (uses: owner/repo@<sha>), or
+          #   (b) it is covered by .github/workflows/actions.lock — the
+          #       gh-actions-lock model, where inline refs are tags and the
+          #       authoritative, identity-verified SHA lives in the lockfile
+          #       and is enforced by GitHub before the run starts.
+          unpinned=$(grep -rnE --include='*.yml' --include='*.yaml' "^[[:space:]]+uses:" .github/workflows/ | \
             grep -v "@[a-f0-9]\{40\}" | \
             grep -v "uses: \./\|uses: docker://\|uses: actions/github-script" || true)
 
+          if [ -f .github/workflows/actions.lock ] && [ -n "$unpinned" ]; then
+            unpinned=$(echo "$unpinned" | while IFS= read -r line; do
+              # Normalize to owner/repo@ref: the lockfile keys subpath actions
+              # (github/codeql-action/init@v4) at repo level (github/codeql-action@v4).
+              ref=$(echo "$line" | sed -E "s/.*uses:[[:space:]]*//; s/[[:space:]]*#.*//; s/['\"]//g; s|^([^/]+/[^/@]+)[^@]*@|\1@|")
+              grep -qiF "'$ref':" .github/workflows/actions.lock || echo "$line"
+            done)
+          fi
+
           if [ -n "$unpinned" ]; then
-            echo "ERROR: Found unpinned actions:"
+            echo "ERROR: Found unpinned actions (no inline SHA and not in actions.lock):"
             echo "$unpinned"
             echo ""
-            echo "Replace version tags with SHA pins, e.g.:"
-            echo "  uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.1"
+            echo "Either pin inline:  uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.1"
+            echo "or run 'gh actions-lock' to cover the ref in .github/workflows/actions.lock"
             exit 1
           fi
-          echo "All actions are SHA-pinned"
+          echo "All actions are SHA-pinned (inline or via actions.lock)"
 
       - name: Check for Duplicate Workflows
         run: |
