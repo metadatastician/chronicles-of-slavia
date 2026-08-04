@@ -47,7 +47,22 @@ jobs:
         run: |
           echo "=== Installing apt-based provers ==="
           sudo apt-get update
-          sudo apt-get install -y agda coq openjdk-17-jre-headless
+          sudo apt-get install -y agda agda-stdlib coq openjdk-17-jre-headless
+          # Ubuntu's agda-stdlib package ships ~2000 sources under
+          # /usr/share/agda-stdlib but NO .agda-lib metadata file at all
+          # (verified against the noble file list), so `import Data.Nat`
+          # fails with "Failed to find source of module Data.Nat" until the
+          # library is described and registered by hand:
+          STDLIB_DIR=/usr/share/agda-stdlib
+          [ -d "$STDLIB_DIR" ] || { echo "agda-stdlib dir missing" >&2; exit 1; }
+          printf 'name: standard-library\ninclude: .\n' | sudo tee "$STDLIB_DIR/standard-library.agda-lib" >/dev/null
+          mkdir -p "$HOME/.agda"
+          echo "$STDLIB_DIR/standard-library.agda-lib" >> "$HOME/.agda/libraries"
+          echo "standard-library" >> "$HOME/.agda/defaults"
+          # agda 2.6.3 writes interface files under <lib>/_build/<version>/,
+          # and /usr/share is root-owned — without this the check dies with
+          # "_build: createDirectory: permission denied".
+          sudo install -d -o "$(id -u)" -g "$(id -g)" "$STDLIB_DIR/_build"
           echo "agda:  $(agda --version 2>&1 | head -1 || echo 'unknown')"
           echo "coq:   $(coqc --version 2>&1 | head -1 || echo 'unknown')"
           echo "java:  $(java --version 2>&1 | head -1 || echo 'unknown')"
