@@ -18,10 +18,16 @@ workflows:
         - 'actions/checkout@v7.0.1'
     '.github/workflows/estate-rules.yml':
         - 'actions/checkout@v7.0.1'
+    '.github/workflows/governance.yml':
+        - 'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4'
     '.github/workflows/guix-policy.yml':
         - 'actions/checkout@v7.0.1'
+    '.github/workflows/hypatia-scan.yml':
+        - 'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4'
     '.github/workflows/instant-sync.yml':
         - 'peter-evans/repository-dispatch@v4.0.1'
+    '.github/workflows/mirror.yml':
+        - 'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4'
     '.github/workflows/oikosbot.yml':
         - 'actions/checkout@v7.0.1'
         - 'github/codeql-action@v3.37.3'
@@ -53,6 +59,12 @@ workflows:
         - 'actions/checkout@v7.0.1'
     '.github/workflows/runtime-policy.yml':
         - 'actions/checkout@v6.0.2'
+    '.github/workflows/rust-ci.yml':
+        - 'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4'
+    '.github/workflows/scorecard.yml':
+        - 'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4'
+    '.github/workflows/secret-scanner.yml':
+        - 'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4'
     '.github/workflows/security-policy.yml':
         - 'actions/checkout@v7.0.1'
     '.github/workflows/sonarqube.yml':
@@ -167,6 +179,11 @@ dependencies:
         commit: 'sha1-bb95ab5063ab9b43a948e21ed8b3fe35b1d1768b'
         owner_id: 6759885
         repo_id: 1274526902
+    'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4':
+        ref: 'fcb8669169b4e9f5d9848608df880ae5fae812b4'
+        commit: 'sha1-fcb8669169b4e9f5d9848608df880ae5fae812b4'
+        owner_id: 6759885
+        repo_id: 1116521501
     'peter-evans/repository-dispatch@v4.0.1':
         ref: 'v4.0.1'
         commit: 'sha1-28959ce8df70de7be546dd1250a005dd32156697'

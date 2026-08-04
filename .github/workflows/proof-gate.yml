@@ -47,7 +47,17 @@ jobs:
         run: |
           echo "=== Installing apt-based provers ==="
           sudo apt-get update
-          sudo apt-get install -y agda coq openjdk-17-jre-headless
+          sudo apt-get install -y agda agda-stdlib coq openjdk-17-jre-headless
+          # Ubuntu's agda package does not register the standard library —
+          # without this wiring `import Data.Nat` fails with "Failed to find
+          # source of module Data.Nat" (first honest agda run, 2026-08-04).
+          # Locate the .agda-lib file from the package rather than hard-coding
+          # a path that shifts between Ubuntu releases.
+          LIBFILE=$(dpkg -L agda-stdlib | grep -m1 '\.agda-lib$')
+          echo "agda-stdlib lib file: $LIBFILE"
+          mkdir -p "$HOME/.agda"
+          echo "$LIBFILE" >> "$HOME/.agda/libraries"
+          echo "standard-library" >> "$HOME/.agda/defaults"
           echo "agda:  $(agda --version 2>&1 | head -1 || echo 'unknown')"
           echo "coq:   $(coqc --version 2>&1 | head -1 || echo 'unknown')"
           echo "java:  $(java --version 2>&1 | head -1 || echo 'unknown')"
