@@ -59,6 +59,10 @@ jobs:
           mkdir -p "$HOME/.agda"
           echo "$STDLIB_DIR/standard-library.agda-lib" >> "$HOME/.agda/libraries"
           echo "standard-library" >> "$HOME/.agda/defaults"
+          # agda 2.6.3 writes interface files under <lib>/_build/<version>/,
+          # and /usr/share is root-owned — without this the check dies with
+          # "_build: createDirectory: permission denied".
+          sudo install -d -o "$(id -u)" -g "$(id -g)" "$STDLIB_DIR/_build"
           echo "agda:  $(agda --version 2>&1 | head -1 || echo 'unknown')"
           echo "coq:   $(coqc --version 2>&1 | head -1 || echo 'unknown')"
           echo "java:  $(java --version 2>&1 | head -1 || echo 'unknown')"

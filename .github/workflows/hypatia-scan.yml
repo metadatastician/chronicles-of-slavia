@@ -23,7 +23,10 @@ concurrency:
 permissions:
   actions: read
   contents: read
-  security-events: read
+  # write, not read: the hypatia-scan reusable's job requests
+  # security-events: write (SARIF upload), and a caller granting less makes
+  # GitHub reject the run as a 0-second startup_failure (standards#451 class).
+  security-events: write
 
 jobs:
   scan:
