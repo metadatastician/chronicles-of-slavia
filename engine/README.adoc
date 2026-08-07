@@ -53,11 +53,28 @@ cd engine
 cargo run -p slavia-zone-a
 ----
 
-Opens a window (needs a display — under WSL2 this is WSLg). Controls print to the
-terminal: `Tab` switch girl, `A/D`/arrows move, `E` reach out to the birds, `S`
-settle the crossing (Donna only), `C` cross, `R` awaken the Rift, `Esc` quit.
-The birds recolour by response, the crossing solidifies when settled, the sky
-darkens at the Fracture, and five pips along the top fill as each beat happens.
+Opens a window (needs a display — under WSL2 this is WSLg). The game starts on a
+title card, then the menu shell; "Begin" enters play, and "Continue" resumes a
+saved run. Controls also print to the terminal:
+
+[cols="1,3",options="header"]
+|===
+| Key | Action
+
+| `A`/`D` or arrows | Move
+| `Space` / `↑` | Jump
+| `Tab` | Switch girl
+| `E` | Reach out to the birds
+| `F` | Settle the crossing (Donna only), then cross it
+| `R` | Awaken the Rift
+| `Esc` | Back to the menu
+|===
+
+`F` carries both halves of the co-op grammar: it settles an unsettled crossing,
+and crosses a settled one. The birds recolour by response, the crossing solidifies
+when settled, the sky darkens at the Fracture, and five pips along the top fill as
+each understanding-beat happens. Progress is autosaved on each new beat and on
+leaving play.
 
 Build note: uses Bevy's `x11` backend only (no `wayland`), so it builds without
 `libwayland-dev`. Add the `wayland` feature back if that dev lib is installed.

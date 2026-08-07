@@ -1,0 +1,318 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Technical Debt Register — Chronicles of Slavia
+:toc:
+:toclevels: 2
+
+Compiled 2026-08-07 by ground-truthing the repository, not by reading status files.
+Machine-readable twin: `.machine_readable/bot_directives/debt.a2ml`.
+
+*What counts as debt here:* anything owed that a reader could otherwise mistake for
+done. Deliberate decisions are listed too when they leave an obligation open — a
+decision to defer is still a thing owed. Items marked *OWNER* cannot be actioned by an
+agent under estate doctrine (licence edits are manual and owner-only) or require
+access an agent does not have.
+
+Severity: *high* = misleads or blocks · *medium* = real cost, contained · *low* =
+tidiness.
+
+== 1. Licence debt — all OWNER
+
+Doctrine forbids automated licence edits, so every item here is recorded and left
+untouched. `LICENSE-INTENT.md` and ADR-0008 agree that code is AGPL-3.0-or-later and
+prose is CC-BY-SA-4.0; the items below are places that disagree with that ruling.
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Item | Severity
+
+| LIC-1
+| *`README.adoc` carries two conflicting SPDX headers* — `AGPL-3.0-or-later` on line 1
+  and `CC-BY-SA-4.0` on line 2. A file has one licence. Left exactly as found: choosing
+  which to delete is a licensing decision. (Prose docs are CC-BY-SA-4.0 per ADR-0008,
+  which suggests line 1 is the stray — but that call is the owner's.)
+| high
+
+| LIC-2
+| *`chronicles-of-slavia.launcher.a2ml` declares `license = "MPL-2.0"`* — contradicts
+  ADR-0008. The same file declares `version = "0.1.0"` while both crates are `0.0.0`.
+| high
+
+| LIC-3
+| *`AGENTIC.a2ml` and `CLAUDE.md` both say "Never use AGPL"* while ADR-0008 rules
+  AGPL-3.0-or-later for this repo's code. The estate language policy is explicitly
+  per-repo overridable via AGENTIC, but the override is not recorded there — so the
+  substrate an agent reads on arrival contradicts the merged ADR. The Rhodibot canary
+  was aligned to ADR-0008 in #58; the descriptiles were not.
+| high
+
+| LIC-4
+| *Estate norm vs repo ruling, upstream.* Rhodibot's canonical rule expects MPL-2.0 for
+  dotfile SPDX headers estate-wide. Reported on `hyperpolymath/standards#506`; needs an
+  exception class for repos with a licence ADR.
+| medium
+|===
+
+== 2. Documentation debt
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Item | Severity
+
+| DOC-1
+| *52 files still contain unsubstituted `{{TOKEN}}` placeholders* from the RSR template
+  — including `docs/status/READINESS.adoc` (`{{PROJECT_NAME}}`, `{{FORGE}}`, `{{OWNER}}`,
+  `{{CURRENT_DATE}}`, `{{AUTHOR}}`, and a literal grade of `X`) and
+  `docs/status/PROOF-NEEDS.adoc` (`{{PROJECT}}`). Files whose *purpose* is to be a
+  template (`docs/decisions/0000-template.adoc`, `docs/governance/CRG-AUDIT-TEMPLATE.adoc`)
+  are correct as-is and are not part of this count's problem.
+| medium
+
+| DOC-2
+| *`docs-template/` is shipped inside a real project* — six files of generic scaffolding
+  (`architecture.adoc`, `contributing.adoc`, `usage.adoc`, `troubleshooting.adoc`, …)
+  that duplicate and contradict the real docs. Instantiation residue.
+| medium
+
+| DOC-3
+| *`SECURITY_FIXES_20260726.md` is a dated snapshot in the repo root.* Point-in-time
+  records rot; the Rhodibot canary flags this shape generally. Either fold into
+  `CHANGELOG.md`/an advisory, or move under `docs/reports/security/`.
+| low
+
+| DOC-4
+| *Root-shape pressure.* 17 files sit in the repo root, several of which
+  (`AFFIRMATION.adoc`, `AUDIT.adoc`, `RSR-PHILOSOPHY.adoc`, `MAINTAINERS.adoc`) are
+  estate-template prose duplicated by `docs/` equivalents — `docs/attribution/MAINTAINERS.adoc`
+  exists alongside root `MAINTAINERS.adoc`.
+| low
+
+| DOC-5
+| *Wiki was a 52-byte stub.* Populated 2026-08-07 in this pass; keep it in step with
+  `docs/design/` rather than letting it become a third source of truth.
+| resolved
+
+| DOC-6
+| *Unverified compliance badges removed.* The README displayed SOC 3, ISO 27001 and
+  CIAQ "Compliant" badges linked to a private org settings page, with no attestation
+  behind them, plus a typo (`nimage:`) that broke a fourth. Removed this pass. This is a
+  known estate-wide template drift — worth grepping other repos.
+| resolved
+|===
+
+== 3. Code debt
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Item | Severity
+
+| CODE-1
+| *The camera never moves; X is hard-clamped to ±620.* `render.rs::setup` spawns one
+  static `Camera2d` and no follow system exists — about 1240px, all on one screen.
+  There is no code path for a level wider than a screen. Blocks A2–A5 and Zone B.
+| high
+
+| CODE-2
+| *`Session` has no concept of a room.* Position is one float per girl along one flat
+  `Vec<Beat>` — no room, branch, or "which area am I in". `docs/design/23` requires two
+  levels of position. Same blocker as CODE-1, and the two are the real prerequisites
+  for any further zone work.
+| high
+
+| CODE-3
+| *The ESM is complete but wired to nothing.* `slavia-core/src/esm/` passes 10 testbed
+  tests headless and has never touched a scene. Deliberate under ADR-0004 — but
+  doctrine 8 is "unwired is not done", and `docs/design/23` names A5 as where it should
+  earn its place.
+| medium
+
+| CODE-4
+| *Accessibility toggles drive nothing.* The menu's settings panel genuinely flips
+  `UiSettings` on click, but no motion/contrast/subtitle system consumes it. A control
+  that appears to work and does nothing is worse than an absent one.
+| medium
+
+| CODE-5
+| *The save file lives next to the executable* (`chronicles-of-slavia-save.toml`),
+  not an OS-appropriate save directory. Deliberate v1 simplification, flagged in
+  `save.rs` itself.
+| medium
+
+| CODE-6
+| *Zone A beats 5–7 have no dedicated visuals.* Shrine, ridge, overlook and fracture
+  exist as monotonic landmark X positions with text, not as authored scenery.
+| medium
+
+| CODE-7
+| *Two doc-tests never run.* `slavia-core/src/esm/kanren.rs` lines 284 and 336 use
+  ```` ```ignore ```` fences, so `cargo test` reports "2 ignored". *Now identified*:
+  there are zero `#[ignore]` attributes in the workspace, so this — and not a hidden
+  test — is what STATE.a2ml has been carrying as unexplained debt since July. Either
+  make the examples compile or demote them to plain text.
+| low
+
+| CODE-8
+| *The UMS panel is a static stub* in the menu, by design (doc 20). Listed so the
+  gap is visible, not because it is wrong.
+| low
+|===
+
+== 4. Proof debt
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Item | Severity
+
+| PRF-1
+| *No proof is about Slavia.* All 7 declared obligations concern a generic C ABI/FFI
+  seam inherited from the template. The game's own invariants — determinism, the
+  opposition rule, living-taxis soundness, ESM belief locality — are held by tests
+  only. The Agda and Coq manifests say so themselves: _"still generic template
+  content, not a chronicles invariant"_.
+| high
+
+| PRF-2
+| *TLA+ verifies nothing.* `verification/proofs/tlaplus/StateMachine.tla` is
+  `quarantine` — _"tla2sany not available … proof cannot be verified"_ — and a
+  quarantined module passes the check by continuing to fail. A green board reads as
+  "five provers verified" when four did. The quarantine note may now be stale: the
+  Proof Gate installs `tla2tools.jar` and a JRE, so re-evaluate whether it can be
+  promoted to `gated`.
+| high
+
+| PRF-3
+| *The proof suite has never gated a Slavia change.* The Proof Gate's first successful
+  run in its entire history was 2026-08-04 (81 prior runs were `startup_failure`). It
+  is real now, but it has no track record yet.
+| low
+|===
+
+== 5. CI/CD debt
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Item | Severity
+
+| CI-1
+| *`governance` is red and blocks merges.* The `hyperpolymath/standards`
+  governance-reusable embeds a workflow linter that predates lockfiles: it demands
+  inline 40-hex SHAs and therefore fails every consumer that adopted `gh actions-lock`,
+  whose model is tag-form refs with the authoritative SHA in `actions.lock`. Fix belongs
+  upstream — reported with a patch recipe on `standards#573`; this repo's own linter was
+  made lockfile-aware in #59 and is the template. *Not fixable here.*
+| high
+
+| CI-2
+| *`mise.toml` declares banned-language toolchains* — `node`, `python`, `go`, `npm`,
+  `pnpm`, `pip`, `denojs`, `go-task`, `gofmt`, `isort`, `vitest`, `pytest`, `jest`. The
+  estate language policy denies Node/npm, TypeScript, Python and Go outright. Worse,
+  most do not resolve, so *mise prints a wall of warnings on every shell command run in
+  this repo*. Pure template residue: none of it builds a Rust/Bevy game.
+| high
+
+| CI-3
+| *`just build`, `build-release`, `build-watch`, `clean` are TODO stubs* that echo and
+  never invoke cargo. A developer following the Justfile gets a silent no-op.
+| medium
+
+| CI-4
+| *`just changelog` is broken* — `.machine_readable/configs/git-cliff/cliff.toml`
+  references an undefined `OWNER` variable ("Variable `OWNER` not found in context"), so
+  `CHANGELOG.md` must be hand-written.
+| medium
+
+| CI-5
+| *`e2e.yml` never fires on the game.* Its path filter is `src/**` and `tests/**`; the
+  game lives in `engine/**`. The E2E workflow has therefore never run against a change
+  to the actual product.
+| medium
+
+| CI-6
+| *`just e2e` and `just aspect` are honest non-gates* — they print "NOT IMPLEMENTED —
+  this is not a pass" to stderr. Correct behaviour, but the coverage they imply does not
+  exist.
+| medium
+
+| CI-7
+| *`gh actions-lock` fights the SPDX linter.* Every run re-inserts its marker comment as
+  line 1, displacing the `SPDX-License-Identifier` line that the workflow linter requires
+  to be first — turning 29 files red in one commit. The marker must be re-hoisted to line
+  2 after every lockfile refresh.
+| medium
+
+| CI-8
+| *Five Dependabot runs have been queued for 22+ hours* (nix, github_actions, npm_and_yarn,
+  hex, pip). The config is valid; the runner pool is stalled. *OWNER* — may need a check
+  of the org's Dependabot spending limit. Note the ecosystems themselves are template
+  residue and mostly do not apply to a Rust project.
+| medium
+
+| CI-9
+| *Three workflows are `disabled_manually`* — Instant Sync, GitHub Pages (Ddraig SSG),
+  and Push email notification. The Pages one matters: the repo advertises a homepage at
+  `metadatastician.github.io/chronicles-of-slavia/` that nothing currently publishes.
+| medium
+
+| CI-10
+| *`release.yml` has never run* — it is tag-triggered and no release has been cut. Fine
+  today (deliberately `0.0.0`), listed so it is not mistaken for a working path.
+| low
+
+| CI-11
+| *`scripts/check-root-shape.sh` ignores `.gitignore`.* It scans the working tree, so any
+  gitignored local tooling directory (e.g. `.claude/`) makes it FAIL locally while CI —
+  which checks out a clean tree — passes. A gate that fails only on developer machines
+  trains people to ignore it.
+| low
+|===
+
+== 6. Design/canon debt
+
+These are open questions, not defects — but they block work and belong in one place.
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Item | Severity
+
+| CAN-1
+| *Co-op vs switch-only self-contradiction.* `docs/design/13` lists Chronicle II as
+  "Dual-Character Simultaneous"; `08` and the built engine are switch-only. This one
+  touches the engine and should be settled before Chronicle II is designed against it.
+| high
+
+| CAN-2
+| *Chronicle I's tone is unresolved.* `13` says "surreal, dangerous, fast-paced"; the
+  Kishōtenketsu blueprint in `22` and the built Zone A both say calm. Recorded as Q1 of
+  the Zone B decision sheet.
+| medium
+
+| CAN-3
+| *Zone B's eight rulings are outstanding* — `docs/design/25-zone-b-decision-sheet.md`,
+  tracked in issue #63. Zone B cannot be scoped until they land, and doc 24 stays
+  provisional. *OWNER*.
+| medium
+
+| CAN-4
+| *`gv-clade-index` registration missing.* `CLADE.a2ml` carries the post-transfer UUID
+  but the repo is absent from the estate registry. *OWNER* — outward-facing.
+| low
+|===
+
+== Summary
+
+[cols="2,1,1,1",options="header"]
+|===
+| Area | High | Medium | Low
+
+| Licence | 3 | 1 | 0
+| Documentation | 0 | 2 | 2
+| Code | 2 | 4 | 2
+| Proof | 2 | 0 | 1
+| CI/CD | 2 | 6 | 2
+| Design/canon | 1 | 2 | 1
+| *Total* | *10* | *15* | *8*
+|===
+
+The two structural items worth reading twice: *CODE-1 and CODE-2* (no moving camera, no
+rooms) are the real gate on every future zone, and *PRF-1* (no proof concerns Slavia)
+is the gap between this repo's formal apparatus and its actual subject.
