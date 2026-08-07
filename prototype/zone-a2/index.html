@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronicles of Slavia — Segment A2: Animals &amp; Plants (mock)</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #05060c; overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif; color: #eae6df;
+  }
+  #wrap { position: fixed; inset: 0; display: grid; place-items: center; }
+  canvas { image-rendering: auto; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
+  #hint {
+    position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+    font-size: 13px; color: #9aa; letter-spacing: .3px; opacity: .85;
+    background: rgba(0,0,0,.35); padding: 6px 14px; border-radius: 20px;
+    pointer-events: none; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" width="1280" height="720"></canvas></div>
+<div id="hint">A / D move &nbsp;·&nbsp; Shift run &nbsp;·&nbsp; Space jump &nbsp;·&nbsp; Tab switch girl &nbsp;·&nbsp; E reach out &nbsp;·&nbsp; G gather &nbsp;·&nbsp; N design notes &nbsp;·&nbsp; R restart</div>
+<script>
+"use strict";
+/* ===========================================================================
+   Chronicles of Slavia — Segment A2, "Animals & Plants" — INTERACTION MOCK
+
+   Status: MOCK. Not canon, not engine code, not a build.
+   Spec: docs/design/23-level-scope-and-pacing.md (A2), with
+         docs/design/03 (living taxis), 16 (flora & non-animal beings),
+         17 (clothing: repair ⊥ pattern weaving).
+
+   Scope discipline — what this mock DELIBERATELY does NOT do:
+     · No taxis on plants, and no tropism. Doc 23 rules that plants get no
+       stir/settle reaction in A2 "or for some while after", that any effect
+       is a LATER, subtle, untutored reveal — and that the girls themselves
+       do not know they can do it. Nothing here hints at it.
+     · No pattern weaving. Pattern plants are GATHERED here and carried into
+       A3, which is where clothing work happens (doc 23's fluidity principle).
+     · No combat, no spirits, no inventory sprawl, no crafting recipe tree
+       (doc 16 explicitly rules the recipe tree out).
+
+   It DOES demonstrate a camera scrolling over a world wider than one screen —
+   which the real engine cannot do yet (render.rs clamps X to ±620 and never
+   moves the camera). That limit, and Session's lack of rooms, are the real
+   prerequisites for A2. See docs/status/DEBT.adoc CODE-1 / CODE-2.
+   =========================================================================== */
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+function fit() {
+  const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+  canvas.style.width = (W * s) + 'px';
+  canvas.style.height = (H * s) + 'px';
+}
+addEventListener('resize', fit); fit();
+
+// ---- input -----------------------------------------------------------------
+const down = new Set(), tapped = new Set();
+addEventListener('keydown', e => {
+  if (['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(e.code)) e.preventDefault();
+  if (!down.has(e.code)) tapped.add(e.code);
+  down.add(e.code);
+});
+addEventListener('keyup', e => down.delete(e.code));
+const held = c => down.has(c);
+const tap  = c => tapped.has(c);
+
+// ---- helpers ---------------------------------------------------------------
+const clamp = (v,a,b) => v < a ? a : v > b ? b : v;
+function hex(c){ return [parseInt(c.slice(1,3),16), parseInt(c.slice(3,5),16), parseInt(c.slice(5,7),16)]; }
+function mix(a, b, t){
+  const A = hex(a), B = hex(b); t = clamp(t,0,1);
+  return `rgb(${Math.round(A[0]+(B[0]-A[0])*t)},${Math.round(A[1]+(B[1]-A[1])*t)},${Math.round(A[2]+(B[2]-A[2])*t)})`;
+}
+
+// ---- world -----------------------------------------------------------------
+const GROUND = 560;
+const WORLD  = 2600;                 // deliberately wider than the 1280 viewport
+
+// Left-to-right this is a teaching order: food -> craft -> pattern -> the two
+// signature restoratives -> the nature tiers -> the diagnostic failure.
+const SITES = [
+  { x: 120,  kind: 'save',    label: 'from A1' },
+  { x: 330,  kind: 'food',    label: 'bilberry',      good: true  },
+  { x: 520,  kind: 'food',    label: 'hemlock',       good: false },
+  { x: 720,  kind: 'craft',   label: 'nettle'  },
+  { x: 940,  kind: 'pattern', label: 'madder' },
+  { x: 1140, kind: 'pattern', label: 'woad'   },
+  { x: 1420, kind: 'honey',   label: 'bee tree' },
+  { x: 1760, kind: 'yogurt',  label: "shepherd's hut" },
+  { x: 1980, kind: 'wool',    label: 'shorn fleece' },
+  { x: 2450, kind: 'save',    label: 'to A3' },
+];
+
+const FAUNA = [
+  // nature: how THIS creature answers. The girl picks the verb; the creature
+  // picks the response (doc 03). Tier per doc 16's hierarchy.
+  { x: 300,  kind: 'bird',   tier: 'wild',        y: GROUND-120 },
+  { x: 1000, kind: 'hare',   tier: 'wild',        y: GROUND-14  },
+  { x: 1420, kind: 'bees',   tier: 'wild',        y: GROUND-170 },
+  { x: 1700, kind: 'goat',   tier: 'domesticated',y: GROUND-30  },
+  // The sheep stands beside the fleece, unshorn and unbothered — the wool in
+  // the basket cost her nothing. That is the whole point made visually.
+  { x: 1900, kind: 'sheep',  tier: 'domesticated',y: GROUND-22  },
+  { x: 2150, kind: 'magpie', tier: 'blighted',    y: GROUND-100 },
+];
+
+let state, showNotes = false;
+
+function girl(id, x, verve, speed){
+  return { id, x, y: GROUND, vy: 0, face: 1, verve, speed, onGround: true, step: 0 };
+}
+
+function reset(){
+  state = {
+    active: 'anya',
+    anya:  girl('anya',  150, 1.0, 200),
+    donna: girl('donna', 210, 0.45, 155),
+    cam: 0,
+    msg: '', msgT: 0,
+    t: 0,
+    pouch: { food: 0, craft: 0, wool: 0, pattern: 0, honey: false, yogurt: false, poisoned: 0 },
+    sites: SITES.map(s => ({ ...s, taken: false })),
+    fauna: FAUNA.map(f => ({ ...f, mood: 'calm', moodT: 0, phase: Math.random()*6.28, ox: 0, oy: 0 })),
+    beesSettled: false,
+    learned: new Set(),      // which teaching beats have landed
+  };
+  say('A2 — the slope past the grove. The world here is wider than the path.', 5);
+}
+const active = () => state[state.active];
+const other  = () => state.active === 'anya' ? state.donna : state.anya;
+function say(t, dur = 3.2){ state.msg = t; state.msgT = dur; }
+function learn(k, t){ if (!state.learned.has(k)) { state.learned.add(k); say(t, 4.2); } }
+
+// ---- the emotional grammar, applied to fauna -------------------------------
+// Anya stirs; Donna settles. Neither can do the other's act. The CREATURE'S
+// OWN NATURE decides what that means — that is the whole point (doc 03).
+function reachOut(g, f){
+  const stir = g.id === 'anya';
+  if (f.tier === 'blighted') {
+    // Doc 16: controlled/blighted are barely touched, and the FAILURE is the
+    // diagnostic. This is the beat Zone B's dread is later built from.
+    f.mood = 'unmoved'; f.moodT = 3.0;
+    learn('blight', 'It does not answer. Not calm — *unmoved*. Something else has it.');
+    return;
+  }
+  switch (f.kind) {
+    case 'bird':
+      f.mood = stir ? 'stirred' : 'settled'; f.moodT = 2.6;
+      say(stir ? 'The birds lift, bright and scattering.' : 'The birds fold down and roost.');
+      break;
+    case 'hare':
+      // A hare's nature: stirring makes it BOLT; settling makes it FREEZE.
+      // Neither is "calm" — the verb is the girl's, the meaning is the hare's.
+      f.mood = stir ? 'bolted' : 'frozen'; f.moodT = 2.6;
+      learn('nature',
+        stir ? 'The hare bolts. Stirring a hare does not embolden it — it runs.'
+             : 'The hare freezes flat. Settling a hare does not soothe it — it hides.');
+      break;
+    case 'bees':
+      if (stir) {
+        f.mood = 'stirred'; f.moodT = 3.0; state.beesSettled = false;
+        say('The hive boils out. Nobody is taking honey now.');
+      } else {
+        f.mood = 'settled'; f.moodT = 6.0; state.beesSettled = true;
+        learn('coop', 'The hive quietens. Donna has made the wild thing reachable.');
+      }
+      break;
+    case 'goat':
+      // Doc 16: domesticated -> effect PLUS it reveals their true nature.
+      f.mood = stir ? 'skittish' : 'trusting'; f.moodT = 3.0;
+      learn('domestic',
+        stir ? 'The goat startles — then stays. It has been startled by people before.'
+             : 'The goat walks to her. It expects hands. It is not wild, and now you know.');
+      break;
+    case 'sheep':
+      f.mood = stir ? 'skittish' : 'trusting'; f.moodT = 3.0;
+      say(stir ? 'The ewe shuffles a few steps and thinks better of it.'
+               : 'The ewe settles into the grass, entirely unbothered.');
+      break;
+  }
+}
+
+// ---- gathering -------------------------------------------------------------
+// Plants in A2 are FUNCTIONAL ONLY: food / craft / pattern (doc 16 axis B).
+// They do not answer taxis. Nothing here teaches or hints otherwise (doc 23).
+function gather(g, s){
+  switch (s.kind) {
+    case 'food':
+      s.taken = true;
+      if (s.good) { state.pouch.food++; learn('food', 'Bilberries. Food helps a little — it is not medicine.'); }
+      else { state.pouch.poisoned++; learn('poison', 'Hemlock. Food plants can also harm. The world does not label them for you.'); }
+      break;
+    case 'craft':
+      s.taken = true; state.pouch.craft++;
+      learn('craft', 'Nettle fibre — for mending cloth. Repair is material: anything given freely will serve.');
+      break;
+    case 'wool':
+      // RULED 2026-08-07: repair MAY use animal materials that cost the animal
+      // nothing. The test is cost to the creature, not origin of the material.
+      s.taken = true; state.pouch.wool++;
+      learn('wool', 'Shorn fleece — already given, and the ewe none the poorer. It mends better than nettle.');
+      break;
+    case 'pattern':
+      s.taken = true; state.pouch.pattern++;
+      learn('pattern', 'Dye stock — petals and pigment. Patterns are plant, always. Carried to A3, where the weaving happens.');
+      break;
+    case 'honey':
+      if (!state.beesSettled) { say('The bees are up. Not while they are like this.'); return; }
+      if (g.id !== 'anya')    { say("Donna leaves it. It is not hers to take."); return; }
+      s.taken = true; state.pouch.honey = true;
+      learn('honey', "Wild honey — Anya's. Found, not made. It restores her better than any food.");
+      break;
+    case 'yogurt':
+      if (g.id !== 'donna') { say('Anya has no patience for the churn.'); return; }
+      s.taken = true; state.pouch.yogurt = true;
+      learn('yogurt', "Yogurt — Donna's. Made, not found. Set, kept, and waited for.");
+      break;
+    case 'save':
+      say(s.label === 'from A1' ? 'A1 ends here. The segment boundary is a save point.'
+                                : 'A3 begins past this stone. What you gathered comes with you.');
+      break;
+  }
+}
+
+function nearest(g, list, reach){
+  let best = null, bd = reach;
+  for (const it of list) {
+    if (it.taken) continue;
+    const d = Math.abs((it.x) - g.x);
+    if (d < bd) { bd = d; best = it; }
+  }
+  return best;
+}
+
+// ---- update ----------------------------------------------------------------
+let last = performance.now();
+function update(dt){
+  state.t += dt;
+  if (state.msgT > 0) state.msgT -= dt;
+
+  if (tap('KeyR')) { reset(); return; }
+  if (tap('KeyN')) showNotes = !showNotes;
+  if (tap('Tab'))  { state.active = state.active === 'anya' ? 'donna' : 'anya'; say(state.active === 'anya' ? 'Anya.' : 'Donna.', 1.2); }
+
+  const g = active();
+  const run = held('ShiftLeft') || held('ShiftRight');
+  let dx = 0;
+  if (held('KeyA') || held('ArrowLeft'))  dx -= 1;
+  if (held('KeyD') || held('ArrowRight')) dx += 1;
+  if (dx) g.face = dx;
+  // Anya is quicker; Donna is steadier. Running widens the gap, not the natures.
+  g.x += dx * g.speed * (run ? 1.6 : 1) * dt;
+  g.x = clamp(g.x, 40, WORLD - 40);
+  g.step += Math.abs(dx) * dt * (run ? 14 : 9);
+
+  if ((tap('Space') || tap('ArrowUp')) && g.onGround) { g.vy = -430 * (0.85 + g.verve*0.25); g.onGround = false; }
+  g.vy += 1250 * dt; g.y += g.vy * dt;
+  if (g.y >= GROUND) { g.y = GROUND; g.vy = 0; g.onGround = true; }
+
+  // the other girl ambles toward her sister, always a little behind
+  const o = other();
+  const want = g.x - 78 * g.face;
+  if (Math.abs(o.x - want) > 26) { const d = Math.sign(want - o.x); o.x += d * o.speed * 0.62 * dt; o.face = d; o.step += dt*7; }
+
+  if (tap('KeyE')) {
+    const f = nearest(g, state.fauna, 190);
+    if (f) reachOut(g, f);
+    else say(g.id === 'anya' ? 'Nothing near enough to stir.' : 'Nothing near enough to settle.', 1.6);
+  }
+  if (tap('KeyG')) {
+    const s = nearest(g, state.sites, 90);
+    if (s) gather(g, s);
+    else say('Nothing to gather here.', 1.6);
+  }
+
+  for (const f of state.fauna) {
+    if (f.moodT > 0) { f.moodT -= dt; if (f.moodT <= 0 && f.kind !== 'bees') f.mood = 'calm'; }
+    f.phase += dt * (f.mood === 'stirred' || f.mood === 'bolted' ? 9 : 2.2);
+    if (f.kind === 'bird')  { f.oy = f.mood === 'stirred' ? -34 - Math.sin(f.phase)*10 : f.mood === 'settled' ? 8 : Math.sin(f.phase)*4; }
+    if (f.kind === 'hare')  { f.ox = f.mood === 'bolted' ? Math.min(150, f.ox + 240*dt) : f.mood === 'frozen' ? f.ox : f.ox*0.94;
+                              f.oy = f.mood === 'frozen' ? 6 : 0; }
+    if (f.kind === 'bees')  { f.oy = f.mood === 'settled' ? 6 : Math.sin(f.phase)*3; }
+    if (f.kind === 'goat')  { f.ox = f.mood === 'trusting' ? f.ox + (0 - f.ox)*0.9*dt*3 : f.ox; }
+    if (f.kind === 'magpie'){ f.oy = Math.sin(f.phase*0.5)*2; }  // barely moves, ever
+  }
+
+  // camera: dead-zone follow, clamped to the world. The thing the real engine
+  // cannot do yet — a level wider than one screen.
+  const target = clamp(g.x - W/2, 0, WORLD - W);
+  state.cam += (target - state.cam) * Math.min(1, dt * 3.5);
+}
+
+// ---- draw ------------------------------------------------------------------
+function drawSky(){
+  const sky = ctx.createLinearGradient(0,0,0,GROUND+60);
+  sky.addColorStop(0,    '#2b2440');
+  sky.addColorStop(0.55, '#4a3f63');
+  sky.addColorStop(1,    '#c9a072');
+  ctx.fillStyle = sky; ctx.fillRect(0,0,W,H);
+}
+function drawHills(cam){
+  for (let layer = 3; layer >= 1; layer--){
+    const d = layer/3.4, par = 0.2 + layer*0.12;
+    ctx.fillStyle = mix('#6a6f86','#2b2c3a', d);
+    ctx.beginPath(); ctx.moveTo(0,H);
+    for (let x = 0; x <= W; x += 40){
+      const wx = x + cam*par;
+      ctx.lineTo(x, 300 + layer*62 + Math.sin(wx*0.0027 + layer)*38 + Math.sin(wx*0.0009)*26);
+    }
+    ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+  }
+}
+function drawGround(cam){
+  ctx.fillStyle = '#2f4a24'; ctx.fillRect(0, GROUND, W, H-GROUND);
+  ctx.fillStyle = '#26401d';
+  for (let x = -(cam % 60); x < W; x += 60){
+    ctx.fillRect(x, GROUND, 30, 6);
+  }
+  // tussocks
+  ctx.fillStyle = '#3a5c2b';
+  for (let i = 0; i < 90; i++){
+    const wx = i*31.7 % WORLD, sx = wx - cam;
+    if (sx < -20 || sx > W+20) continue;
+    const h = 8 + (i*7 % 9);
+    ctx.fillRect(sx, GROUND - h, 3, h);
+  }
+}
+
+function drawPlant(s, cam){
+  const x = s.x - cam; if (x < -60 || x > W+60) return;
+  const y = GROUND;
+  if (s.taken){
+    ctx.strokeStyle = '#3d5230'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y-10); ctx.stroke();
+    return;
+  }
+  const col = s.kind === 'food'    ? (s.good ? '#5b2b57' : '#cfd8c0')
+            : s.kind === 'craft'   ? '#4d7a3a'
+            : s.kind === 'pattern' ? (s.label === 'madder' ? '#b5432f' : '#3f5fa8')
+            : '#888';
+  ctx.strokeStyle = '#3f6b31'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y-38); ctx.stroke();
+  for (let i=0;i<5;i++){
+    const a = -0.4 + i*0.42, r = 13;
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.ellipse(x + Math.cos(a-1.57)*r, y-40 + Math.sin(a-1.57)*r*0.7, 6, 5, a, 0, 6.28);
+    ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(232,230,223,.55)'; ctx.font = '11px Segoe UI'; ctx.textAlign = 'center';
+  ctx.fillText(s.label, x, y - 62);
+}
+
+function drawSite(s, cam){
+  const x = s.x - cam; if (x < -140 || x > W+140) return;
+  if (s.kind === 'food' || s.kind === 'craft' || s.kind === 'pattern') return drawPlant(s, cam);
+  if (s.kind === 'save'){
+    ctx.fillStyle = '#5c5750'; ctx.fillRect(x-9, GROUND-52, 18, 52);
+    ctx.fillStyle = '#7d776d'; ctx.fillRect(x-14, GROUND-58, 28, 8);
+    ctx.fillStyle = 'rgba(232,230,223,.6)'; ctx.font='italic 13px Georgia'; ctx.textAlign='center';
+    ctx.fillText(s.label, x, GROUND-70);
+    return;
+  }
+  if (s.kind === 'honey'){
+    // bee tree
+    ctx.fillStyle = '#4a3524'; ctx.fillRect(x-16, GROUND-190, 32, 190);
+    ctx.fillStyle = '#2f5a28';
+    ctx.beginPath(); ctx.ellipse(x, GROUND-215, 86, 58, 0, 0, 6.28); ctx.fill();
+    ctx.fillStyle = s.taken ? '#5b4a30' : '#c8912f';
+    ctx.beginPath(); ctx.ellipse(x+6, GROUND-150, 18, 24, 0, 0, 6.28); ctx.fill();
+    ctx.fillStyle = 'rgba(232,230,223,.55)'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(s.taken ? 'bee tree (taken)' : 'bee tree', x, GROUND-250);
+    return;
+  }
+  if (s.kind === 'wool'){
+    // A basket of already-shorn fleece: nothing is taken from the ewe on screen.
+    ctx.fillStyle = '#6b5238';
+    ctx.beginPath(); ctx.ellipse(x, GROUND-10, 26, 12, 0, 0, 6.28); ctx.fill();
+    ctx.fillStyle = s.taken ? '#59544c' : '#efe7d8';
+    for (let i=0;i<5;i++){
+      ctx.beginPath(); ctx.arc(x-16+i*8, GROUND-22 - (i%2)*5, 9, 0, 6.28); ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(232,230,223,.55)'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(s.taken ? 'fleece (taken)' : 'shorn fleece', x, GROUND-46);
+    return;
+  }
+  if (s.kind === 'yogurt'){
+    // shepherd's hut + churn: yogurt is MADE, never taken from a creature
+    ctx.fillStyle = '#4b4038'; ctx.fillRect(x-70, GROUND-96, 140, 96);
+    ctx.fillStyle = '#6b3f30';
+    ctx.beginPath(); ctx.moveTo(x-84, GROUND-96); ctx.lineTo(x, GROUND-150); ctx.lineTo(x+84, GROUND-96); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#2a2320'; ctx.fillRect(x-16, GROUND-52, 32, 52);
+    ctx.fillStyle = s.taken ? '#5a5348' : '#e8e2d2';
+    ctx.fillRect(x+52, GROUND-34, 22, 34);
+    ctx.fillStyle = 'rgba(232,230,223,.55)'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(s.taken ? 'churn (set)' : 'churn', x+63, GROUND-44);
+    ctx.fillText("shepherd's hut", x, GROUND-162);
+  }
+}
+
+const MOOD_COL = {
+  calm:'#e8e6df', stirred:'#ffbf5a', settled:'#8fd0f0', bolted:'#ffbf5a',
+  frozen:'#8fd0f0', skittish:'#ffbf5a', trusting:'#8fd0f0', unmoved:'#6d6d72'
+};
+
+function drawFauna(f, cam){
+  const x = f.x - cam + (f.ox||0); if (x < -80 || x > W+80) return;
+  const y = f.y + (f.oy||0);
+  const col = MOOD_COL[f.mood] || '#e8e6df';
+  ctx.fillStyle = col;
+  if (f.kind === 'bird'){
+    for (let i=0;i<4;i++){
+      const bx = x + i*22 - 33, by = y + Math.sin(f.phase + i)*(f.mood==='stirred'?9:2);
+      ctx.beginPath(); ctx.ellipse(bx, by, 7, 5, 0, 0, 6.28); ctx.fill();
+    }
+  } else if (f.kind === 'bees'){
+    const n = f.mood === 'settled' ? 4 : 14;
+    for (let i=0;i<n;i++){
+      const a = f.phase + i*1.7, r = f.mood==='settled' ? 10 : 26 + Math.sin(a)*12;
+      ctx.beginPath(); ctx.arc(x + Math.cos(a)*r, y + Math.sin(a*1.3)*r*0.6, 2.6, 0, 6.28); ctx.fill();
+    }
+  } else if (f.kind === 'hare'){
+    ctx.beginPath(); ctx.ellipse(x, y-9, 15, 10, 0, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x+13, y-16, 7, 6, 0, 0, 6.28); ctx.fill();
+    ctx.fillRect(x+12, y-30, 3, 13); ctx.fillRect(x+17, y-29, 3, 12);
+  } else if (f.kind === 'goat'){
+    ctx.beginPath(); ctx.ellipse(x, y-22, 24, 14, 0, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x+24, y-33, 10, 8, 0, 0, 6.28); ctx.fill();
+    ctx.fillRect(x-16, y-10, 4, 12); ctx.fillRect(x+10, y-10, 4, 12);
+    ctx.strokeStyle = col; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x+28, y-40); ctx.lineTo(x+34, y-50); ctx.stroke();
+  } else if (f.kind === 'sheep'){
+    // deliberately drawn in full fleece — she has given nothing she misses
+    ctx.beginPath(); ctx.ellipse(x, y-20, 26, 17, 0, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.arc(x-19, y-26, 9, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+17, y-26, 9, 0, 6.28); ctx.fill();
+    ctx.fillStyle = mix(col, '#000', 0.5);
+    ctx.beginPath(); ctx.ellipse(x+26, y-30, 8, 6, 0, 0, 6.28); ctx.fill();
+    ctx.fillRect(x-14, y-6, 4, 8); ctx.fillRect(x+9, y-6, 4, 8);
+  } else if (f.kind === 'magpie'){
+    ctx.beginPath(); ctx.ellipse(x, y, 11, 8, 0, 0, 6.28); ctx.fill();
+    ctx.fillStyle = mix(col, '#000', 0.45);
+    ctx.beginPath(); ctx.ellipse(x-12, y+2, 10, 4, 0.2, 0, 6.28); ctx.fill();
+  }
+  // the manpu: a small mark of how it answered (doc 21 — legibility)
+  if (f.moodT > 0 && f.mood !== 'calm'){
+    ctx.fillStyle = col; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+    ctx.globalAlpha = Math.min(1, f.moodT);
+    ctx.fillText(f.mood, x, y - 44);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawGirl(g, cam, isActive){
+  const x = g.x - cam, y = g.y;
+  if (x < -60 || x > W+60) return;
+  const anya = g.id === 'anya';
+  const bob = Math.sin(g.step) * (2 + g.verve*3);
+  const skirt = anya ? '#2f5fa8' : '#e8e4da';
+  const trim  = anya ? '#e8c53a' : '#2f7a3a';
+  const embro = anya ? '#c0392b' : '#b03030';
+
+  const HAIR = '#2b211c';
+  const hy = y - 100 + bob*0.5;   // head centre
+  const R  = 11;                  // head radius
+
+  if (isActive){
+    ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(x, y+4, 30, 8, 0, 0, 6.28); ctx.stroke();
+  }
+
+  // 1. HAIR BEHIND THE BODY — Anya only. Canvas has no z-index, so hair that
+  //    falls behind her must be painted before the torso; painting it after
+  //    is what buried her face under a slab. Donna's hair is UP in a bun
+  //    (doc 15), so she has no back-fall and needs nothing here.
+  if (anya){
+    const sway = -g.face*5 + Math.sin(g.step*0.6)*3;
+    ctx.fillStyle = HAIR;
+    ctx.beginPath();
+    ctx.moveTo(x-12, hy);
+    ctx.quadraticCurveTo(x-21+sway, y-58, x-15+sway, y-10);
+    ctx.lineTo(x+15+sway, y-10);
+    ctx.quadraticCurveTo(x+21+sway, y-58, x+12, hy);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // 2. body
+  ctx.fillStyle = skirt;
+  ctx.beginPath();
+  ctx.moveTo(x-4, y-58); ctx.lineTo(x+4, y-58);
+  ctx.lineTo(x+19, y+bob*0.3); ctx.lineTo(x-19, y+bob*0.3);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = trim; ctx.fillRect(x-19, y-5+bob*0.3, 38, 5);
+  ctx.fillStyle = '#efeae0'; ctx.fillRect(x-11, y-88+bob*0.4, 22, 32);
+  ctx.fillStyle = embro; ctx.fillRect(x-11, y-76+bob*0.4, 22, 3);
+
+  // 3. face — painted OVER the back hair, so it is never buried
+  ctx.fillStyle = '#e6c9a8';
+  ctx.beginPath(); ctx.arc(x, hy, R, 0, 6.28); ctx.fill();
+
+  // 4. hair in FRONT: a crown on the skull (never a bald cap) plus, for Anya,
+  //    strands that FRAME the face instead of covering it.
+  ctx.fillStyle = HAIR;
+  if (anya){
+    ctx.beginPath(); ctx.arc(x, hy, R+1, Math.PI, 0); ctx.fill();   // top half only
+    ctx.beginPath(); ctx.ellipse(x-R+1.5, hy+3, 3.5, 9, 0, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x+R-1.5, hy+3, 3.5, 9, 0, 0, 6.28); ctx.fill();
+  } else {
+    // Donna, unchanged — this is the version that already reads correctly.
+    ctx.beginPath(); ctx.arc(x, y-104+bob*0.5, 12, Math.PI, 0); ctx.fill();
+    ctx.beginPath(); ctx.arc(x-13, y-104+bob*0.5, 8, 0, 6.28); ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(232,230,223,.75)'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText(anya ? 'Anya' : 'Donna', x, y-118);
+}
+
+function drawPouch(){
+  const p = state.pouch;
+  const x = 18, y = 16, w = 258, boxH = 136;
+  ctx.fillStyle = 'rgba(0,0,0,.42)'; ctx.fillRect(x, y, w, boxH);
+  ctx.strokeStyle = 'rgba(232,230,223,.16)'; ctx.lineWidth=1; ctx.strokeRect(x+.5, y+.5, w, boxH);
+  ctx.textAlign='left'; ctx.font='12px Segoe UI'; ctx.fillStyle='#cfcabf';
+  ctx.fillText('POUCH', x+12, y+20);
+  ctx.font='12px Segoe UI';
+  const rows = [
+    ['food plants',    p.food    + (p.poisoned ? `  (+${p.poisoned} poisonous)` : ''), '#5b2b57'],
+    ['craft fibre',    p.craft   + '  → repair',                                        '#4d7a3a'],
+    ['wool',           p.wool    + '  → repair',                                        '#d8cfc0'],
+    ['pattern dye',    p.pattern + '  → A3 (plant only)',                               '#b5432f'],
+    ['honey (Anya)',   p.honey  ? 'found' : '—',                                        '#c8912f'],
+    ['yogurt (Donna)', p.yogurt ? 'made'  : '—',                                        '#e8e2d2'],
+  ];
+  rows.forEach((r,i) => {
+    const yy = y + 40 + i*16;
+    ctx.fillStyle = r[2]; ctx.fillRect(x+12, yy-8, 8, 8);
+    ctx.fillStyle = '#cfcabf'; ctx.fillText(r[0], x+28, yy);
+    ctx.fillStyle = '#eae6df'; ctx.fillText(String(r[1]), x+132, yy);
+  });
+}
+
+function drawNotes(){
+  const w = 720, h = 470, x = (W-w)/2, y = (H-h)/2;
+  ctx.fillStyle = 'rgba(4,6,12,.94)'; ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = 'rgba(232,230,223,.22)'; ctx.strokeRect(x+.5, y+.5, w, h);
+  ctx.textAlign='left';
+  ctx.fillStyle='#eae6df'; ctx.font='600 17px Segoe UI';
+  ctx.fillText('Segment A2 — Animals & Plants · interaction mock', x+26, y+36);
+  ctx.font='12px Segoe UI'; ctx.fillStyle='#9aa4b2';
+  ctx.fillText('MOCK — not canon, not engine code. Spec: docs/design/23 (A2), with 03, 16, 17.', x+26, y+56);
+
+  const lines = [
+    ['IN SCOPE — what A2 teaches', '#8fd0f0'],
+    ['· Animals beyond the grove: each answers by ITS OWN nature, not the girl\'s intent.', ''],
+    ['  hare — stirred it bolts, settled it freezes. Neither is "calm".', ''],
+    ['  goat — domesticated: the answer also REVEALS that it is not wild (doc 16 tiers).', ''],
+    ['  magpie — blighted: it does not answer at all. The failure is the diagnostic.', ''],
+    ['· Plants are functional only, in three harvest types (doc 16 axis B):', ''],
+    ['  food (edible OR poisonous — helps or harms, never "healing")', ''],
+    ['  craft fibre → physical repair of cloth · pattern dye → carried into A3', ''],
+    ['· REPAIR vs PATTERN are sourced differently (ruled 2026-08-07):', ''],
+    ['  repair  ← plant fibre AND harmless animal material (shorn wool)', ''],
+    ['  pattern ← plants ONLY: fibres, pigments, petals. No exception.', ''],
+    ['  The test is COST TO THE CREATURE, not origin. The ewe stands beside her', ''],
+    ['  own fleece, unshorn and unbothered — she gave nothing she misses.', ''],
+    ['· Signature restoratives: honey is Anya\'s and is FOUND; yogurt is Donna\'s and is MADE.', ''],
+    ['  Wild vs crafted — the same axis stir/settle already runs on (doc 23).', ''],
+    ['· Co-op still governs: Donna settles the hive so Anya can reach the honey.', ''],
+    ['', ''],
+    ['DELIBERATELY OUT OF SCOPE', '#ffbf5a'],
+    ['· No taxis on plants and no tropism. Doc 23 rules it out of A2 "and for some while', ''],
+    ['  after" — it is a later, untutored reveal that the GIRLS THEMSELVES do not know.', ''],
+    ['· No pattern weaving (that is A3) · no combat · no spirits · no recipe tree.', ''],
+    ['', ''],
+    ['NOTE FOR THE ENGINE', '#c8912f'],
+    ['This mock scrolls a camera across a 2600px world. The real renderer cannot:', ''],
+    ['it clamps X to ±620 and never moves the camera, and Session has no rooms.', ''],
+    ['Those two limits (DEBT CODE-1 / CODE-2) are the true prerequisites for A2.', ''],
+    ['', ''],
+    ['RULED 2026-08-07 — plants do not answer here', '#9ee493'],
+    ['Docs 16 and 23 disagreed: 16 gave plants a full stir/settle traversal layer;', ''],
+    ['23 said no taxis, and hidden even from the girls. The owner ruled for 23 —', ''],
+    ['the ability is developed LATER and must be self-discovered, so on this level', ''],
+    ['only ANIMAL taxis matters. Doc 16 re-scoped at source; this mock was already', ''],
+    ['correct, and rules.test.js enforces the absence as a scope guard.', ''],
+  ];
+  ctx.font='12.5px Segoe UI';
+  lines.forEach((L,i) => {
+    const yy = y + 84 + i*14.2;
+    if (L[1]) { ctx.fillStyle = L[1]; ctx.font='600 12.5px Segoe UI'; }
+    else      { ctx.fillStyle = '#cfcabf'; ctx.font='12.5px Segoe UI'; }
+    ctx.fillText(L[0], x+26, yy);
+  });
+  ctx.fillStyle='#9aa4b2'; ctx.font='12px Segoe UI';
+  ctx.fillText('N — close', x+26, y+h-18);
+}
+
+function draw(){
+  const cam = state.cam;
+  drawSky(); drawHills(cam); drawGround(cam);
+  for (const s of state.sites) drawSite(s, cam);
+  for (const f of state.fauna) drawFauna(f, cam);
+  drawGirl(other(), cam, false);
+  drawGirl(active(), cam, true);
+  drawPouch();
+
+  // prompts
+  const g = active();
+  const nf = nearest(g, state.fauna, 190), ns = nearest(g, state.sites, 90);
+  ctx.textAlign='center'; ctx.font='13px Segoe UI';
+  if (nf){
+    ctx.fillStyle='rgba(232,230,223,.8)';
+    ctx.fillText(g.id==='anya' ? 'E — stir' : 'E — settle', nf.x - cam + (nf.ox||0), nf.y - 62);
+  }
+  if (ns && ns.kind !== 'save'){
+    ctx.fillStyle='rgba(232,230,223,.8)';
+    ctx.fillText('G — gather', ns.x - cam, GROUND - 92);
+  }
+
+  if (state.msgT > 0){
+    ctx.globalAlpha = Math.min(1, state.msgT);
+    ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fillRect(W/2-430, H-92, 860, 40);
+    ctx.fillStyle='#eae6df'; ctx.font='italic 17px Georgia'; ctx.textAlign='center';
+    ctx.fillText(state.msg, W/2, H-66);
+    ctx.globalAlpha = 1;
+  }
+
+  // scroll indicator — makes the wider-than-a-screen point visible
+  const frac = state.cam / (WORLD - W);
+  ctx.fillStyle='rgba(232,230,223,.18)'; ctx.fillRect(W-232, 22, 200, 4);
+  ctx.fillStyle='rgba(232,230,223,.7)';  ctx.fillRect(W-232 + frac*168, 20, 32, 8);
+  ctx.fillStyle='rgba(232,230,223,.45)'; ctx.font='11px Segoe UI'; ctx.textAlign='right';
+  ctx.fillText('A2 · 2600px world · camera scrolls', W-32, 48);
+
+  if (showNotes) drawNotes();
+}
+
+function frame(now){
+  const dt = Math.min(0.033, (now - last)/1000); last = now;
+  update(dt); draw();
+  tapped.clear();
+  requestAnimationFrame(frame);
+}
+reset();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
