@@ -93,17 +93,21 @@ Those two limits — `CODE-1` and `CODE-2` in `docs/status/DEBT.adoc` — are th
 **actual prerequisites for building A2**, ahead of any content work. The mock is
 partly here to make that concrete.
 
-## Open question this surfaced
+## Canon question this surfaced — now ruled
 
-`docs/design/16` and `docs/design/23` **disagree about plants**:
+`docs/design/16` and `docs/design/23` **disagreed about plants**: 16 gave them the
+full stir/settle taxis as a deliberate traversal layer (*"Anya grows a vine to bridge
+a gap; Donna retracts a thorn-wall to pass"*), while 23 said no taxis at all — any
+effect is tropism, arrives much later, and is unknown even to the girls.
 
-- **16** gives plants the full stir/settle taxis as a deliberate traversal layer —
-  *"Anya grows a vine to bridge a gap or reach a ledge; Donna retracts a thorn-wall
-  to pass."*
-- **23** says plants get no stir/settle reaction; any effect is *tropism*, is not
-  introduced in A2 or for a long while after, and is unknown even to the girls.
+> **RULED 2026-08-07 (owner):** the girls *develop the ability later and must discover
+> it themselves*, so **on this level only animal taxis matters**.
 
-These are different framings of the same mechanic — a known, used ability versus an
-undiscovered emergence. This mock follows **23**, since it is the later document and
-the one that actually specifies A2's scope. **An owner ruling would settle it**, and
-it is worth settling before A2 is built rather than after.
+Doc 23 governs. Doc 16 has been re-scoped at source: its flora-taxis section now reads
+as a **late-game** ability rather than early puzzle furniture, and its claim that
+deep-water reeds (`05`) were "the first seeded case" is corrected — those reeds are
+**grabbed**, not grown, so deep-water traversal is unaffected.
+
+This mock was already built to 23 and needed no change. `rules.test.js` keeps it that
+way: the scope guard fails if any plant is given a taxis response or if tropism
+vocabulary appears in the rule functions. The ruling is checked, not just written down.
