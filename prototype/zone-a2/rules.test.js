@@ -107,5 +107,61 @@ st().anya.x = 2000; api.update(0.016);
 t('world is wider than the viewport', api.WORLD > api.W);
 t('camera moved off origin',          st().cam > 0);
 
+// ---------------------------------------------------------------------------
+// Paint-order regression. Canvas has no z-index: the first version of drawGirl
+// painted Anya's hair AFTER her face, as a closed path whose closePath() drew a
+// straight lid across the top — so the fill covered her whole face and torso,
+// leaving only a crescent of scalp above the lid. She read as "a mass of hair
+// with a bald scalp". Donna was unaffected: her hair was already a top-half
+// crown arc. These assertions encode the rule that fixed it.
+// ---------------------------------------------------------------------------
+console.log('\n-- paint order: hair must never bury the face --');
+{
+  const SKIN = '#e6c9a8', HAIR = '#2b211c';
+  const ops = [];
+  let cur = '';
+  const recorder = new Proxy({}, {
+    get: (_, k) => {
+      if (k === 'createLinearGradient') return () => ({ addColorStop() {} });
+      if (k === 'measureText') return () => ({ width: 40 });
+      if (typeof k === 'string' && ['fillStyle','strokeStyle','lineWidth','font','textAlign','globalAlpha','canvas'].includes(k)) return cur;
+      return (...a) => ops.push({ op: String(k), args: a, style: cur });
+    },
+    set: (_, k, v) => { if (k === 'fillStyle') cur = String(v); return true; },
+  });
+
+  const api2 = new Function(`${js}
+return { reset, drawGirl, state:()=>state, ctxSwap: c => { ctx = c; } };`)();
+  // rebuild against the recording context
+  const rebuilt = new Function('REC', `${js.replace(/const ctx = canvas\.getContext\('2d'\);/, 'const ctx = REC;')}
+return { reset, drawGirl, state:()=>state };`)(recorder);
+
+  rebuilt.reset();
+  const anya = rebuilt.state().anya;
+  anya.x = 300; anya.step = 0;
+  ops.length = 0;
+  rebuilt.drawGirl(anya, 0, false);
+
+  const hx = anya.x, R = 11;
+  const skinAt = ops.findIndex(o => o.op === 'arc' && o.style.toLowerCase() === SKIN);
+  t('the face is drawn', skinAt >= 0);
+  t('back hair is painted BEFORE the face',
+    ops.slice(0, skinAt).some(o => o.style.toLowerCase() === HAIR));
+
+  const after = ops.slice(skinAt + 1).filter(o => o.style.toLowerCase() === HAIR);
+  t('hair is also painted after the face (a crown, not a bald scalp)', after.length > 0);
+
+  // Everything hair-coloured drawn after the face must be either the crown
+  // (an arc starting at PI — the TOP half only) or a strand set aside from
+  // the face centre. Nothing may span the face.
+  const offenders = after.filter(o => {
+    if (o.op === 'arc')     return Math.abs(o.args[3] - Math.PI) > 1e-6;   // not a top-half crown
+    if (o.op === 'ellipse') return Math.abs(o.args[0] - hx) < R - 4;       // strand over the face
+    return ['moveTo','lineTo','quadraticCurveTo','closePath'].includes(o.op); // a slab path
+  });
+  t('nothing hair-coloured covers the face after it is drawn', offenders.length === 0);
+  if (offenders.length) console.log('       offenders:', offenders.map(o => o.op).join(', '));
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail) process.exit(1);
