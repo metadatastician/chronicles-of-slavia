@@ -15,7 +15,7 @@ last-updated = "2026-07-16"
 [project-info]
 type = "game"              # library | binary | monorepo | service | website | game
 languages = ["rust", "toml", "nickel", "shell"]
-license = "MPL-2.0"
+license = "AGPL-3.0-or-later"
 author = "Jonathan D.A. Jewell (hyperpolymath)"
 
 # On `type`: the inherited enum offers library|binary|service|website|monorepo, none

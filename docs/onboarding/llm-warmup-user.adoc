@@ -16,6 +16,6 @@ See `README.adoc` for overview.
 
 == Quick Context
 
-* License: MPL-2.0
+* License: AGPL-3.0-or-later (code) / CC-BY-SA-4.0 (docs)
 * Part of hyperpolymath ecosystem
 * See `EXPLAINME.adoc` for architecture

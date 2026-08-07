@@ -59,7 +59,7 @@ issues = [
 [critical-next-actions]
 actions = [
   "Owner: rule on Zone B's 8 open questions. They are now laid out as decisions with options and a recommendation each in docs/design/25-zone-b-decision-sheet.md, tracked in issue #63. Nothing past Zone A is scheduled until they're settled, per 08-level1-five-zone-map.md.",
-  "Owner: reconcile the licence contradiction — AGENTIC.a2ml and CLAUDE.md still say 'Never use AGPL' while ADR-0008 rules AGPL-3.0-or-later for this repo's code, and the launcher a2ml still declares MPL-2.0. Licence edits are owner-only (doctrine 6); see LIC-1..LIC-3 in docs/status/DEBT.adoc.",
+  "DONE 2026-08-07: the licence contradictions are resolved. The owner reaffirmed ADR-0008 explicitly — AGPL-3.0-or-later for code, CC-BY-SA-4.0 for docs — and 18 files that said otherwise were corrected, including the per-repo AGPL override now recorded in AGENTIC.a2ml and CLAUDE.md. Third-party licences untouched.",
   "Upstream: standards#573 — the governance-reusable's embedded linter is pre-lockfile and reds every consumer that adopted gh actions-lock. It is the last red on this board and it blocks merges.",
   "Sweep mise.toml of banned-language toolchains (CI-2) — it also spams warnings on every shell command in the repo.",
   "Consolidate the bounded Zone A fixture into the canonical UMS profiles/chronicles-of-slavia layout after the UMS SDK reconciliation.",

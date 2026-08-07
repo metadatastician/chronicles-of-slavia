@@ -25,12 +25,16 @@ Per estate policy (hyperpolymath/standards `LICENCE-POLICY.adoc` Rule 1 + Addend
 
 - Code / config / scripts: `SPDX-License-Identifier: AGPL-3.0-or-later`.
 - Prose docs (`*.adoc`, `*.md` narrative): `SPDX-License-Identifier: CC-BY-SA-4.0`.
-- GitHub shows only one repo licence: the root `LICENSE` is MPL-2.0 (so the
-  sidebar reads MPL-2.0); **both** canonical texts live in `LICENSES/`
-  (`MPL-2.0.txt` + `CC-BY-SA-4.0.txt`) and prose is CC-BY-SA-4.0 by its
+- GitHub shows only one repo licence: the root `LICENSE` is AGPL-3.0-or-later
+  (so the sidebar reads AGPL-3.0); the canonical texts live in `LICENSES/`
+  and prose is CC-BY-SA-4.0 by its
   per-file header, not a second root licence file.
-- Fallback (platform-required only): MPL-2.0 with a comment explaining why.
-- NEVER use AGPL-3.0 (son-shared repos are the only exception, per Rule 3 — not this template).
+- The estate default denies AGPL; **this repo overrides it** per ADR-0008
+  (`docs/decisions/0008-licence-position.adoc`), reaffirmed by the owner
+  2026-08-07. AGPL-3.0-or-later is correct here — do not "correct" it back.
+- Incorporated MPL-2.0 components keep MPL-2.0. That is legal and intended:
+  MPL §3.3 (Secondary Licenses) names AGPL-3.0 explicitly. Bundled PT Serif
+  fonts keep OFL-1.1.
 - Preserve third-party licenses verbatim; never relicense.
 - Licence-header remediation on existing files is manual, owner-only — no
   automated/bulk SPDX edits (Addendum A2). New files may carry the correct

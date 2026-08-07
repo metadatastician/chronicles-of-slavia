@@ -26,7 +26,17 @@ can-create-files = true
 # - Never commit secrets or credentials
 # - Never use banned languages: Nix, Node/npm, TypeScript, Python, Go
 # - Never place state files in repository root (must be in .machine_readable/)
-# - Never use AGPL. No automated licence edits at all — manual, owner-only.
+# - No automated licence edits at all — manual, owner-only. Third-party
+#   licences are untouchable.
+# - AGPL: the estate default denies it, but THIS REPO OVERRIDES THAT — the
+#   estate language policy is explicitly per-repo overridable via AGENTIC, and
+#   this is the override. ADR-0008 (docs/decisions/0008-licence-position.adoc,
+#   merged in PR #45, reaffirmed by the owner 2026-08-07) rules:
+#     code, configuration and scripts -> AGPL-3.0-or-later
+#     prose documentation and design notes -> CC-BY-SA-4.0
+#   Incorporated MPL-2.0 components keep MPL-2.0 (legal and intended: MPL §3.3
+#   Secondary Licenses names AGPL-3.0), and the bundled PT Serif fonts keep
+#   OFL-1.1. Do not "correct" this repo toward the estate default.
 # - Note Zig is ALLOWED (it is V's replacement). V/vlang is the banned one.
 
 # Repo-specific. These are scope gates, not style preferences — canon states each

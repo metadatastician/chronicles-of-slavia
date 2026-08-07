@@ -16,11 +16,29 @@ access an agent does not have.
 Severity: *high* = misleads or blocks · *medium* = real cost, contained · *low* =
 tidiness.
 
-== 1. Licence debt — all OWNER
+== 1. Licence debt — RESOLVED 2026-08-07
 
-Doctrine forbids automated licence edits, so every item here is recorded and left
-untouched. `LICENSE-INTENT.md` and ADR-0008 agree that code is AGPL-3.0-or-later and
-prose is CC-BY-SA-4.0; the items below are places that disagree with that ruling.
+[NOTE]
+====
+*All four items below are closed.* The owner reaffirmed ADR-0008 explicitly —
+*AGPL-3.0-or-later for code, CC-BY-SA-4.0 for docs* — and directed the fix, which
+is the owner-only authorisation doctrine 6 requires.
+
+*18 files corrected*, including: README's two conflicting SPDX headers reduced to
+one (CC-BY-SA-4.0, it being prose); the launcher's `MPL-2.0` and `0.1.0`; the
+"never use AGPL" lines in `AGENTIC.a2ml`, `CLAUDE.md`, `.github/copilot-instructions.md`
+and `docs/practice/AI-CONVENTIONS.adoc`, each now recording the *per-repo override*
+rather than the estate default; and twelve further assertions of MPL-2.0 across
+onboarding docs, `RSR_OUTLINE`, `STATE-VISUALIZER`, `CITATIONS`, `CRG-CRITERIA`,
+`TEST-NEEDS` and `META.a2ml`.
+
+*Deliberately untouched:* incorporated MPL-2.0 components keep MPL-2.0 — legal and
+intended, since MPL §3.3 (Secondary Licenses) names AGPL-3.0 explicitly; the bundled
+PT Serif fonts keep OFL-1.1; `compliance/rust/deny.toml`'s dependency allow-list is
+unchanged; and ADR-0001/0008 keep their historical text.
+====
+
+The original findings, retained for the record:
 
 [cols="1,4,1",options="header"]
 |===
@@ -304,13 +322,13 @@ These are open questions, not defects — but they block work and belong in one 
 |===
 | Area | High | Medium | Low
 
-| Licence | 3 | 1 | 0
+| Licence (all resolved 08-07) | 0 | 0 | 0
 | Documentation | 0 | 2 | 2
 | Code | 2 | 4 | 2
 | Proof | 2 | 0 | 1
 | CI/CD | 2 | 6 | 2
 | Design/canon | 1 | 2 | 1
-| *Total* | *10* | *15* | *8*
+| *Total* | *7* | *14* | *8*
 |===
 
 The two structural items worth reading twice: *CODE-1 and CODE-2* (no moving camera, no

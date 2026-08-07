@@ -24,30 +24,6 @@ method = "ground-truthed against the tree, not read off status docs"
 # are outward-facing (doctrine 11). Recorded, deliberately untouched.
 
 [[debt.owner]]
-id = "LIC-1"
-component = "README.adoc"
-issue = "Two conflicting SPDX headers: AGPL-3.0-or-later (line 1) and CC-BY-SA-4.0 (line 2). A file has one licence. ADR-0008 makes prose CC-BY-SA-4.0, which suggests line 1 is the stray — but deleting either is a licensing decision."
-effort = "easy"
-impact = "high"
-discovered = "2026-08-07"
-
-[[debt.owner]]
-id = "LIC-2"
-component = "chronicles-of-slavia.launcher.a2ml"
-issue = "Declares license = MPL-2.0, contradicting ADR-0008 (AGPL-3.0-or-later). Same file declares version = 0.1.0 while both crates are 0.0.0."
-effort = "easy"
-impact = "high"
-discovered = "2026-08-07"
-
-[[debt.owner]]
-id = "LIC-3"
-component = ".machine_readable/descriptiles/AGENTIC.a2ml + CLAUDE.md"
-issue = "Both say 'Never use AGPL' while ADR-0008 rules AGPL-3.0-or-later for this repo's code. The estate policy is per-repo overridable via AGENTIC, but the override is unrecorded — so the substrate an agent reads on arrival contradicts the merged ADR. Rhodibot's canary was aligned in #58; the descriptiles were not."
-effort = "easy"
-impact = "high"
-discovered = "2026-08-07"
-
-[[debt.owner]]
 id = "CAN-3"
 component = "docs/design/24 + 25"
 issue = "Zone B's 8 rulings outstanding (issue #63). Zone B cannot be scoped and doc 24 stays provisional until they land."
@@ -266,6 +242,12 @@ discovered = "2026-08-07"
 # ============================================================================
 # RESOLVED THIS PASS (2026-08-07) — kept briefly for the next session's context
 # ============================================================================
+
+[[debt.resolved]]
+id = "LIC-1/2/3"
+component = "README.adoc, launcher a2ml, AGENTIC.a2ml, CLAUDE.md, +12 others"
+issue = "Licence contradictions: README carried two conflicting SPDX headers; the launcher declared MPL-2.0 and version 0.1.0; AGENTIC/CLAUDE/copilot-instructions/AI-CONVENTIONS said 'never AGPL' while ADR-0008 rules AGPL for this repo; and 15 files across docs, onboarding, governance metadata and descriptiles asserted MPL-2.0 as the repo licence."
+resolved = "2026-08-07 — owner reaffirmed ADR-0008 explicitly (AGPL-3.0-or-later for code, CC-BY-SA-4.0 for docs) and directed the fix. Third-party licences untouched: MPL-2.0 components keep MPL (legal per MPL 3.3), OFL-1.1 fonts keep OFL, and the rust deny.toml dependency allow-list is unchanged."
 
 [[debt.resolved]]
 id = "DOC-6"
