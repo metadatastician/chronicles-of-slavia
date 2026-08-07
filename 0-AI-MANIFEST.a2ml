@@ -5,11 +5,12 @@
 #
 [metadata]
 version = "0.1.0"
-last-updated = "{{CURRENT_DATE}}"
+last-updated = "2026-08-07"
 
 [project]
-name = "[YOUR-REPO-NAME]"
-purpose = "{{PROJECT_DESCRIPTION}}"
+name = "chronicles-of-slavia"
+purpose = "A two-character Slavic-folkloric narrative game. The world answers the player through an emotional grammar — Anya stirs, Donna settles — and the animal's own nature decides the result. Authored as data (the SGS) over a pure, deterministic rules core, with the renderer as a replaceable skin."
+orientation = "Read .machine_readable/descriptiles in the order CLADE -> ANCHOR -> AGENTIC -> ECOSYSTEM -> STATE. Current honest state: docs/status/READINESS.adoc (grade E) and docs/status/DEBT.adoc (33 open items)."
 
 [ai-allocation]
 agents = [

@@ -14,8 +14,13 @@ Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 
 ## License
 
-- SPDX: `MPL-2.0` on all new files.
-- Never use AGPL-3.0.
+- SPDX: `AGPL-3.0-or-later` on new code/config/scripts; `CC-BY-SA-4.0` on new prose docs (ADR-0008).
+- The estate default denies AGPL, but **this repo overrides it**: ADR-0008
+  (`docs/decisions/0008-licence-position.adoc`) rules AGPL-3.0-or-later for code
+  and CC-BY-SA-4.0 for prose. Follow ADR-0008 here.
+- Never edit a licence header automatically — licence changes are manual and
+  owner-only. Third-party licences (MPL-2.0 components, OFL-1.1 fonts) are
+  untouchable and keep their own terms.
 - Copyright: `{{AUTHOR}} ({{OWNER}}) <{{AUTHOR_EMAIL}}>`
 
 ## Code Style

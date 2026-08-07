@@ -7,9 +7,24 @@ and opposition-as-mechanic — extended onto the *growth* axis and Slavia's
 
 ## Flora and the taxis gift
 
+> **RULED 2026-08-07 (owner).** *The girls only develop this ability later, and
+> they must discover it themselves — so on Level 1 it is only animal taxis that
+> matters.*
+>
+> This section therefore describes a **late-game** ability, not an available
+> mechanic. Everything below is what the gift becomes **once they have it**; none
+> of it is a designed traversal layer for Level 1, and nothing in Level 1 may
+> teach, prompt, or UI-surface it. See `23-level-scope-and-pacing.md` (A2) for the
+> discovery framing: the reveal is untutored and diegetic — *Anya and Donna do not
+> know they can do this*, and the player is meant to notice unaided.
+>
+> Consequence for this doc: the traversal examples below (growing a vine to bridge
+> a gap, retracting a thorn-wall) are **not** early-game puzzle furniture. They are
+> what the ability affords much later, if it is used for traversal at all.
+
 Taxis is "the rate and direction of a living thing's motion" — for rooted plants
-that is the **rate of growth, opening, and sway**. So the girls affect plants by
-the same rule that moves animals:
+that is the **rate of growth, opening, and sway**. Once the gift extends to them,
+the girls affect plants by the same rule that moves animals:
 
 - **Anya raises it** — quickens growth, bursts buds open, shoots vines out,
   germinates seeds, makes tendrils reach, sets brambles thrashing.
@@ -18,9 +33,14 @@ the same rule that moves animals:
 - **Nature-gated** (as animals): natural plants answer; **blighted / Rift-touched**
   plants fail to answer naturally (diagnostic); plants **twisted by an enemy**
   act against their nature.
-- **Opposition is the mechanic:** Anya grows a vine to bridge a gap or reach a
-  ledge; Donna retracts a thorn-wall to pass. What one does, the other undoes.
-  (Reeds for deep water are the first seeded case — `05`.)
+- **Opposition still holds:** what one does, the other undoes — Anya grows a vine,
+  Donna retracts a thorn-wall. *Later.*
+
+**Correction (2026-08-07):** this doc previously called "reeds for deep water"
+(`05`) the first seeded case of flora-taxis. It is not. Doc `05` specifies **reeds
+*to grab*** — a physical handhold — alongside a raft or buoyant object, with Donna
+*stilling a span*. Nothing there asks a plant to answer the gift, so deep-water
+traversal is unaffected by the ruling and needs no rescheduling.
 
 ## Plants have two ORTHOGONAL aspects (owner's framing)
 
@@ -34,10 +54,16 @@ layer (vines, reeds, brambles, blooming platforms).
   - **Food plants** — edible *or* poisonous. **Not** pure healing; they *help*
     (sustenance, minor effects) or *harm* (poison). A lesser, situational tier.
   - **Craft plants** — fibres for the **physical repair** of clothing, the
-    protection layer (`17-clothing-repair-and-pattern-weaving.md`). Fibres come
-    from **plants**, never harvested from living animals (`03`).
-  - **Pattern plants** — tinctures / dyes / special fibres: the materials for
-    **pattern weaving**, the embroidery upgrades — "the proper stuff" (`17`).
+    protection layer (`17-clothing-repair-and-pattern-weaving.md`).
+    *Not the only source:* per the ruling of 2026-08-07, repair may also use
+    **harmless animal materials — sheep wool above all**. The test is cost to
+    the creature, not origin: shorn wool costs a sheep nothing. Taking anything
+    at a living animal's expense remains forbidden (`03`).
+  - **Pattern plants** — tinctures / dyes / special fibres, **pigments and
+    petals**: the materials for **pattern weaving**, the embroidery upgrades —
+    "the proper stuff" (`17`). **Plants only, with no exception** — a pattern is
+    a meaning carried by what the land yields, and no animal material enters one
+    however harmlessly obtained.
 
 Independent: a reed can be both a traversal plant *and* a craft fibre; a bloom
 can be *food* and a *dye*.
@@ -80,14 +106,30 @@ only by behaviour, never a glow. Roster, split by the girls' heritages:
 
 ## Zone A scope
 
-None of this is in Zone A's base (natural birds only). The first likely flora
-use is **reeds at the water** (deep-water traversal, `05`). Everything else is
-canon for later.
+None of this is in Zone A's base (natural birds only), and per the ruling above
+**no flora-taxis appears anywhere in Level 1**.
+
+What Zone A *does* get, per `23-level-scope-and-pacing.md`:
+
+- **A1** (built) — animal taxis only: the grove birds.
+- **A2** — animals broadened (nature-gating made legible across several species
+  and tiers), and plants present but **functional only**: the three harvest types
+  in §B below — food, craft fibre, pattern dye. They are gathered, never moved.
+- Deep-water reeds (`05`) remain available as a *handhold*, not as a plant
+  answering the gift.
+
+An interaction mock of A2 built to this scope lives at `prototype/zone-a2/`; its
+test suite enforces the absence of flora-taxis as a scope guard, so the ruling is
+checked rather than merely written down.
 
 ## Open questions for the owner (steer)
 
-1. Which plant role leads — **traversal flora**, **herbs/medicine**, or
-   **folk-symbol/sacred**?
+1. ~~Which plant role leads — **traversal flora**, **herbs/medicine**, or
+   **folk-symbol/sacred**?~~ **Partly answered by the 2026-08-07 ruling:**
+   traversal flora does *not* lead — it cannot, since the ability arrives late and
+   by self-discovery. On Level 1 the leading plant role is the **harvest** axis
+   (food / craft / pattern). Which of herbs-medicine or folk-symbol/sacred leads
+   *after* that is still open.
 2. Which folklore figures are canon (the roster above — keep/cut/add)?
 3. Do spirits appear in **Chronicle I**, or later?
 4. Do plants have *will* at all (a sacred tree that chooses), or only the

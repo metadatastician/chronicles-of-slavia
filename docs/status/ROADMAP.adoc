@@ -1,23 +1,125 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= YOUR Template Repo Roadmap
+= Chronicles of Slavia — Roadmap
+:toc:
 
-== Current Status
+Ground-truthed 2026-08-07 against the built engine and the design canon. Percentages
+are evidence-backed or absent; see `READINESS.adoc` for the component grades and
+`DEBT.adoc` for what is knowingly owed.
 
-Initial development phase.
+[IMPORTANT]
+====
+*The governing rule is `docs/design/08-level1-five-zone-map.md`: do not build Zones
+B–E until Zone A holds.* Design work on later zones is permitted and ongoing; engine
+and SGS work on them is not scheduled. Nothing in this roadmap overrides that.
+====
 
-== Milestones
+== Where we are
 
-=== v0.1.0 - Foundation
-* [ ] Core functionality
-* [ ] Basic documentation
-* [ ] CI/CD pipeline
+Zone A — the Border Path — is *built and playable*: the free-roam scene, the
+two-heroine paper-doll rig, grove birds answering by their own nature, the unstable
+crossing, the Rift's interruption, and a full in-game menu with save/load/continue.
+The rules core and the ESM are complete and green. 52 tests pass; none fail.
 
-=== v1.0.0 - Stable Release
-* [ ] Full feature set
-* [ ] Comprehensive tests
-* [ ] Production ready
+Under `docs/design/23-level-scope-and-pacing.md`, what is built is *segment A1* of a
+Zone A that is intended to be roughly five times its current size.
 
-== Future Directions
+== Done
 
-_To be determined based on community feedback._
+[cols="3,1,4",options="header"]
+|===
+| Milestone | State | Evidence
+
+| Zone A five-beat success condition
+| Done
+| `engine/slavia-core/tests/zone_a.rs` — 7 tests green
+
+| L2 rules core — emotional grammar, living taxis, SGS parsing
+| Done
+| 29 unit tests green; dependencies are `serde` + `toml` only
+
+| ESM — belief, kanren, intent, decay (ADR-0004)
+| Done, unwired
+| 10 testbed tests green; headless by decision, connected to no scene
+
+| L3 renderer — Bevy Zone A (ADR-0003)
+| Done
+| `engine/slavia-zone-a/src/render.rs`; paper-doll rig, physics, birds, crossing, Rift
+
+| In-game menu, real typography, save/load/continue
+| Done
+| `menu/` (8 panels, PT Serif OFL-1.1), `save.rs` (TOML), Continue resumes state
+
+| UMS Zone A / Border Path profile
+| Done
+| Sibling UMS profile validates; descriptive only — no runtime loader, by ADR-0007
+
+| Honest five-prover proof gate
+| Done
+| `.github/workflows/proof-gate.yml` green 2026-08-04 — first pass in the gate's life
+|===
+
+== Next — awaiting owner rulings, not engineering
+
+These are blocked on decisions, and no amount of implementation unblocks them.
+
+. *Zone B's eight questions.* `docs/design/25-zone-b-decision-sheet.md` puts each in
+  front of the owner with options and a recommendation; issue #63 tracks them. Zone B
+  cannot be scoped until they are ruled.
+. *Chronicle I's tone.* `docs/design/13` says "surreal, dangerous, fast-paced"; the
+  Kishōtenketsu blueprint in `22` and the built Zone A both say calm and grounding.
+  One ruling, applied at source in `13`/`22`.
+. *Co-op vs switch-only.* `13` lists Chronicle II as "Dual-Character Simultaneous";
+  `08` and the built engine are switch-only. This one touches the engine — settle it
+  before Chronicle II is designed against it.
+
+== Then — the engine substrate A2–A5 and Zone B both need
+
+Two limits block *every* zone larger than one screen. Neither is started, and both are
+prerequisites rather than features:
+
+* *A moving camera.* `render.rs` spawns one static `Camera2d`; X is hard-clamped to
+  ±620. There is no code path for a level wider than a screen.
+* *Rooms in `Session`.* Position is one float along one flat `Vec<Beat>`. `docs/design/23`
+  calls for discrete connected rooms, each possibly larger than a screen — which needs
+  two levels of position (which room, and where within it).
+
+== Zone A, at full scope (`docs/design/23`)
+
+One continuous level, five internal segments, a save point at each boundary.
+
+[cols="1,4",options="header"]
+|===
+| Segment | Content
+
+| *A1* | Built today. Gains a closing beat: a marauder appears and Anya disrupts the crossing to repel them — protective disruption, distinct from the Rift's accidental kind.
+| *A2* | Animals and plants; functional plants and pattern plants; each girl's signature recharge item (Anya: foraged honey; Donna: made yogurt — wild vs. crafted, matching their natures).
+| *A3* | NPCs and clothing as legible identity; the girls obtain an artefact, inert until A5; differential NPC reaction becomes a real puzzle tool.
+| *A4* | Puzzle dynamics — the place to finally wire the named ability rosters already written in `docs/characters/the-little-book-of-{anya,donna}.adoc`.
+| *A5* | Synthesis, plus asymmetric information and theory of mind — the natural home for the ESM, using the A3 artefact.
+|===
+
+== After Zone A
+
+* *Zone B — Fracture Line.* Drafted beat-by-beat (`docs/design/24`); the Rift opens a
+  seam along the hole in the co-op grammar, and the girls' loyalty is the lever that
+  parts them. Gated on the eight rulings.
+* *Zones C, D, E.* Each girl alone on her own shore in a world tilted toward her own
+  excess, the other visible across the chasm, to a reunion at the Rift Node Chamber.
+* *Chronicle II — The Echo Engine.* Chiasmus/ring composition. Structurally *depends*
+  on Chronicle I's route existing first — a C→B→A mirror needs a real A→B→C.
+* *Chronicle III — The Two Who Were Needed.* Fichtean curve.
+
+== Explicitly not now
+
+Combat · inventory · multiplayer · the full class system · NPC factions · boss design ·
+Level 2 · full animal AI · a production art pipeline.
+
+These are parked, not forgotten; several have design material waiting in
+`docs/design/04`, `05`, and `19`.
+
+== Release posture
+
+No release is scheduled. Both crates are `0.0.0` deliberately, `docs/status/READINESS.adoc`
+carries the honest component grades, and a version number will follow a decision to
+publish rather than announce one.

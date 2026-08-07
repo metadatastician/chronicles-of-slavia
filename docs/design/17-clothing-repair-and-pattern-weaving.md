@@ -9,12 +9,20 @@ living forces).
 ## Axis 1 — Physical state (Pristine → Tatters)
 
 The cloth's condition. High = protection (impact, thorns, weather); Tatters =
-that protection is gone. Degrades with hits/hazards; **repaired with *craft*-
-plant fibres** (`16`). Purely material.
+that protection is gone. Degrades with hits/hazards; **repaired with craft-plant
+fibres *and* harmless animal materials — sheep wool above all** (ruling of
+2026-08-07, see Explicit NOTs below). Purely material.
+
+Wool is the natural best-in-class here: it is what a shepherd's country actually
+mends with, it costs the sheep nothing, and it gives the repair axis its own
+sourcing story distinct from the pattern axis — you mend with what the flock
+gives and you weave meaning from what the land grows.
 
 ## Axis 2 — Pattern weaving (orthogonal upgrade layer)
 
-Woven with **pattern-plant** dyes/fibres (`16`). A prerequisite tree of sacred
+Woven with **pattern-plant** materials only (`16`) — fibres, pigments, dyes,
+**petals**, and whatever else the land yields. No animal material enters a
+pattern, however harmlessly obtained (ruling of 2026-08-07). A prerequisite tree of sacred
 geometry (foundations combine into higher motifs), using real motifs as cultural
 grounding — Ukrainian **Berehynia** line, Bulgarian **Kanatitsa / Elbetitsa**
 line. Patterns are **dormant when the cloth is in Tatters** and snap back when it
@@ -55,11 +63,33 @@ it. If it wants a hotkey and a cooldown, it is the wrong shape.
 
 - **No combat power-fantasy.** Anya does not slay armies; Donna is not Atlas
   holding up the world. No "you are ready to destroy the enemy."
-- **The dress does not accrete living things**, and it does **not** pull wool /
-  fibres / materials from living animals. Craft and pattern materials come from
-  **plants** (`16`) — never harvested from creatures. This is consistent with
-  the core rule that the girls change the world's rhythm but never *command or
-  consume* animals (`03`).
+- **The dress does not accrete living things.** It is never built out of
+  creatures, and nothing is taken from an animal at the animal's cost.
+
+  > **RULED 2026-08-07 (owner), refining the blanket ban this clause used to
+  > carry:** *sheep wool and things that will not hurt animals can be used to
+  > improve armour values by repairing them — but the patterns are all plant
+  > based: fibres, pigments, petals and so on.*
+  >
+  > So the governing test is **cost to the creature, not origin of the
+  > material**. Shorn wool costs a sheep nothing; a moulted feather or shed
+  > material costs its owner nothing. Those are admissible for **repair**. What
+  > stays forbidden is anything that takes from a living animal at its expense —
+  > which is what "never *command or consume* animals" (`03`) actually protects,
+  > and it is protected exactly as strictly as before.
+  >
+  > This makes the two axes differ in their *materials*, not only their effects:
+  >
+  > | Axis | Materials |
+  > |---|---|
+  > | **Axis 1 — physical repair** (armour value) | plant craft fibres **and** harmless animal materials — wool above all |
+  > | **Axis 2 — pattern weaving** (the upgrade layer) | **plants only** — fibres, pigments, dyes, petals |
+  >
+  > The asymmetry is not arbitrary. Repair is *material*: it restores a garment's
+  > protection, and any harmlessly-given fibre will serve. A pattern is a
+  > *meaning* — a blueprint of identity read by NPCs and spirits — and its
+  > meaning is carried by what the land itself yields. A pattern woven from an
+  > animal would say something the design does not want said.
 - **No triggered special moves** (restated): passive/ambient, not a moveset.
 
 In-scale examples (owner defines the real set — these only calibrate scale):

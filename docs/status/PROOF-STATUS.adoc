@@ -1,101 +1,121 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-// Template: rsr-template-repo/docs/status/PROOF-STATUS.adoc
 // Tracks proof completion. Requirements defined in PROOF-NEEDS.adoc
-= Proof Status — {{PROJECT}}
+= Proof Status — Chronicles of Slavia
+:toc:
+
+Ground-truthed 2026-08-07 against `verification/proofs/*/MANIFEST` and the Proof Gate
+run of 2026-08-04 (the first successful run in the gate's history).
 
 == Summary
 
 [cols="2,1,1,1,1,1", options="header"]
 |===
-| Category | Total | Done | In Progress | Blocked | Remaining
+| Category | Total | Mechanically verified | In progress | Blocked | Remaining
 
-| ABI/FFI (ABI) | 5 | 0 | 0 | 0 | 5
-| Typing (TP) | 2 | 0 | 0 | 0 | 2
+| ABI/FFI (ABI) | 5 | 5 | 0 | 0 | 0
+| Typing (TP) | 2 | 2 | 0 | 0 | 0
 | Invariant (INV) | 0 | 0 | 0 | 0 | 0
 | Security (SEC) | 0 | 0 | 0 | 0 | 0
 | Concurrency (CONC) | 0 | 0 | 0 | 0 | 0
 | Algorithm (ALG) | 0 | 0 | 0 | 0 | 0
 | Domain (DOM) | 0 | 0 | 0 | 0 | 0
-| *Total* | *7* | *0* | *0* | *0* | *7*
+| *Total* | *7* | *7* | *0* | *0* | *0*
 |===
 
-*Overall*: 0% proven
+*All 7 declared requirements are mechanically verified in CI.* Read the two caveats
+below before quoting that number anywhere.
 
-== Proofs Done
+[IMPORTANT]
+.Caveat 1 — what these proofs are about
+====
+Every one of the 7 requirements concerns a *generic C ABI/FFI seam* inherited from the
+RSR template: pointer non-nullity, struct layout and alignment, per-platform type
+sizes, FFI return types, and API type well-formedness.
 
-// Format:
-// | ID | Proof | Prover | File | Date | Verified By |
-// | ABI-1 | Non-null pointer proofs | Idris2 | verification/proofs/idris2/ABI/Pointers.idr | 2026-XX-XX | idris2 --check |
+*None of them is about Slavia.* No proof yet states an invariant of the emotional
+grammar, the living-taxis rules, determinism, or the ESM. Those properties are
+currently held by the Rust test suite (52 tests), which is real evidence but is not a
+proof. Two prover manifests say so in their own words: the Agda and Coq entries both
+read _"still generic template content, not a chronicles invariant"_.
+====
 
-[cols="1,3,1,3,1,2", options="header"]
+[IMPORTANT]
+.Caveat 2 — TLA+ verifies nothing today
+====
+`verification/proofs/tlaplus/StateMachine.tla` is marked *quarantine*, not *gated* —
+_"tla2sany not available in current environment; proof cannot be verified"_.
+
+Under `scripts/check-proofs.sh`, a quarantined module passes the check by *continuing
+to fail*. So `proof-check-tla` reporting PASS means "the known-broken module is still
+broken, as recorded" — it does **not** mean a TLA+ specification was model-checked.
+The gate is honest about this by design; a reader skimming a green board might not be.
+
+The quarantine note may now be stale: the Proof Gate workflow does install
+`tla2tools.jar` and a JRE. Re-evaluating whether `StateMachine.tla` can be promoted to
+`gated` is tracked in `DEBT.adoc`.
+====
+
+== Verified
+
+[cols="1,3,1,3", options="header"]
 |===
-| ID | Proof | Prover | File | Date | Verified By
+| ID | Proof | Prover | File
 
-| — | No proofs completed yet | — | — | — | —
+| ABI-1 | Non-null pointer proofs | Idris2 | `verification/proofs/idris2/ABI/Pointers.idr`
+| ABI-2 | Memory layout correctness | Idris2 | `verification/proofs/idris2/ABI/Layout.idr`
+| ABI-3 | Platform type size proofs (7 platforms) | Idris2 | `verification/proofs/idris2/ABI/Platform.idr`
+| ABI-4 | FFI function return types | Idris2 | `verification/proofs/idris2/ABI/Foreign.idr`
+| ABI-5 | C ABI compliance | Idris2 | `verification/proofs/idris2/ABI/Compliance.idr`
+| TP-1  | Core data type well-formedness | Idris2 | `verification/proofs/idris2/Types.idr`
+| TP-2  | Public API type safety | Lean 4 | `verification/proofs/lean4/ApiTypes.lean`
 |===
 
-== Proofs In Progress
+All Idris2 modules are `gated` in `verification/proofs/idris2/MANIFEST`, whose own note
+records the quality bar met: *all 12 typed holes discharged constructively; no
+`believe_me`, no `postulate`, no `assert_total`*. That matters — those are precisely the
+escape hatches that let a proof file typecheck while proving nothing, and
+`scripts/scan-dangerous.sh` gates against them.
 
-[cols="1,3,1,2,1,2", options="header"]
+== Per-prover state
+
+[cols="1,1,2,3", options="header"]
 |===
-| ID | Proof | Prover | Assignee | Started | Blocker
+| Prover | Modules | Status | Note
 
-| — | — | — | — | — | —
-|===
-
-== Proofs Blocked
-
-[cols="1,3,2,3", options="header"]
-|===
-| ID | Proof | Blocked By | Notes
-
-| — | — | — | —
-|===
-
-== Proofs Remaining
-
-[cols="1,3,1,1,1,1", options="header"]
-|===
-| ID | Proof | Category | Prover | Priority | Est. Effort
-
-| ABI-1 | Non-null pointer proofs | ABI | Idris2 | P1 | 2h
-| ABI-2 | Memory layout correctness | ABI | Idris2 | P1 | 4h
-| ABI-3 | Platform type size proofs | ABI | Idris2 | P1 | 2h
-| ABI-4 | FFI function return type proofs | ABI | Idris2 | P1 | 2h
-| ABI-5 | C ABI compliance | ABI | Idris2 | P1 | 4h
-| TP-1 | Core data type well-formedness | TP | Idris2 | P1 | 4h
-| TP-2 | Public API type safety | TP | Lean4 | P2 | 4h
+| Idris2 | 6 | all gated, all compile | The substantive body of work. Verified under 0.8.0.
+| Lean 4 | 1 | gated, compiles | `ApiTypes.lean`.
+| Agda | 1 | gated, compiles under `agda --safe` | Generic template content, not a Slavia invariant.
+| Coq | 1 | gated, compiles under `coqc` | Generic template content, not a Slavia invariant.
+| TLA+ | 1 | *quarantine — unverified* | See Caveat 2.
 |===
 
-== Verification Commands
+== How this is checked
 
-[source,bash]
-----
-# Check all Idris2 proofs
-just proof-check-idris2
+`scripts/check-proofs.sh <prover>` is the single source of truth; both CI and a local
+`just proof-check-all` call it, so a green local run and a green CI run mean the same
+thing. It exists because four earlier "checks that could not fail" let non-compiling
+proofs sit in estate repos for months while status files said "proved" — including the
+trap that `idris2 --check` *exits 0 on a missing import* while printing `Error:`. The
+script therefore requires exit 0 **and** no `Error:` line.
 
-# Check all Lean4 proofs
-just proof-check-lean4
+`.github/workflows/proof-gate.yml` provisions all five toolchains and treats a missing
+prover as *fatal, never a skip*: an unrun prover means the proofs are unverified, and
+the gate declines to certify them.
 
-# Check all Agda proofs
-just proof-check-agda
+== What would make this meaningful for Slavia
 
-# Check all Coq proofs
-just proof-check-coq
+In rough order of value, tracked in `PROOF-NEEDS.adoc` and `DEBT.adoc`:
 
-# Run all proof checks
-just proof-check-all
+. *Determinism (INV).* L2's central claim — same seed and same inputs give the same
+  result — is currently test-evidenced, not proven.
+. *The opposition invariant (DOM).* Only Donna can settle; only Anya can stir; no state
+  lets one perform the other's act. This is the rule the whole game and Zone B's design
+  rest on.
+. *Living-taxis soundness (DOM).* An animal's response is a function of its own nature
+  and the acting girl — never of the girl alone.
+. *ESM belief locality (INV).* Belief is baseline plus an entity's own deltas; no
+  entity reads another's private belief.
 
-# Scan for dangerous patterns
-panic-attack assail --proofs-only
-----
-
-== Changelog
-
-[cols="1,3,1", options="header"]
-|===
-| Date | Change | By
-
-| 2026-04-04 | Initial proof status tracking | Template
-|===
+Until at least one of these lands, the accurate summary of this repo's formal position
+is: *a rigorously gated ABI proof suite, and a well-tested but unproven game core.*
