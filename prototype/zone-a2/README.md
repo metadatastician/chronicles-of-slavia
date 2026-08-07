@@ -58,10 +58,26 @@ verb; the creature's own nature chooses the meaning:
 **Plants, in three harvest types** (doc 16's axis B) — functional only:
 
 - **food** — edible *or* poisonous. Helps a little, or harms. Never "healing".
-- **craft fibre** — for the physical repair of cloth. From plants, *never* from a
-  living creature (docs 03 / 17).
-- **pattern dye** — gathered here, carried into A3, which is where weaving happens.
-  One of doc 23's deliberate cross-segment threads.
+- **craft fibre** — for the physical repair of cloth.
+- **pattern dye** — petals and pigment, gathered here and carried into A3, which is
+  where weaving happens. One of doc 23's deliberate cross-segment threads.
+
+**Repair and pattern are sourced differently** (ruled 2026-08-07):
+
+| Axis | Materials |
+|---|---|
+| **Repair** (armour value) | plant craft fibre **and** harmless animal material — **shorn wool** above all |
+| **Pattern** (the upgrade layer) | **plants only** — fibres, pigments, petals. No exception. |
+
+The governing test is **cost to the creature, not origin of the material**. Shorn
+wool costs a sheep nothing; taking anything at a living animal's expense stays
+forbidden. The mock states this without a word of UI: **the ewe stands beside her
+own fleece, in full coat, entirely unbothered.** She is never a gather target —
+the fleece is a site in the world, already given.
+
+The asymmetry isn't arbitrary. Repair is *material* — any freely-given fibre will
+serve. A pattern is a *meaning*, read by NPCs and spirits, and its meaning is
+carried by what the land itself yields.
 
 **The two signature restoratives**, which encode the girls' natures in how they are
 *obtained* rather than in a stat:

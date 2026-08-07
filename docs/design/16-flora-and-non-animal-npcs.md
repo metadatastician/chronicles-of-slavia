@@ -54,10 +54,16 @@ layer (vines, reeds, brambles, blooming platforms).
   - **Food plants** — edible *or* poisonous. **Not** pure healing; they *help*
     (sustenance, minor effects) or *harm* (poison). A lesser, situational tier.
   - **Craft plants** — fibres for the **physical repair** of clothing, the
-    protection layer (`17-clothing-repair-and-pattern-weaving.md`). Fibres come
-    from **plants**, never harvested from living animals (`03`).
-  - **Pattern plants** — tinctures / dyes / special fibres: the materials for
-    **pattern weaving**, the embroidery upgrades — "the proper stuff" (`17`).
+    protection layer (`17-clothing-repair-and-pattern-weaving.md`).
+    *Not the only source:* per the ruling of 2026-08-07, repair may also use
+    **harmless animal materials — sheep wool above all**. The test is cost to
+    the creature, not origin: shorn wool costs a sheep nothing. Taking anything
+    at a living animal's expense remains forbidden (`03`).
+  - **Pattern plants** — tinctures / dyes / special fibres, **pigments and
+    petals**: the materials for **pattern weaving**, the embroidery upgrades —
+    "the proper stuff" (`17`). **Plants only, with no exception** — a pattern is
+    a meaning carried by what the land yields, and no animal material enters one
+    however harmlessly obtained.
 
 Independent: a reed can be both a traversal plant *and* a craft fibre; a bloom
 can be *food* and a *dye*.

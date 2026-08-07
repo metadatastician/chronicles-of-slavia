@@ -94,6 +94,7 @@ const SITES = [
   { x: 1140, kind: 'pattern', label: 'woad'   },
   { x: 1420, kind: 'honey',   label: 'bee tree' },
   { x: 1760, kind: 'yogurt',  label: "shepherd's hut" },
+  { x: 1980, kind: 'wool',    label: 'shorn fleece' },
   { x: 2450, kind: 'save',    label: 'to A3' },
 ];
 
@@ -104,6 +105,9 @@ const FAUNA = [
   { x: 1000, kind: 'hare',   tier: 'wild',        y: GROUND-14  },
   { x: 1420, kind: 'bees',   tier: 'wild',        y: GROUND-170 },
   { x: 1700, kind: 'goat',   tier: 'domesticated',y: GROUND-30  },
+  // The sheep stands beside the fleece, unshorn and unbothered — the wool in
+  // the basket cost her nothing. That is the whole point made visually.
+  { x: 1900, kind: 'sheep',  tier: 'domesticated',y: GROUND-22  },
   { x: 2150, kind: 'magpie', tier: 'blighted',    y: GROUND-100 },
 ];
 
@@ -121,7 +125,7 @@ function reset(){
     cam: 0,
     msg: '', msgT: 0,
     t: 0,
-    pouch: { food: 0, craft: 0, pattern: 0, honey: false, yogurt: false, poisoned: 0 },
+    pouch: { food: 0, craft: 0, wool: 0, pattern: 0, honey: false, yogurt: false, poisoned: 0 },
     sites: SITES.map(s => ({ ...s, taken: false })),
     fauna: FAUNA.map(f => ({ ...f, mood: 'calm', moodT: 0, phase: Math.random()*6.28, ox: 0, oy: 0 })),
     beesSettled: false,
@@ -175,6 +179,11 @@ function reachOut(g, f){
         stir ? 'The goat startles — then stays. It has been startled by people before.'
              : 'The goat walks to her. It expects hands. It is not wild, and now you know.');
       break;
+    case 'sheep':
+      f.mood = stir ? 'skittish' : 'trusting'; f.moodT = 3.0;
+      say(stir ? 'The ewe shuffles a few steps and thinks better of it.'
+               : 'The ewe settles into the grass, entirely unbothered.');
+      break;
   }
 }
 
@@ -190,11 +199,17 @@ function gather(g, s){
       break;
     case 'craft':
       s.taken = true; state.pouch.craft++;
-      learn('craft', 'Nettle fibre — for mending cloth. Fibre comes from plants. Never from a living creature.');
+      learn('craft', 'Nettle fibre — for mending cloth. Repair is material: anything given freely will serve.');
+      break;
+    case 'wool':
+      // RULED 2026-08-07: repair MAY use animal materials that cost the animal
+      // nothing. The test is cost to the creature, not origin of the material.
+      s.taken = true; state.pouch.wool++;
+      learn('wool', 'Shorn fleece — already given, and the ewe none the poorer. It mends better than nettle.');
       break;
     case 'pattern':
       s.taken = true; state.pouch.pattern++;
-      learn('pattern', 'Dye stock. Not used here — it is carried to A3, where the weaving happens.');
+      learn('pattern', 'Dye stock — petals and pigment. Patterns are plant, always. Carried to A3, where the weaving happens.');
       break;
     case 'honey':
       if (!state.beesSettled) { say('The bees are up. Not while they are like this.'); return; }
@@ -364,6 +379,18 @@ function drawSite(s, cam){
     ctx.fillText(s.taken ? 'bee tree (taken)' : 'bee tree', x, GROUND-250);
     return;
   }
+  if (s.kind === 'wool'){
+    // A basket of already-shorn fleece: nothing is taken from the ewe on screen.
+    ctx.fillStyle = '#6b5238';
+    ctx.beginPath(); ctx.ellipse(x, GROUND-10, 26, 12, 0, 0, 6.28); ctx.fill();
+    ctx.fillStyle = s.taken ? '#59544c' : '#efe7d8';
+    for (let i=0;i<5;i++){
+      ctx.beginPath(); ctx.arc(x-16+i*8, GROUND-22 - (i%2)*5, 9, 0, 6.28); ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(232,230,223,.55)'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(s.taken ? 'fleece (taken)' : 'shorn fleece', x, GROUND-46);
+    return;
+  }
   if (s.kind === 'yogurt'){
     // shepherd's hut + churn: yogurt is MADE, never taken from a creature
     ctx.fillStyle = '#4b4038'; ctx.fillRect(x-70, GROUND-96, 140, 96);
@@ -409,6 +436,14 @@ function drawFauna(f, cam){
     ctx.fillRect(x-16, y-10, 4, 12); ctx.fillRect(x+10, y-10, 4, 12);
     ctx.strokeStyle = col; ctx.lineWidth=2;
     ctx.beginPath(); ctx.moveTo(x+28, y-40); ctx.lineTo(x+34, y-50); ctx.stroke();
+  } else if (f.kind === 'sheep'){
+    // deliberately drawn in full fleece — she has given nothing she misses
+    ctx.beginPath(); ctx.ellipse(x, y-20, 26, 17, 0, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.arc(x-19, y-26, 9, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+17, y-26, 9, 0, 6.28); ctx.fill();
+    ctx.fillStyle = mix(col, '#000', 0.5);
+    ctx.beginPath(); ctx.ellipse(x+26, y-30, 8, 6, 0, 0, 6.28); ctx.fill();
+    ctx.fillRect(x-14, y-6, 4, 8); ctx.fillRect(x+9, y-6, 4, 8);
   } else if (f.kind === 'magpie'){
     ctx.beginPath(); ctx.ellipse(x, y, 11, 8, 0, 0, 6.28); ctx.fill();
     ctx.fillStyle = mix(col, '#000', 0.45);
@@ -488,16 +523,17 @@ function drawGirl(g, cam, isActive){
 
 function drawPouch(){
   const p = state.pouch;
-  const x = 18, y = 16, w = 240;
-  ctx.fillStyle = 'rgba(0,0,0,.42)'; ctx.fillRect(x, y, w, 118);
-  ctx.strokeStyle = 'rgba(232,230,223,.16)'; ctx.lineWidth=1; ctx.strokeRect(x+.5, y+.5, w, 118);
+  const x = 18, y = 16, w = 258, boxH = 136;
+  ctx.fillStyle = 'rgba(0,0,0,.42)'; ctx.fillRect(x, y, w, boxH);
+  ctx.strokeStyle = 'rgba(232,230,223,.16)'; ctx.lineWidth=1; ctx.strokeRect(x+.5, y+.5, w, boxH);
   ctx.textAlign='left'; ctx.font='12px Segoe UI'; ctx.fillStyle='#cfcabf';
   ctx.fillText('POUCH', x+12, y+20);
   ctx.font='12px Segoe UI';
   const rows = [
     ['food plants',    p.food    + (p.poisoned ? `  (+${p.poisoned} poisonous)` : ''), '#5b2b57'],
     ['craft fibre',    p.craft   + '  → repair',                                        '#4d7a3a'],
-    ['pattern dye',    p.pattern + '  → carried to A3',                                 '#b5432f'],
+    ['wool',           p.wool    + '  → repair',                                        '#d8cfc0'],
+    ['pattern dye',    p.pattern + '  → A3 (plant only)',                               '#b5432f'],
     ['honey (Anya)',   p.honey  ? 'found' : '—',                                        '#c8912f'],
     ['yogurt (Donna)', p.yogurt ? 'made'  : '—',                                        '#e8e2d2'],
   ];
@@ -528,7 +564,11 @@ function drawNotes(){
     ['· Plants are functional only, in three harvest types (doc 16 axis B):', ''],
     ['  food (edible OR poisonous — helps or harms, never "healing")', ''],
     ['  craft fibre → physical repair of cloth · pattern dye → carried into A3', ''],
-    ['· Fibre comes from plants, never from a living creature (docs 03 / 17).', ''],
+    ['· REPAIR vs PATTERN are sourced differently (ruled 2026-08-07):', ''],
+    ['  repair  ← plant fibre AND harmless animal material (shorn wool)', ''],
+    ['  pattern ← plants ONLY: fibres, pigments, petals. No exception.', ''],
+    ['  The test is COST TO THE CREATURE, not origin. The ewe stands beside her', ''],
+    ['  own fleece, unshorn and unbothered — she gave nothing she misses.', ''],
     ['· Signature restoratives: honey is Anya\'s and is FOUND; yogurt is Donna\'s and is MADE.', ''],
     ['  Wild vs crafted — the same axis stir/settle already runs on (doc 23).', ''],
     ['· Co-op still governs: Donna settles the hive so Anya can reach the honey.', ''],

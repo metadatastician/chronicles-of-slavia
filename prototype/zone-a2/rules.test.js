@@ -95,6 +95,25 @@ api.gather(st().anya, bad);  t('poisonous food harms',  st().pouch.poisoned === 
 api.gather(st().anya, S('craft'));   t('craft fibre gathered', st().pouch.craft === 1);
 api.gather(st().anya, S('pattern')); t('pattern dye gathered', st().pouch.pattern === 1);
 
+console.log('\n-- repair vs pattern are sourced differently (ruled 2026-08-07) --');
+api.reset();
+api.gather(st().anya, S('wool'));
+t('shorn wool is gatherable',            st().pouch.wool === 1);
+t('wool feeds REPAIR, not the pattern count',
+  st().pouch.wool === 1 && st().pouch.pattern === 0);
+// The ruling's actual invariant: cost to the creature, not origin. No animal is
+// touched to obtain the fleece — it is a site, never a fauna interaction.
+t('fleece is a site, not something taken from an animal',
+  st().sites.some(s => s.kind === 'wool') && !st().fauna.some(f => f.kind === 'wool'));
+t('the ewe is present and is never a gather target',
+  st().fauna.some(f => f.kind === 'sheep'));
+// Patterns stay plant-only: nothing that increments `pattern` may be animal.
+{
+  const patternSites = st().sites.filter(s => s.kind === 'pattern').map(s => s.label);
+  const ANIMAL = /wool|fleece|hide|leather|feather|bone|silk|sinew/i;
+  t('no pattern material is animal-derived', !patternSites.some(l => ANIMAL.test(l)));
+}
+
 console.log('\n-- SCOPE GUARD: no plant answers taxis; no tropism (doc 23) --');
 t('no plant appears in the fauna list',
   st().fauna.every(f => !['food', 'craft', 'pattern'].includes(f.kind)));
