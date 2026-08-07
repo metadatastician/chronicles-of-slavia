@@ -1,373 +1,250 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-License-Identifier: CC-BY-SA-4.0
 
-= Chronicles of Slavia Prototype
+= Chronicles of Slavia
 :toc:
 :toclevels: 2
 :sectanchors:
 :sectlinks:
 
-// Compliance
-image:https://img.shields.io/badge/SOC_3-Compliant-brightgreen[SOC 3 Compliant,link=https://github.com/organizations/metadatastician/settings/compliance]
-image:https://img.shields.io/badge/ISO_27001-Compliant-blue[ISO 27001 Compliant,link=https://github.com/organizations/metadatastician/settings/compliance]
-image:https://img.shields.io/badge/CIAQ-Compliant-9f55ff[CIAQ Compliant,link=https://github.com/organizations/metadatastician/settings/compliance]
 image:https://api.scorecard.dev/projects/github.com/metadatastician/chronicles-of-slavia/badge[OpenSSF Scorecard,link="https://scorecard.dev/viewer/?uri=github.com/metadatastician/chronicles-of-slavia"]
-nimage:https://www.bestpractices.dev/projects/8509/badge[OpenSSF Best Practices,link="https://www.bestpractices.dev/projects/8509"]
-
-Code licence: MPL-2.0 +
-Docs licence: CC-BY-SA-4.0 +
-Status: Private exploratory prototype +
-Repository standard: Rhodium Standard Repository aligned
-Estate: `metadatastician` (transferred 2026-07-25)
-
-# [IMPORTANT]
-
-This repository is currently a private exploratory prototype.
-
-It is intended to preserve and develop the early playable and design work for *Chronicles of Slavia* without losing it inside chat history.
-
-# Although the intended estate split is MPL-2.0 for code and CC-BY-SA-4.0 for prose documentation, publication and wider reuse decisions are not yet final. Treat this repository as private working material unless and until it is explicitly published.
-
-== What this is
-
-*Chronicles of Slavia Prototype* is a mythic 2D puzzle-platform prototype about two girls, Anya and Donna, whose bond shapes a world of memory, medicine, folklore, and moral choice.
-
-The central strapline is:
+image:https://img.shields.io/badge/proof_gate-ABI_suite-blue[Proof Gate: Idris2, Lean4, Agda, Coq, TLA+]
+image:https://img.shields.io/badge/licence-AGPL--3.0--or--later-blue[Code licence]
+image:https://img.shields.io/badge/docs-CC--BY--SA--4.0-lightgrey[Docs licence]
 
 [quote]
-
----
-
+____
 What do you become when the world breaks?
+____
 
----
+*Chronicles of Slavia* is a two-heroine Slavic-folkloric narrative game. Anya
+stirs the world; Donna settles it. Neither can do the other's act — and every
+living thing answers according to *its own nature*, not the girl's intent. The
+game is authored as *data* over a pure, deterministic rules core; the renderer
+is a replaceable skin.
 
-The core world principle is:
+The world principle, stated once:
 
 [quote]
-
----
-
+____
 Slavia is not just geography. It is memory, medicine, folklore, and moral choice.
+____
 
----
+== Status at a glance
 
-The current focus is:
-
-* *Level 1* — The First Tear
-* *Zone A* — Border Path
-
-This first playable mock is deliberately small. It is not trying to build the whole game. It exists to test the emotional grammar of the game in its simplest form.
-
-== Current prototype goal
-
-The current Zone A prototype should show that:
-
-* Anya moves, stirs, quickens, and excites.
-* Donna steadies, settles, calms, and holds.
-* Natural animals answer them differently.
-* Donna can stabilize what Anya crosses.
-* The Rift interrupts the natural answer of the world.
-
-The prototype succeeds if the player can feel:
-
-[quote]
-
----
-
-Anya and Donna are different. +
-They need each other. +
-Slavia itself knows this.
-
----
-
-== UMS and Enaction status
-
-Universal Modding Studio now has a bounded, validated Zone A / Border Path
-profile containing Anya, Donna, birds, the unstable bridge, a shrine, one Rift
-disturbance and a cooperative completion condition. It captures quickening,
-settling, responses according to the recipient's nature, environmental
-receptivity, place memory, moral/world marking, Rift
-disruption/inversion/corruption/severance, and the cost of either heroine's
-absence.
-
-That profile is evidence that UMS can describe Slavia without making UMS Core
-IDApTIK-specific. It is not a Slavia runtime package integration: no loader was
-added here, and this game does not depend on the UMS UI.
-
-Enaction is a future source of neutral deterministic primitives—events,
-appraisal domains, relationships, influence and memory—not a shared narrative
-vocabulary. The terms and rules above remain Slavia-owned. See ADR-0004.
-
-== Quick start
-
-Open the browser prototype directly:
-
-## [source,sh]
-
-## prototype/zone-a/index.html
-
-No build step is currently required.
-
-Open the file in a modern web browser.
-
-== Controls
-
-[cols="1,2",options="header"]
+[cols="1,3",options="header"]
 |===
-| Control
-| Action
+| Thing | Where it stands
 
-| `A` / `D` or Arrow Keys
-| Move
+| Built and playable
+| *Zone A* — the Border Path. Free-roam scene, two-heroine paper-doll rig, grove
+  birds that answer by nature, the unstable crossing, the Rift's interruption, a
+  full in-game menu with save/load/continue.
 
-| `Space`
-| Jump
+| Rules core
+| `slavia-core` — the emotional grammar, living taxis, and SGS parsing. Depends on
+  `serde` + `toml` only. Renders nothing.
 
-| `Tab`
-| Switch between Anya and Donna
+| Formal proofs
+| Five prover toolchains gate every push (Idris2, Lean4, Agda, Coq, TLA+), and a
+  missing prover is fatal rather than skipped. Scope, stated honestly: the proofs
+  cover a generic C ABI/FFI seam, *not* Slavia's game logic, and the TLA+ module is
+  quarantined (unverified). See `docs/status/PROOF-STATUS.adoc`.
 
-| `E`
-| Interact / use ability
+| Designed, not built
+| Zone A segments *A2–A5* (`docs/design/23`) and *Zone B — Fracture Line*
+  (`docs/design/24`), whose eight open questions are awaiting owner rulings
+  (`docs/design/25`, tracked in issue #63).
 
-| `R`
-| Restart prototype
+| Deliberately unwired
+| The *ESM* (belief / intent / decay — the theory-of-mind substrate). Complete and
+  tested headless; wired to no scene yet, by ADR-0004.
 |===
 
-== What is currently implemented
+Maturity is *experimental*. Version is `0.0.0` on both crates, deliberately: nothing
+here is released.
 
-The current browser mock includes:
+== Play it
 
-* a side-scrolling Zone A layout
-* Anya and Donna as simple drawn canvas characters
-* character switching
-* a shrine interaction
-* birds that respond differently to Anya and Donna
-* an unstable bridge
-* Donna's bridge-stabilising action
-* Anya crossing after Donna stabilises the bridge
-* an overlook requiring both characters
-* a Rift trigger ending
+The game is Rust + https://bevy.org[Bevy] 0.15. You need a Rust toolchain and a
+display (WSLg/XWayland works).
 
-== Core design principles
+[source,sh]
+----
+git clone https://github.com/metadatastician/chronicles-of-slavia
+cd chronicles-of-slavia/engine
+cargo run -p slavia-zone-a
+----
 
-=== Slavia
+There is also a launcher wrapper, `chronicles-of-slavia-launcher.sh`, which looks
+for a release build.
 
-Slavia is not only a fantasy location.
+=== Controls
 
-It is a world where places remember, remedies matter, folklore acts, and moral decisions leave marks on the land.
+[cols="1,3",options="header"]
+|===
+| Key | Action
 
-Slavia is therefore:
+| `A` / `D` or `←` / `→` | Move
+| `Space` or `↑` | Jump
+| `Tab` | Switch between Anya and Donna
+| `E` | Reach out to the birds
+| `F` | Settle the crossing (Donna), then cross it
+| `R` | Awaken the Rift
+| `Esc` | Back to the menu
+|===
 
-* memory
-* medicine
-* folklore
-* moral choice
+`F` is one key doing both halves of the co-op grammar: Donna settles what is
+unsettled, and whoever stands at a settled crossing may cross it. That is the game
+in miniature — Anya crosses *because Donna made the path hold*.
 
-=== Anya
+=== What a run looks like
 
-Anya is associated with Chaos, movement, courage, excitement, and quickening.
+Seven beats, walked left to right: forest entrance → bird grove → shrine
+(_"Two lands, one heart."_) → the stream crossing → ridge path → overlook →
+fracture prelude. Five of them are *understanding beats* the game tracks; the
+menu's Continue resumes exactly where you left off.
 
-Prototype role:
+== The idea
 
-* faster movement
-* slightly more agile
-* stirs birds and living things
-* represents the force that wakes the world
+=== The emotional grammar
 
-Visual direction:
+Anya *quickens*: she excites, stirs, emboldens, agitates. Donna *settles*: she
+calms, slows, quietens, reassures. These are not two skins on one chaos/order
+slider — they are *opposed verbs*, and the opposition is load-bearing. Only Donna
+can steady; only Anya can stir; the puzzles live in the gap.
 
-* very long dark hair, slightly chaotic
-* Ukrainian-inspired blue and yellow accents
-* red embroidery motifs
-* light, forward-moving silhouette
+=== Living taxis
 
-=== Donna
+Animals are not tools, pets, buttons, or units. The girls do not command them —
+they change the rhythm of the living world, and each creature answers *according
+to its own nature*. When an animal answers wrongly, that is not a bug in the
+world; it is the world telling you something — corruption, enchantment, false
+life, or the Rift's influence.
 
-Donna is associated with Order, care, structure, calm, and settling.
+=== The two lands
 
-Prototype role:
+Anya carries Carpathian/Ukrainian motifs (blue and yellow, red embroidery, a
+forward-moving silhouette, hair slightly chaotic). Donna carries Rhodope/Bulgarian
+ones (white, green and red, an upright grounded stance, hair in a tidy bun). The
+shrine between them reads _"Two lands, one heart."_ Zone B is where that stitch
+tears.
 
-* slower movement
-* stabilises the bridge
-* settles birds and living things
-* represents the force that lets the world hold
+== Architecture — game as data
 
-Visual direction:
+Three layers, described in full in `ARCHITECTURE.md` and ADR-0002:
 
-* very long dark hair in a tidy bun
-* Bulgarian-inspired white, green, and red accents
-* grounded, upright silhouette
-* stronger, steadier posture
+[cols="1,3",options="header"]
+|===
+| Layer | What it is
 
-=== Living Taxis
+| *L1 — Slavia Game Spec (SGS)*
+| Declarative TOML describing a zone: characters, animals, beats.
+  `engine/slavia-core/data/*.sgs.toml`. *Change the game by changing this data.*
+  ADR-0006 makes the SGS the public authoring schema.
 
-Animals in Slavia are not tools, pets, buttons, or controllable units.
+| *L2 — `slavia-core`*
+| The pure rules core: the emotional grammar, living taxis, spec parsing, and the
+  ESM. Deterministic, renderer-free, wasm-friendly, `serde` + `toml` only.
 
-Anya and Donna do not command animals. They change the rhythm of the living world around them.
+| *L3 — `slavia-zone-a`*
+| The Bevy renderer and menu (ADR-0003). A skin over L2 — swappable without
+  touching the design.
+|===
 
-Anya tends to:
+The point of the layering is that the game's *meaning* lives in data and a proven
+core, so the runtime can be replaced without renegotiating the design.
 
-* excite
-* quicken
-* stir
-* embolden
-* agitate
+== Develop
 
-Donna tends to:
+[source,sh]
+----
+just test        # cargo test -p slavia-core, then slavia-zone-a headless (no display needed)
+just quality     # fmt-check + lint + test
+just proof-check-all   # all five provers (needs the toolchains; see .github/workflows/proof-gate.yml)
+----
 
-* calm
-* slow
-* settle
-* quieten
-* reassure
+`just test` is the golden path recorded in `ANCHOR.a2ml`: Zone A's five-beat spec
+holds, the ESM testbed passes, and L2 stays deterministic — same seed and same
+inputs give the same result.
 
-Natural animals respond according to their own nature.
-
-If an animal does not respond naturally, this is meaningful. It may suggest corruption, possession, enchantment, false life, fear beyond normal fear, or Rift influence.
-
-=== The bridge metaphor
-
-The bridge is the first playable metaphor of the game.
-
-Anya wants to cross. +
-The bridge will not hold. +
-Donna steadies it. +
-Anya crosses because Donna has made the path hold.
-
-This is the game in miniature.
+Known local wrinkle: `just` must be *>= 1.33* (the Justfile uses `import?`, and
+older versions run imported recipes from the wrong directory). CI pins 1.56.0.
 
 == Repository map
 
 [cols="1,3",options="header"]
 |===
-| Path
-| Purpose
+| Path | Purpose
 
-| `README.adoc`
-| This project overview.
+| `engine/`
+| The Cargo workspace — `slavia-core` (L2) and `slavia-zone-a` (L3). *This is the game.*
 
-| `LICENSE-INTENT.md`
-| Current licensing intent and private status note.
+| `engine/slavia-core/data/`
+| The SGS zone data (L1).
 
 | `docs/design/`
-| Design notes, world principles, mechanics, and parking-lot material.
+| The design canon — 26 documents, `00-start-here.md` onward. Read that one first.
 
-| `docs/prompts/`
-| Prompts used to scaffold or regenerate repository structure.
+| `docs/decisions/`
+| ADRs 0001–0008: the layered architecture, Bevy, the ESM, fail-forward, the SGS,
+  the UMS profile, and the licence position.
 
-| `prototype/zone-a/`
-| Browser-based mock prototype for Level 1, Zone A.
+| `docs/characters/`
+| The Little Books of Anya and Donna — the named ability rosters.
 
-| `prototype/zone-a/index.html`
-| Current playable JavaScript/canvas mock.
+| `docs/status/`
+| Honest status: readiness, proof status, roadmap, and the debt register.
 
-| `prototype/zone-a/README.md`
-| Local instructions for the Zone A prototype.
-
-| `assets/`
-| Placeholder location for future art, sound, reference, and production assets.
+| `verification/proofs/`
+| Idris2, Lean4, Agda, Coq and TLA+ proofs (currently ABI/FFI-shaped, not game logic).
 
 | `.machine_readable/`
-| Future Rhodium Standard Repository / estate metadata, if enabled.
+| The estate's machine-readable substrate (descriptiles, contractiles, k9).
 
-| `0-AI-MANIFEST.a2ml`
-| Future AI-agent entrypoint, if enabled.
+| `prototype/zone-a/`
+| The original browser/canvas mock. Superseded by the Bevy build; kept as the
+  visual reference the paper-doll rig was drawn from.
 |===
 
-== Development status
+== Design canon
 
-This project is at the exploratory playable-prototype stage.
+The design is *written down*, extensively, and the documents are the source the
+SGS is compiled from. Start at `docs/design/00-start-here.md`. Load-bearing ones:
 
-Current focus:
+* `01-world-principle.md` — what Slavia is
+* `06-attunement-and-modifiers.md` — the opposition mechanic
+* `08-level1-five-zone-map.md` — Zones A–E, and the rule that *nothing past Zone A
+  is built until Zone A holds*
+* `20-cognitive-npcs-and-theory-of-mind.md` — the ESM's design
+* `22-narrative-structure-per-chronicle.md` — Kishōtenketsu / chiasmus / Fichtean,
+  one shape per Chronicle
+* `23-level-scope-and-pacing.md` — the A1–A5 scale-up
+* `24-zone-b-fracture-line.md` + `25-zone-b-decision-sheet.md` — Zone B and its
+  eight pending rulings
 
-. Keep Zone A small.
-. Refine the existing emotional beats.
-. Avoid adding major new systems too early.
-. Preserve larger ideas in design notes rather than implementing them immediately.
+== Not this project
 
-Do not add yet:
+Boundaries, kept deliberately: this is *not* rsr-template-repo (the template it was
+instantiated from), *not* IDApTIK (the estate's other game), *not* Universal Modding
+Studio (an independent authoring platform in which Slavia is merely a profile), *not*
+an engine-owned ontology (Bevy is a chosen skin, the core stays renderer-neutral),
+*not* a multiplayer game (parked), and *not* an AI or neurosymbolic research project.
 
-* combat
-* inventory
-* multiplayer
-* full class system
-* full NPC factions
-* full boss design
-* Level 2
-* full animal AI
-* save/load system
-* production art pipeline
+== Contributing
 
-== Parked design directions
+See `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`. Commits are signed; CI runs a
+five-prover proof gate, CodeQL, gitleaks, OpenSSF Scorecard, and an estate rules
+check. Honest gates only — a check that cannot fail is treated as a defect here.
 
-The following ideas are important but not currently implemented.
-
-=== Apothecary and class paths
-
-A future apothecary scene may introduce class-like paths through questions of virtue, medicine, and moral diagnosis.
-
-Possible Anya paths:
-
-* Runner
-* Flicker
-* Wildheart
-
-Possible Donna paths:
-
-* Pillar
-* Architect
-* Guardian
-
-The apothecary's central question may be:
-
-[quote]
-
----
-
-What do you become when the world breaks?
-
----
-
-=== Absence mechanic
-
-If Anya is absent, the world becomes over-settled, muted, heavy, slow, and sedated.
-
-If Donna is absent, the world becomes over-stirred, noisy, unstable, fast, and turbulent.
-
-This should eventually make the player feel the cost of separation not only through missing abilities, but through the whole changed behaviour of Slavia.
-
-=== Mirror of Misalignment
-
-A future corruption boss may weaponise Anya and Donna's flaws against each other.
-
-This is currently parked and should not be implemented in Zone A.
-
-== Repository standard intent
-
-This repository is intended to align over time with the Rhodium Standard Repository pattern.
-
-Relevant estate-level intentions may include:
-
-* machine-readable project metadata
-* AI-agent working boundaries
-* explicit provenance and attribution
-* OpenSSF-oriented security checks
-* reproducible build hooks where appropriate
-* Software Heritage archival once publication is appropriate
-* clear distinction between code, docs, assets, branding, and commercial rights
-
-At this stage, the prototype should remain simple.
+Current known debt is not hidden: see `docs/status/DEBT.adoc`.
 
 == Licence
 
-Intended licence split:
+Per ADR-0008 (`docs/decisions/0008-licence-position.adoc`), the settled position is:
 
-* Code, configuration, and scripts: MPL-2.0
-* Prose documentation and design notes: CC-BY-SA-4.0
+* *Code, configuration, and scripts* — AGPL-3.0-or-later
+* *Prose documentation and design notes* — CC-BY-SA-4.0
 
-However, this repository is currently private exploratory work.
-
-Per-file SPDX headers should be treated as authoritative once added.
-
-Until the project is explicitly published, do not assume any grant beyond the stated private working context.
+The `LICENSE` file and per-file SPDX headers are authoritative; ADR-0008 records the
+reasoning. Third-party material keeps its own terms — the bundled PT Serif fonts are
+OFL-1.1 (`engine/slavia-zone-a/assets/fonts/PT-Serif/OFL.txt`).

@@ -53,6 +53,9 @@ The descriptive family (working name *descriptiles*) describes what-is; the **co
 ## Estate language policy (overridable per-repo via AGENTIC)
 Deny: **Nix, Node/npm, TypeScript, Python, Go, AGPL**. (Guix, not Nix.)
 
+> ⚠ **This repo overrides the AGPL denial.** See the licence line below — ADR-0008
+> rules AGPL-3.0-or-later for code here. The language denials still stand.
+
 ---
 
 # This repo: `chronicles-of-slavia`  ·  clade `gm-chronicles-of-slavia`
@@ -61,7 +64,8 @@ Deny: **Nix, Node/npm, TypeScript, Python, Go, AGPL**. (Guix, not Nix.)
 - **IS** — A two-character Slavic-folkloric narrative game. The world answers the player through an emotional grammar — Anya stirs, Donna settles — and the animal's own nature decides the result. The game is authored as data (the SGS) over a pure, deterministic rules core; the renderer is a skin.
 - **IS-NOT** — rsr-template-repo (the template it was instantiated from) · IDApTIK (the estate's other game project) · Universal Modding Studio (an independent authoring platform in which Slavia is a profile) · an engine-owned ontology (Bevy is the selected L3 renderer, while the rules core stays renderer-neutral) · a multiplayer game (parked) · an AI or neurosymbolic research project
 - **Where it sits** — pipeline position **endpoint**; chain `standards → rsr-template-repo → chronicles-of-slavia`; coordination = `self`.
-- **Constraints here** (AGENTIC) — fail-closed; evidence-per-step; no-silent-skip; rerun-after-fix; release-claim-requires-hard-pass. Never: banned langs (above), secrets, state files in repo root, AGPL. Details: `.machine_readable/bot_directives/{methodology,coverage,debt}.a2ml`.
+- **Constraints here** (AGENTIC) — fail-closed; evidence-per-step; no-silent-skip; rerun-after-fix; release-claim-requires-hard-pass. Never: banned langs (above), secrets, state files in repo root. Details: `.machine_readable/bot_directives/{methodology,coverage,debt}.a2ml`.
+- **Licence** (ADR-0008, reaffirmed by the owner 2026-08-07) — **code, configuration and scripts: AGPL-3.0-or-later · prose docs and design notes: CC-BY-SA-4.0.** This is the per-repo override of the estate's AGPL denial, and it is deliberate — do not "correct" it back. Incorporated MPL-2.0 components keep MPL-2.0 (legal and intended: MPL §3.3 Secondary Licenses names AGPL-3.0); bundled PT Serif fonts keep OFL-1.1. Licence edits remain manual and owner-only.
 - **Golden path** (ANCHOR) — `just test && just quality` → Zone A's five-beat spec holds (engine/slavia-core/tests/zone_a.rs); The ESM testbed passes — belief stays local, confidence is the solution count, the Guilty Conscience trap stays emergent; L2 stays deterministic — same seed and same inputs give the same result; Core tests pass and quality gates pass; No unresolved critical security findings.
 - **State** — phase implementation; maturity experimental; 5% complete; status active.
 

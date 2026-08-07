@@ -12,7 +12,7 @@
 [metadata]
 project = "chronicles-of-slavia"
 version = "0.0.0"          # both crates are 0.0.0 — pre-release, deliberately
-last-updated = "2026-07-29"
+last-updated = "2026-08-07"
 status = "active"          # active | paused | archived
 
 [project-context]
@@ -29,7 +29,7 @@ completion-percentage = 5
 [position]
 phase = "implementation"   # design | implementation | testing | maintenance | archived
 maturity = "experimental"  # experimental | alpha | beta | production | lts
-visibility = "private working material — see README; publication not decided"
+visibility = "PUBLIC since 2026-08-04 (owner-ruled). Full-history secret scan ran clean before the flip. Going public also cured the Actions billing block and unlocked free code scanning."
 estate = "metadatastician"
 
 [route-to-mvp]
@@ -42,6 +42,8 @@ milestones = [
   { name = "Zones B–E of Chronicle I", completion = 0, notes = "GATED. 08-level1-five-zone-map.md: 'Do not build Zones B–E until Zone A holds.' Zone B's first full narrative draft (docs/design/24-zone-b-fracture-line.md, PR #54) is now merged — the Fracture Line beat-by-beat design, with 8 open questions for the owner. Still gated: no Zone B engine/SGS work is authorised until those questions are answered and Zone A's own open issues (below) are settled." },
   { name = "Chronicle II (The Echo Engine)", completion = 0 },
   { name = "Chronicle III (The Two Who Were Needed)", completion = 0 },
+  { name = "Honest five-prover Proof Gate actually running", completion = 100, evidence = "GREEN 2026-08-04 — the first successful run in the gate's history. Its 81 prior runs were all startup_failure (two successive non-allowlisted action pins), then three honest failures peeled the real defects: just <1.33 running import? recipes from the wrong cwd, Ubuntu's agda-stdlib shipping no .agda-lib, and agda 2.6.3 needing a writable _build. CAVEAT: the TLA+ module is quarantined, so four provers verify content and one does not — see docs/status/PROOF-STATUS.adoc." },
+  { name = "CI board honest and mostly green", completion = 90, evidence = "2026-08-04 campaign (#58-#61, #64): repo public; gh actions-lock adopted; six standards reusable callers produced the FIRST successful runs of their existence after removing an illegal timeout-minutes key from their uses: jobs and hand-authoring caller lockfile entries. Remaining red is `governance`, caused by a pre-lockfile linter inside the standards reusable — upstream, reported on standards#573." },
 ]
 
 [blockers-and-issues]
@@ -51,12 +53,15 @@ issues = [
   { id = "co-op-vs-switch-only", severity = "high", notes = "CANON SELF-CONTRADICTION. docs/design/13 lists Chronicle II as 'Dual-Character Simultaneous'; 08-level1-five-zone-map.md confirms switch-only single-active-character and says it 'matches the built engine'. Pre-dates the imported material. Touches the engine — settle before Chronicle II work." },
   { id = "chronicle-i-tone", severity = "low", notes = "docs/design/13 calls Chronicle I 'surreal, dangerous, fast-paced'; the built Zone A is 'calm, folkloric' with 'a foreshadowing tremor, not the rupture itself', and Kishōtenketsu wants grounding. 13's tone line may be out of step." },
   { id = "open-design-questions", severity = "low", notes = "Recorded in docs/design/19 and 22, awaiting owner: Chronicle I geography; the per-Chronicle trial spine; ghost platforms; Chronicle III's centre; birch or pine; Mirror Levels vs chiasmus vocabulary; manpu vs Slavic embroidery symbols." },
-  { id = "zone-b-open-questions", severity = "medium", notes = "8 questions in docs/design/24-zone-b-fracture-line.md awaiting owner ruling before Zone B can be scoped: Chronicle I tone (depends on chronicle-i-tone above), whether the crux is playable-or-authored, which girl lands on which shore, the marauder thread, how legible the Rift's intent should be, Zone B's size/room count, the A3 artefact across the split, and whether the Ten/Ketsu shape is fractal at level scale." },
+  { id = "zone-b-open-questions", severity = "medium", notes = "8 questions awaiting owner ruling before Zone B can be scoped. Since 2026-08-04 each is presented as a decision — context, options, recommendation, and a blank RULING slot — in docs/design/25-zone-b-decision-sheet.md, tracked in issue #63. The questions: Chronicle I tone (depends on chronicle-i-tone above), whether the crux is playable-or-authored, which girl lands on which shore, the marauder thread, how legible the Rift's intent should be, Zone B's size/room count, the A3 artefact across the split, and whether the Ten/Ketsu shape is fractal at level scale." },
 ]
 
 [critical-next-actions]
 actions = [
-  "Owner: answer Zone B's 8 open questions (docs/design/24-zone-b-fracture-line.md) — nothing past Zone A is scheduled until they're settled, per 08-level1-five-zone-map.md.",
+  "Owner: rule on Zone B's 8 open questions. They are now laid out as decisions with options and a recommendation each in docs/design/25-zone-b-decision-sheet.md, tracked in issue #63. Nothing past Zone A is scheduled until they're settled, per 08-level1-five-zone-map.md.",
+  "DONE 2026-08-07: the licence contradictions are resolved. The owner reaffirmed ADR-0008 explicitly — AGPL-3.0-or-later for code, CC-BY-SA-4.0 for docs — and 18 files that said otherwise were corrected, including the per-repo AGPL override now recorded in AGENTIC.a2ml and CLAUDE.md. Third-party licences untouched.",
+  "Upstream: standards#573 — the governance-reusable's embedded linter is pre-lockfile and reds every consumer that adopted gh actions-lock. It is the last red on this board and it blocks merges.",
+  "Sweep mise.toml of banned-language toolchains (CI-2) — it also spams warnings on every shell command in the repo.",
   "Consolidate the bounded Zone A fixture into the canonical UMS profiles/chronicles-of-slavia layout after the UMS SDK reconciliation.",
   "Settle co-op vs switch-only — it constrains the engine and is currently self-contradictory in canon.",
   "Register chronicles-of-slavia in gv-clade-index. CLADE.a2ml now carries the post-transfer UUID (9a94f798-67f8-517c-b88b-4b27417a0218) derived from github.com/metadatastician/chronicles-of-slavia, but the repo is absent from the registry. Owner's action — registration is outward-facing.",
@@ -66,17 +71,28 @@ actions = [
 ]
 
 [test-status]
-# Live `cargo test --workspace` at the engine root, 2026-07-29.
+# Live `cargo test --workspace` at the engine root, re-run 2026-08-07.
 passing = 52               # 29 slavia-core unit + 10 esm_testbed + 7 zone_a + 6 slavia-zone-a
-ignored = 2
+ignored = 2                # IDENTIFIED 2026-08-07: two ```ignore DOC-TEST fences in
+                           # slavia-core/src/esm/kanren.rs (lines 284, 336). There are
+                           # ZERO #[ignore] attributes in the workspace — no test is
+                           # being hidden. See CODE-7 in docs/status/DEBT.adoc.
 failing = 0
 command = "cd engine && cargo test --workspace"
 
 [technical-debt]
+# FULL REGISTER: docs/status/DEBT.adoc (human) and
+# .machine_readable/bot_directives/debt.a2ml (machine) — 32 items compiled
+# 2026-08-07 across licence, docs, code, proof, CI/CD and canon. The entries
+# below are the long-standing ones kept inline for continuity.
 items = [
-  { id = "ignored-tests", notes = "2 tests are #[ignore]d somewhere in the workspace. Ignored tests are debt: they are green by not running. Identify and either fix or delete." },
+  { id = "ignored-tests", status = "identified 2026-08-07, not yet fixed", notes = "RESOLVED AS A MYSTERY: the '2 ignored' are two ```ignore doc-test fences in slavia-core/src/esm/kanren.rs (lines 284, 336). The workspace contains ZERO #[ignore] attributes, so no test was being hidden. Remaining action is cosmetic: make the two examples compile, or demote them to plain text." },
   { id = "esm-unwired", notes = "Deliberate, not accidental (ADR-0004) — but 'unwired is not done' (doctrine 8). The ESM is proven headless against a synthetic cast and has never touched a real scene." },
-  { id = "template-residue", notes = "~150 files still carry rsr-template-repo strings or unsubstituted double-brace template tokens. The descriptiles and the arrival pack were corrected 2026-07-16; the wider residue is not yet swept." },
+  { id = "template-residue", notes = "MEASURED 2026-08-07: 52 files still carry unsubstituted double-brace template tokens (plus more with rsr-template-repo strings). The front door was swept this pass — README, ARCHITECTURE, ROADMAP, PROOF-STATUS and engine/README now describe the real project — but docs/status/READINESS.adoc, docs/status/PROOF-NEEDS.adoc and the docs-template/ tree remain. See DOC-1 and DOC-2 in docs/status/DEBT.adoc." },
+  { id = "mise-banned-toolchains", notes = "mise.toml declares node, python, go, npm, pnpm, pip, denojs, go-task, gofmt, isort, vitest, pytest and jest — all denied by the estate language policy, none of which builds a Rust/Bevy game. Most do not resolve, so mise prints a wall of warnings on EVERY shell command run in this repo. CI-2 in the debt register." },
+  { id = "no-slavia-proof", notes = "All 7 proof obligations concern a generic C ABI/FFI seam inherited from the template; none states a Slavia invariant. The Agda and Coq manifests say so themselves. Determinism, the opposition rule, living-taxis soundness and ESM belief locality are test-evidenced only. PRF-1." },
+  { id = "tla-quarantined", notes = "verification/proofs/tlaplus/StateMachine.tla is quarantine, so it passes the gate by continuing to fail — a green board can read as 'five provers verified' when four did. The quarantine reason ('tla2sany not available') may be stale now that the Proof Gate installs tla2tools.jar and a JRE. PRF-2." },
+  { id = "governance-red-upstream", notes = "The `governance` check is red and blocks merges, because the standards governance-reusable embeds a pre-lockfile workflow linter that rejects the tag-form refs gh actions-lock produces. Not fixable in this repo; reported with a patch recipe on hyperpolymath/standards#573. CI-1." },
   { id = "save-file-location", notes = "The save file (engine/slavia-zone-a/src/save.rs) lives next to the running executable, not an OS-appropriate save directory. Deliberate v1 simplification (avoids a new `dirs`-style dependency for no functional gain yet), not a silent cut — flagged here to be revisited." },
   { id = "git-cliff-template-broken", notes = "`just changelog`/`changelog-preview` fail: .machine_readable/configs/git-cliff/cliff.toml's template references an undefined `OWNER` variable ('Template render error: Variable `OWNER` not found in context'). Found 2026-07-29; CHANGELOG.md's Unreleased section was hand-written instead of generated. Not fixed — the template bug is unrelated to the change that found it." },
 ]
