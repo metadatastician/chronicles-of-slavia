@@ -148,6 +148,15 @@ can be built against a genuine target instead of an inherited default:
      in the game**, with no tutorial or prompt calling it out — the player
      is meant to notice a pattern themselves, unaided, the first time.
 
+     > **RULED 2026-08-07 (owner), settling a conflict with `16`:** *the girls
+     > only develop this ability later and must discover it themselves, so on
+     > this level it is only animal taxis that matters.* This paragraph stands
+     > as written and now governs. `16-flora-and-non-animal-npcs.md` described
+     > flora-taxis as an available early traversal layer ("Anya grows a vine to
+     > bridge a gap; Donna retracts a thorn-wall") — that framing has been
+     > re-scoped at source to a late-game ability. Deep-water reeds (`05`) are
+     > unaffected: they are grabbed, not grown.
+
      **This silence is diegetic, not just a UX choice: Anya and Donna
      themselves do not know they can do this.** The effect is meant to
      emerge as a surprise *to the characters*, tied to them growing older
