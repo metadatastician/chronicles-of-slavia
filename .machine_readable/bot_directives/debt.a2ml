@@ -1,268 +1,49 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+# Copyright (c) {{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}}) <{{AUTHOR_EMAIL}}>
 #
 # debt.a2ml — Meander debt list
 # Things found but not fixed. Carried between sessions.
 # Becomes the next session's Phase 0 input.
 #
 # Reference: ADR-002 in standards/agentic-a2ml/docs/
-#
-# Human-readable twin with full reasoning: docs/status/DEBT.adoc
-# Populated 2026-08-07 by ground-truthing the repository (it had been carrying
-# the empty template, with unsubstituted tokens, since instantiation).
 
 [metadata]
 version = "1.0.0"
-last-updated = "2026-08-07"
-twin = "docs/status/DEBT.adoc"
-method = "ground-truthed against the tree, not read off status docs"
+last-updated = "{{CURRENT_DATE}}"
 
 # ============================================================================
-# OWNER-ONLY — an agent must not action these
+# DEBT ITEMS
 # ============================================================================
-# Licence edits are manual and owner-only (doctrine 6). Registration and billing
-# are outward-facing (doctrine 11). Recorded, deliberately untouched.
-
-[[debt.owner]]
-id = "CAN-3"
-component = "docs/design/24 + 25"
-issue = "Zone B's 8 rulings outstanding (issue #63). Zone B cannot be scoped and doc 24 stays provisional until they land."
-effort = "medium"
-impact = "medium"
-discovered = "2026-08-04"
-
-[[debt.owner]]
-id = "CI-8"
-component = ".github/dependabot.yml"
-issue = "Five Dependabot runs queued 22h+ (nix, github_actions, npm_and_yarn, hex, pip). Config is valid; the runner pool is stalled — may need an org spending-limit check. Separately, most of those ecosystems are template residue and do not apply to a Rust project."
-effort = "easy"
-impact = "medium"
-discovered = "2026-08-04"
-
-[[debt.owner]]
-id = "CAN-4"
-component = "gv-clade-index"
-issue = "CLADE.a2ml carries the post-transfer UUID but the repo is absent from the estate registry. Registration is outward-facing."
-effort = "easy"
-impact = "low"
-discovered = "2026-07-16"
+# Each item has: component, issue, effort (easy|medium|hard), impact (high|medium|low),
+# priority (should|could), and discovered date.
+#
+# Items are consumed (removed) when fixed. New items are added at session end.
+# The debt list prevents the "one more wave" loop — found things are persisted,
+# not forgotten, and not used as justification for infinite meandering.
 
 # ============================================================================
 # SHOULD — would fix next wave
 # ============================================================================
-
-[[debt.should]]
-id = "CI-1"
-component = ".github/workflows/governance.yml (upstream: hyperpolymath/standards)"
-issue = "governance is red and BLOCKS MERGES. The standards governance-reusable embeds a pre-lockfile workflow linter demanding inline 40-hex SHAs, so it fails every consumer that adopted gh actions-lock. Fix belongs upstream — reported with a patch recipe on standards#573; this repo's own lockfile-aware linter (#59) is the template. Not fixable here."
-effort = "medium"
-impact = "high"
-discovered = "2026-08-04"
-
-[[debt.should]]
-id = "CI-2"
-component = "mise.toml"
-issue = "Declares banned-language toolchains: node, python, go, npm, pnpm, pip, denojs, go-task, gofmt, isort, vitest, pytest, jest. Violates the estate language policy, and most do not resolve — mise prints a wall of warnings on EVERY shell command run in this repo. None of it builds a Rust/Bevy game."
-effort = "easy"
-impact = "high"
-discovered = "2026-08-07"
-
-[[debt.should]]
-id = "PRF-1"
-component = "verification/proofs/"
-issue = "No proof is about Slavia. All 7 obligations concern a generic C ABI/FFI seam from the template; the Agda and Coq manifests say so themselves. Determinism, the opposition rule, living-taxis soundness and ESM belief locality are held by tests only."
-effort = "hard"
-impact = "high"
-discovered = "2026-08-07"
-
-[[debt.should]]
-id = "PRF-2"
-component = "verification/proofs/tlaplus/StateMachine.tla"
-issue = "Quarantined, so it passes by continuing to fail — a green board reads as 'five provers verified' when four did. The quarantine note ('tla2sany not available') may be stale now that the Proof Gate installs tla2tools.jar and a JRE; re-evaluate promoting it to gated."
-effort = "medium"
-impact = "high"
-discovered = "2026-08-07"
-
-[[debt.should]]
-id = "CODE-1"
-component = "engine/slavia-zone-a/src/render.rs"
-issue = "The camera never moves and X is hard-clamped to +/-620 (~1240px, one screen). No code path exists for a level wider than a screen. Blocks A2-A5 and Zone B."
-effort = "medium"
-impact = "high"
-discovered = "2026-07-29"
-
-[[debt.should]]
-id = "CODE-2"
-component = "engine/slavia-zone-a/src/session.rs"
-issue = "Session has no concept of a room: position is one float along one flat Vec<Beat>. docs/design/23 requires two levels of position (which room, where within it). Same blocker as CODE-1; together they are the real prerequisite for further zone work."
-effort = "medium"
-impact = "high"
-discovered = "2026-07-29"
-
-[[debt.should]]
-id = "CODE-4"
-component = "engine/slavia-zone-a/src/menu/panels/settings.rs"
-issue = "Accessibility toggles genuinely flip UiSettings but no motion/contrast/subtitle system consumes it. A control that appears to work and does nothing is worse than an absent one."
-effort = "medium"
-impact = "medium"
-discovered = "2026-07-29"
-
-[[debt.should]]
-id = "CODE-3"
-component = "engine/slavia-core/src/esm/"
-issue = "The ESM passes 10 testbed tests headless and has never touched a scene. Deliberate under ADR-0004, but doctrine 8 is 'unwired is not done'; docs/design/23 names A5 as where it should earn its place."
-effort = "hard"
-impact = "medium"
-discovered = "2026-07-16"
-
-[[debt.should]]
-id = "CI-5"
-component = ".github/workflows/e2e.yml"
-issue = "Path filter is src/** and tests/**, but the game lives in engine/**. The E2E workflow has never run against a change to the actual product."
-effort = "easy"
-impact = "medium"
-discovered = "2026-08-07"
-
-[[debt.should]]
-id = "CI-3"
-component = "Justfile"
-issue = "build, build-release, build-watch and clean are TODO stubs that echo and never invoke cargo. A developer following the Justfile gets a silent no-op."
-effort = "easy"
-impact = "medium"
-discovered = "2026-08-07"
-
-[[debt.should]]
-id = "DOC-1"
-component = "docs/status/READINESS.adoc, docs/status/PROOF-NEEDS.adoc, +50 others"
-issue = "52 files still contain unsubstituted {{TOKEN}} placeholders. READINESS.adoc carries {{PROJECT_NAME}}, {{FORGE}}, {{OWNER}}, {{CURRENT_DATE}}, {{AUTHOR}} and a literal grade of X. Files whose purpose IS to be a template are correct as-is and excluded."
-effort = "medium"
-impact = "medium"
-discovered = "2026-07-16"
-
-[[debt.should]]
-id = "CAN-1"
-component = "docs/design/13 vs docs/design/08"
-issue = "Canon self-contradiction: 13 lists Chronicle II as 'Dual-Character Simultaneous'; 08 and the built engine are switch-only. Touches the engine — settle before Chronicle II is designed against it."
-effort = "easy"
-impact = "high"
-discovered = "2026-07-16"
+# These are inputs for the next session if the user says "keep going".
+#
+# Example:
+# [[debt.should]]
+# component = "system-tools/monitoring/observatory"
+# issue = "Stale duplicate of root observatory/"
+# effort = "easy"
+# impact = "medium"
+# discovered = "2026-03-23"
 
 # ============================================================================
 # COULD — would fix eventually
 # ============================================================================
-
-[[debt.could]]
-id = "CI-4"
-component = ".machine_readable/configs/git-cliff/cliff.toml"
-issue = "just changelog fails: template references an undefined OWNER variable. CHANGELOG.md must be hand-written."
-effort = "easy"
-impact = "medium"
-discovered = "2026-07-29"
-
-[[debt.could]]
-id = "CI-7"
-component = ".github/workflows/*.yml"
-issue = "gh actions-lock re-inserts its marker comment as line 1 on every run, displacing the SPDX header the workflow linter requires to be first — 29 files red in one commit. Re-hoist the marker to line 2 after every lockfile refresh."
-effort = "easy"
-impact = "medium"
-discovered = "2026-08-04"
-
-[[debt.could]]
-id = "CI-9"
-component = ".github/workflows/pages.yml"
-issue = "Three workflows are disabled_manually (Instant Sync, Pages/Ddraig SSG, Push email). Pages matters: the repo advertises a homepage at metadatastician.github.io/chronicles-of-slavia/ that nothing currently publishes."
-effort = "medium"
-impact = "medium"
-discovered = "2026-08-07"
-
-[[debt.could]]
-id = "CI-6"
-component = "Justfile"
-issue = "just e2e and just aspect print 'NOT IMPLEMENTED — this is not a pass'. Honest, but the coverage they imply does not exist."
-effort = "hard"
-impact = "medium"
-discovered = "2026-08-07"
-
-[[debt.could]]
-id = "CODE-5"
-component = "engine/slavia-zone-a/src/save.rs"
-issue = "Save file lives next to the executable, not an OS-appropriate save directory. Deliberate v1 simplification, flagged in the source."
-effort = "easy"
-impact = "medium"
-discovered = "2026-07-29"
-
-[[debt.could]]
-id = "CODE-6"
-component = "engine/slavia-zone-a/src/render.rs"
-issue = "Zone A beats 5-7 (shrine, ridge, overlook, fracture) exist as monotonic landmark X positions with text, not authored scenery."
-effort = "medium"
-impact = "medium"
-discovered = "2026-07-29"
-
-[[debt.could]]
-id = "DOC-2"
-component = "docs-template/"
-issue = "Six files of generic template scaffolding shipped inside a real project, duplicating and contradicting the real docs. Instantiation residue."
-effort = "easy"
-impact = "medium"
-discovered = "2026-08-07"
-
-[[debt.could]]
-id = "CODE-7"
-component = "engine/slavia-core/src/esm/kanren.rs"
-issue = "Lines 284 and 336 use ```ignore doc fences, so cargo test reports '2 ignored'. IDENTIFIED 2026-08-07: there are zero #[ignore] attributes in the workspace, so this — not a hidden test — is the unexplained debt STATE.a2ml carried since July. Make the examples compile or demote them to plain text."
-effort = "easy"
-impact = "low"
-discovered = "2026-08-07"
-
-[[debt.could]]
-id = "DOC-3"
-component = "SECURITY_FIXES_20260726.md"
-issue = "Dated point-in-time snapshot in the repo root. Fold into CHANGELOG.md or an advisory, or move under docs/reports/security/."
-effort = "easy"
-impact = "low"
-discovered = "2026-08-07"
-
-[[debt.could]]
-id = "DOC-4"
-component = "repository root"
-issue = "17 root files, several estate-template prose duplicated by docs/ equivalents — e.g. root MAINTAINERS.adoc alongside docs/attribution/MAINTAINERS.adoc."
-effort = "medium"
-impact = "low"
-discovered = "2026-08-07"
-
-[[debt.could]]
-id = "CI-10"
-component = ".github/workflows/release.yml"
-issue = "Never run — tag-triggered, no release cut. Correct today (deliberately 0.0.0); listed so it is not mistaken for a working path."
-effort = "easy"
-impact = "low"
-discovered = "2026-08-07"
-
-# ============================================================================
-# RESOLVED THIS PASS (2026-08-07) — kept briefly for the next session's context
-# ============================================================================
-
-[[debt.resolved]]
-id = "LIC-1/2/3"
-component = "README.adoc, launcher a2ml, AGENTIC.a2ml, CLAUDE.md, +12 others"
-issue = "Licence contradictions: README carried two conflicting SPDX headers; the launcher declared MPL-2.0 and version 0.1.0; AGENTIC/CLAUDE/copilot-instructions/AI-CONVENTIONS said 'never AGPL' while ADR-0008 rules AGPL for this repo; and 15 files across docs, onboarding, governance metadata and descriptiles asserted MPL-2.0 as the repo licence."
-resolved = "2026-08-07 — owner reaffirmed ADR-0008 explicitly (AGPL-3.0-or-later for code, CC-BY-SA-4.0 for docs) and directed the fix. Third-party licences untouched: MPL-2.0 components keep MPL (legal per MPL 3.3), OFL-1.1 fonts keep OFL, and the rust deny.toml dependency allow-list is unchanged."
-
-[[debt.resolved]]
-id = "DOC-6"
-component = "README.adoc"
-issue = "Displayed SOC 3, ISO 27001 and CIAQ 'Compliant' badges with no attestation, linked to a private org settings page, plus a typo (nimage:) breaking a fourth. Removed. Known estate-wide template drift — worth grepping other repos."
-resolved = "2026-08-07"
-
-[[debt.resolved]]
-id = "DOC-5"
-component = "wiki"
-issue = "The GitHub wiki was a 52-byte Home.md stub. Populated from the design canon."
-resolved = "2026-08-07"
-
-[[debt.resolved]]
-id = "DOC-7"
-component = "README.adoc, ARCHITECTURE.md, docs/status/ROADMAP.adoc, docs/status/PROOF-STATUS.adoc, engine/README.adoc"
-issue = "Front-door docs were template residue or materially false: README described a private browser mock with MPL-2.0 and wrong controls; ARCHITECTURE described a src/tests/config layout that does not exist here; ROADMAP was titled 'YOUR Template Repo Roadmap'; PROOF-STATUS claimed 0% proven; engine README documented S/C keys the code does not bind (it is F)."
-resolved = "2026-08-07"
+# These are low-priority items that don't justify a session on their own.
+# They get picked up when an agent is in the area for other reasons.
+#
+# Example:
+# [[debt.could]]
+# component = "cicada"
+# issue = "RSR_OUTLINE.adoc references banned AGPL-3.0"
+# effort = "easy"
+# impact = "low"
+# discovered = "2026-03-23"
