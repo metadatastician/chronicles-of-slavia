@@ -2,7 +2,7 @@
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = RSR Template Repository
 
-image:https://img.shields.io/badge/Code-MPL--2.0-blue.svg[Code licence: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"] image:https://img.shields.io/badge/Docs-CC--BY--SA--4.0-blue.svg[Docs licence: CC-BY-SA-4.0,link="https://creativecommons.org/licenses/by-sa/4.0/"]
+image:https://img.shields.io/badge/Code-AGPL--3.0--or--later-blue.svg[Code licence: AGPL-3.0-or-later,link="https://www.gnu.org/licenses/agpl-3.0"] image:https://img.shields.io/badge/Docs-CC--BY--SA--4.0-blue.svg[Docs licence: CC-BY-SA-4.0,link="https://creativecommons.org/licenses/by-sa/4.0/"]
 :toc:
 :sectnums:
 
@@ -80,10 +80,10 @@ just validate-rsr
 |Container build (Wolfi base, Podman)
 
 |`LICENSE`
-|MPL-2.0 (code) / CC-BY-SA-4.0 (docs)
+|AGPL-3.0-or-later (code) / CC-BY-SA-4.0 (docs)
 
 |`EXHIBIT-A-ETHICAL-USE.txt`
-|MPL-2.0 source-code-form license notice (LICENSE Exhibit A)
+|ethical-use notice (LICENSE Exhibit A)
 
 |`EXHIBIT-B-QUANTUM-SAFE.txt`
 |Quantum-safe provenance spec (LICENSE Exhibit B)
@@ -192,8 +192,8 @@ project/
 ├── guix.scm                   # Guix package
 ├── Justfile                   # Task runner
 ├── Containerfile              # Container build
-├── LICENSE                    # MPL-2.0
-├── EXHIBIT-A-ETHICAL-USE.txt  # MPL-2.0 source-code-form license notice
+├── LICENSE                    # AGPL-3.0-or-later
+├── EXHIBIT-A-ETHICAL-USE.txt  # ethical-use notice
 ├── EXHIBIT-B-QUANTUM-SAFE.txt # Quantum-safe provenance
 ├── README.adoc                # Overview
 ├── TOPOLOGY.md                # Architecture + completion
@@ -216,7 +216,7 @@ project/
 * `.gitignore`
 * `Justfile`
 * `README.adoc`
-* `LICENSE` (MPL-2.0)
+* `LICENSE` (AGPL-3.0-or-later)
 * `.machine_readable/descriptiles/STATE.a2ml`
 * `.well-known/security.txt`
 * `.well-known/ai.txt`

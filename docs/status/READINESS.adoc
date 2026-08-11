@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= {{PROJECT_NAME}} Component Readiness Assessment
+= Chronicles of Slavia Component Readiness Assessment
 
-*Standard:* link:https://{{FORGE}}/{{OWNER}}/standards/tree/main/component-readiness-grades[Component Readiness Grades (CRG) v2.0 STRICT] +
-*Assessed:* {{CURRENT_DATE}} +
-*Assessor:* {{AUTHOR}} +
-*Previous assessment:* _<date or "none">_
+*Standard:* link:https://github.com/hyperpolymath/standards/tree/main/component-readiness-grades[Component Readiness Grades (CRG) v2.0 STRICT] +
+*Assessed:* 2026-08-07 +
+*Assessor:* Jonathan D.A. Jewell +
+*Previous assessment:* none — this is the first populated assessment (the file
+previously carried the unsubstituted template)
 
-*Current Grade:* X
+*Current Grade:* E
 
 This line is parsed by `just crg-grade` / `just crg-badge`. The grade above is
 the worst-graded in-scope component — *the project's weakest link sets its
@@ -59,20 +60,21 @@ Below B, any publication must be explicitly abstract or provisional.
 
 '''
 
-== 2. Headline Evidence (as of {{CURRENT_DATE}})
+== 2. Headline Evidence (as of 2026-08-07)
 
 [cols="2,3,3", options="header"]
 |===
 | Metric | Value | Source
 
-| Test count | _<N>_ | `.machine_readable/descriptiles/STATE.a2ml` or CI
-| Formal-verification posture | _<N `believe_me` / `sorry` / `Admitted` — irreducible only>_ | grep of proof dirs
-| Dangerous patterns (`assert_total`, `unsafeCoerce`, `Obj.magic`) | _<N>_ | grep {{CURRENT_DATE}}
-| Per-unit README coverage | _<M/N (percentage)>_ | filesystem scan of unit dirs
-| CI status | _<workflow name + last green run>_ | `.github/workflows/`
-| RSR mandatory workflows | _<N/17>_ | `.github/workflows/`
-| Third-party badges (if any) | _<e.g. Glama AAA; Scorecard N/10>_ | external
-| LIVE deployment (if any) | _<URL + last health check>_ | production
+| Test count | 52 passing, 0 failing, 2 ignored doc-tests | live `cargo test --workspace`, 2026-08-07; mirrored in `STATE.a2ml [test-status]`
+| Formal-verification posture | 0 irreducible `believe_me` / `sorry` / `Admitted` | `verification/proofs/idris2/MANIFEST` records all 12 typed holes discharged constructively; `scripts/scan-dangerous.sh` gates it
+| Dangerous patterns (`assert_total`, `unsafeCoerce`, `Obj.magic`) | 0 | `just proof-scan-dangerous`, PASS in the 2026-08-04 Proof Gate run
+| Proof scope | 7/7 obligations mechanically verified — *all generic C ABI/FFI, none a Slavia invariant*; TLA+ module quarantined | `docs/status/PROOF-STATUS.adoc`
+| Per-unit README coverage | 2 of ~8 source subtrees (`engine/`, `docs/*`); no per-file annotation sweep | filesystem scan
+| CI status | 18 of 19 workflows green on the 2026-08-04 wave; `governance` red (upstream cause) | `.github/workflows/`, run history
+| Proof Gate | first successful run in its history, 2026-08-04 (81 prior runs were `startup_failure`) | run history
+| Third-party badges | OpenSSF Scorecard (live); previously-displayed SOC 3 / ISO 27001 / CIAQ badges were unattested and have been removed | `README.adoc`
+| LIVE deployment | none — Pages workflow is `disabled_manually` while a homepage URL is advertised | `.github/workflows/pages.yml`
 |===
 
 '''
@@ -87,10 +89,53 @@ unless noted.
 |===
 | Component | Grade | Posture | Evidence Summary | Promotion blocker | Last Assessed
 
-| _<component 1>_ | X/F/E/D/C/B/A | _<shorthand>_ | _<what was checked + counts>_ | _<specific, actionable gap to next grade>_ | {{CURRENT_DATE}}
-| _<component 2>_ | … | … | … | … | {{CURRENT_DATE}}
-| _<component 3>_ | … | … | … | … | {{CURRENT_DATE}}
+| `slavia-core` (L2 rules core)
+| D | `alpha-unstable`
+| 46 tests green (29 unit + 10 `esm_testbed` + 7 `zone_a`); dependencies are `serde` + `toml` only; deterministic by construction (no ambient RNG or clock); scope documented in ADR-0002 and `engine/README.adoc`.
+| No `[dogfooding-status]` in STATE.a2ml and no per-file annotation sweep. Also API-unstable by design: `Session` must gain rooms (DEBT CODE-2) before it can be called settled.
+| 2026-08-07
+
+| L1 SGS data + schema
+| D | `alpha-unstable`
+| One zone authored (`slavia-core/data/zone-a.sgs.toml`), parsed and exercised by the 7 `zone_a.rs` tests; ADR-0006 makes it the public authoring schema.
+| Only one zone exists, so the schema has never been stressed by a second author or a second zone. No schema versioning story.
+| 2026-08-07
+
+| ESM (belief / kanren / intent / decay)
+| D | `alpha-unstable`
+| 10 testbed tests green; complete against its design in `docs/design/20`; ADR-0004 records the architecture.
+| *Wired to no scene.* Doctrine 8 — unwired is not done. Promotion needs it exercised in situ (planned for segment A5).
+| 2026-08-07
+
+| `slavia-zone-a` (L3 renderer + menu)
+| E | `pre-alpha`
+| Playable end-to-end; ~930-line renderer, paper-doll rig, 8-panel menu, TOML save/load. But only 6 tests exist, all covering `session.rs` — *no rendering, menu, input or save-file capability has a test*.
+| Per-capability tests are a hard D gate. Add coverage for menu navigation, save round-trip at the file layer, and input mapping. Also carries two known-false surfaces: accessibility toggles that drive nothing (CODE-4) and a static UMS stub.
+| 2026-08-07
+
+| Proof suite (`verification/proofs/`)
+| E | `pre-alpha`
+| 7/7 obligations mechanically verified, honestly gated, zero dangerous patterns — genuinely rigorous machinery.
+| It verifies *nothing about this project*: all obligations are generic C ABI/FFI inherited from the template (the Agda and Coq manifests say so themselves), and the TLA+ module is quarantined. Promotion needs at least one Slavia invariant proven — determinism or the opposition rule.
+| 2026-08-07
+
+| CI/CD and gates
+| D | `alpha-unstable`
+| 19 workflows; 18 green; honest five-prover Proof Gate that treats a missing prover as fatal; lockfile-pinned actions; CodeQL, gitleaks, Scorecard, estate rules.
+| `governance` is red and blocks merges (upstream `standards#573`); `e2e.yml` never fires on `engine/**`; four `just` build recipes are silent no-ops.
+| 2026-08-07
+
+| Design canon (`docs/design/`)
+| D | `alpha-unstable`
+| 26 cross-referenced documents with an explicit start point, ADR trail, and a decision sheet converting open questions into rulings. The most mature artefact in the repo.
+| Two unresolved canon contradictions (co-op vs switch-only; Chronicle I's tone) and 8 outstanding Zone B rulings mean downstream work cannot rely on it yet.
+| 2026-08-07
 |===
+
+*Project grade is E* — the weakest link sets the grade, and two components sit at E:
+the renderer (no per-capability tests) and the proof suite (proves nothing about this
+project). Both blockers are specific and actionable, which is the point of grading
+honestly rather than aspirationally.
 
 *Rules of thumb for populating this table:*
 
@@ -164,12 +209,25 @@ Real-world external feedback confirming value. Populate
 
 '''
 
-== 7. Summary ({{CURRENT_DATE}})
+== 7. Summary (2026-08-07)
 
-* Project grade: _<grade>_. Why: _<1-2 line justification>_.
-* Delta since last assessment: _<what changed; none if first assessment>_.
-* Next milestone: _<specific promotion target + timeline>_.
+* *Project grade: E* (`pre-alpha`). Why: the weakest link sets the grade. The renderer
+  has no per-capability tests, and the proof suite — however rigorously gated — proves
+  nothing about Slavia. The rules core, the SGS, the ESM, CI and the design canon all
+  reach D.
+* *Delta since last assessment:* none — this is the first populated assessment. The
+  file previously carried the raw template with a literal grade of `X`.
+* *Next milestone: E → D across the board.* Two concrete, independent pieces of work:
+  (a) per-capability tests for `slavia-zone-a` — menu navigation, save round-trip at
+  the file layer, input mapping; (b) one Slavia invariant proven in any prover —
+  determinism is the natural first target, since ADR-0004 already forbids ambient RNG
+  and clocks to make it provable.
+* *Then D → C* needs the two things §4 names and neither exists yet: a populated
+  `[dogfooding-status]` in STATE.a2ml over a real evidence window, and a per-file /
+  per-directory annotation sweep.
 * Machine-readable grade line present (§ header) for `just crg-grade` / `just crg-badge`.
+* Honest-grading note: no component is claimed above the evidence in
+  `docs/status/DEBT.adoc`, which lists 32 open items. Long alpha is discipline, not shame.
 
 '''
 

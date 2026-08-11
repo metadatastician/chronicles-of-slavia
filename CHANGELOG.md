@@ -13,3 +13,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- Run: just changelog -->
 
 ## [Unreleased]
+
+### Design rulings
+
+- **Flora-taxis is a late-game, self-discovered ability — Level 1 is animal
+  taxis only.** Settles a conflict between `16-flora-and-non-animal-npcs.md`
+  (which gave plants a full stir/settle traversal layer: *"Anya grows a vine to
+  bridge a gap"*) and `23-level-scope-and-pacing.md` (no taxis; tropism only,
+  unknown even to the girls). Doc 23 governs; doc 16's flora-taxis section is
+  re-scoped at source from early puzzle furniture to a late-game ability, and
+  nothing in Level 1 may teach, prompt or UI-surface it. Also corrected there:
+  doc 16 had called deep-water reeds (`05`) "the first seeded case" of
+  flora-taxis — they are not; `05` specifies reeds *to grab*, so deep-water
+  traversal is unaffected (#67).
+- **Repair may use harmless animal material; patterns stay plant-only.** Two
+  docs carried a blanket ban on animal-derived materials, both justifying it by
+  citing the core rule that the girls never *command or consume* animals — so
+  the real invariant was always **cost to the creature, not origin**. Repair
+  (armour value) may now use plant craft fibre **and** harmlessly-given animal
+  material, sheep wool best-in-class; pattern weaving remains **plants only**
+  — fibres, pigments, dyes, petals, no exception. Applied at source in `16` and
+  `17`, with the asymmetry motivated: repair is *material*, a pattern is a
+  *meaning* carried by what the land yields.
+
+### Added
+
+- `prototype/zone-a2/` — an interaction mock for **segment A2, Animals &
+  Plants**, in the same spirit as `prototype/zone-a/` before the Bevy build.
+  Teaches what A1's single grove encounter cannot: a hare that *bolts* when
+  stirred and *freezes* when settled (the creature's nature decides, not the
+  girl's intent), a domesticated goat whose answer reveals it is not wild, and
+  a blighted magpie that does not answer at all — the failure being the
+  diagnostic. Plants are functional only, in three harvest types; honey is
+  Anya's and is *found* while yogurt is Donna's and is *made*; and the co-op
+  grammar still governs — Donna must settle the hive before Anya can reach the
+  honey. A ewe in full fleece stands beside a basket of already-shorn wool,
+  stating the materials ruling with no UI at all.
+- `prototype/zone-a2/rules.test.js` — 32 assertions driving the mock's real
+  rule functions headlessly (`bun prototype/zone-a2/rules.test.js`), including
+  scope guards that fail if flora-taxis or tropism vocabulary ever appears, and
+  a paint-order guard added after a rendering bug buried Anya's face under her
+  own hair. Verified to actually fail when the defects are reintroduced.
+- `docs/status/DEBT.adoc` and a populated `.machine_readable/bot_directives/debt.a2ml`
+  — the first real debt register, 33 items across licence, docs, code, proof,
+  CI/CD and canon (see PR #66).
+- Real Bevy in-game main menu implementing the startup-interface mock-up
+  (`docs/design/chronicles-landing-page.html`): opening title card, nav
+  shell, and eight panels (#49).
+- Real PT Serif typography (OFL-1.1) for the menu, replacing Bevy's
+  bundled fallback font (#50).
+- Save/load/continue system: a TOML save capturing both girls' positions,
+  revealed beats, world transition state, and bird mood, autosaved on
+  leaving gameplay and on each newly-revealed beat. "Continue the
+  Chronicle" is real — enabled with a genuine save summary and restores
+  exactly where play left off (#53).
+- Menu visual polish: an animated background world (moon, ridge, rift,
+  bridge, shrine, birds, mist, fireflies — ported as `Mesh2d` geometry
+  from the mock-up's own CSS `clip-path` point lists) and centre-stage
+  Anya/Donna figures with a Bond-panel-driven focus glow (#53).
+- `docs/design/24-zone-b-fracture-line.md` — Zone B's first full narrative
+  draft, developed from its one-line canon entry in
+  `08-level1-five-zone-map.md` into a beat-by-beat design, with eight
+  open questions recorded for the owner (#54).
+
+### Fixed
+- Removed a duplicate `announce_progress` system definition (#46).
+- CodeQL Action repointed at a SHA that actually exists (#51).
+- OikosBot now runs via its published action instead of a dead container
+  pin (#55).
+- 51 security policies corrected to name this repository instead of the
+  template's (#52 and related).

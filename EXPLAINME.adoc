@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = RSR Template Repo - Explainme
-image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
+image:https://img.shields.io/badge/code-AGPL--3.0--or--later-blue.svg[Code licence: AGPL-3.0-or-later,link="https://www.gnu.org/licenses/agpl-3.0"] image:https://img.shields.io/badge/docs-CC--BY--SA--4.0-lightgrey.svg[Docs licence: CC-BY-SA-4.0,link="https://creativecommons.org/licenses/by-sa/4.0/"]
 
 :toc:
 :icons: font

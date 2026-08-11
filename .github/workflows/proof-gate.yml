@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# This workflow is managed by gh actions-lock.
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # Honest Proof Gate — Required by doctrine #8 (wire-first: unwired is not done).
@@ -33,7 +34,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
 
@@ -46,7 +47,22 @@ jobs:
         run: |
           echo "=== Installing apt-based provers ==="
           sudo apt-get update
-          sudo apt-get install -y agda coq openjdk-17-jre-headless
+          sudo apt-get install -y agda agda-stdlib coq openjdk-17-jre-headless
+          # Ubuntu's agda-stdlib package ships ~2000 sources under
+          # /usr/share/agda-stdlib but NO .agda-lib metadata file at all
+          # (verified against the noble file list), so `import Data.Nat`
+          # fails with "Failed to find source of module Data.Nat" until the
+          # library is described and registered by hand:
+          STDLIB_DIR=/usr/share/agda-stdlib
+          [ -d "$STDLIB_DIR" ] || { echo "agda-stdlib dir missing" >&2; exit 1; }
+          printf 'name: standard-library\ninclude: .\n' | sudo tee "$STDLIB_DIR/standard-library.agda-lib" >/dev/null
+          mkdir -p "$HOME/.agda"
+          echo "$STDLIB_DIR/standard-library.agda-lib" >> "$HOME/.agda/libraries"
+          echo "standard-library" >> "$HOME/.agda/defaults"
+          # agda 2.6.3 writes interface files under <lib>/_build/<version>/,
+          # and /usr/share is root-owned — without this the check dies with
+          # "_build: createDirectory: permission denied".
+          sudo install -d -o "$(id -u)" -g "$(id -g)" "$STDLIB_DIR/_build"
           echo "agda:  $(agda --version 2>&1 | head -1 || echo 'unknown')"
           echo "coq:   $(coqc --version 2>&1 | head -1 || echo 'unknown')"
           echo "java:  $(java --version 2>&1 | head -1 || echo 'unknown')"
@@ -61,19 +77,20 @@ jobs:
           elan --version
           lean --version
 
-      - name: Install Idris 2 via pack
+      - name: Install Idris 2 (containerized pack image)
         run: |
-          echo "=== Installing Idris 2 via pack ==="
-          # Install pack (Idris 2 package manager)
-          curl -fsSL https://github.com/idris-lang/pack/releases/latest/download/x86_64-linuxpack -o /tmp/pack
-          chmod +x /tmp/pack
-          sudo mv /tmp/pack /usr/local/bin/pack
-          pack --version
-          # Install Idris 2 >= 0.8.0 (estate requirement)
-          pack install idris2 >= 0.8.0
-          # Ensure idris2 binary is on PATH
-          echo "$HOME/.idris2/bin" >> $GITHUB_PATH
-          export PATH="$HOME/.idris2/bin:$PATH"
+          echo "=== Installing Idris 2 via the idris2-pack container ==="
+          # idris-lang/pack publishes NO release binaries — the old
+          # releases/latest/download URL 404'd on every run. The maintained
+          # distribution is stefan-hoeck/idris2-pack's container image, which
+          # ships idris2 (>= 0.8.0, estate requirement) on PATH. Shim the
+          # binary so check-proofs.sh sees a real `idris2`; the mount maps
+          # the caller's working directory so repo-relative paths resolve.
+          # Ground-truthed 2026-08-04: all 6 gated ABI modules compile under
+          # the image's idris2 0.8.0 via this exact shim.
+          docker pull -q ghcr.io/stefan-hoeck/idris2-pack:latest
+          printf '#!/usr/bin/env bash\nexec docker run --rm -v "$PWD:$PWD" -w "$PWD" ghcr.io/stefan-hoeck/idris2-pack:latest idris2 "$@"\n' | sudo tee /usr/local/bin/idris2 >/dev/null
+          sudo chmod +x /usr/local/bin/idris2
           idris2 --version
 
       - name: Install TLA+ Tools
@@ -102,15 +119,28 @@ jobs:
       # and imported conditionally; ensure just is available.
       # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-      # `casey/just` is the just source repository, not a GitHub Action -- it has
-      # no action.yml -- and the SHA previously pinned here exists in no
-      # repository (the API returns 422). GitHub could not build the run graph,
-      # so this workflow reported startup_failure in 0 seconds on every run since
-      # it was created, and never executed a single proof check.
-      - name: Install just
-        uses: extractions/setup-just@4a174aa1487e2bcb3f86a8fe24a05361a4f4fff1 # v1
-        with:
-          just-version: 1.21.0
+      # No action is used here on purpose. This repo runs with
+      # allowed_actions: "selected", and neither `casey/*` (the previous,
+      # doubly-broken pin: not an action, nonexistent SHA) nor `extractions/*`
+      # is on the allow-list — an action from a non-allowlisted owner makes
+      # GitHub reject the whole run as a 0-second startup_failure before any
+      # job starts, which is why this gate never executed once in 81 runs.
+      # A plain checksum-pinned binary download needs no allow-list entry.
+      # just >= 1.33 is REQUIRED: the root Justfile uses `import?`, and old
+      # just versions (verified on 1.21.0) run imported recipes with the
+      # import file's directory as cwd, so every `./scripts/*.sh` in
+      # build/just/proofs.just exits 127. 1.56.0 runs them from the root
+      # Justfile's directory — reproduced and verified locally on both
+      # versions. Checksum matches the official 1.56.0 SHA256SUMS.
+      - name: Install just (action-free, checksum-pinned)
+        run: |
+          JUST_VERSION="1.56.0"
+          JUST_SHA256="fa2a8ec1015d9df5330941ade12437488fc40d33f9c9f8cd4eb70a26de11b639"
+          curl -fsSL "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" -o /tmp/just.tar.gz
+          echo "${JUST_SHA256}  /tmp/just.tar.gz" | sha256sum -c -
+          tar -C /tmp -xzf /tmp/just.tar.gz just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
 
       # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       # Run the honest proof gate: proof-check-all runs ALL prover checks + scan.
@@ -130,7 +160,7 @@ jobs:
 
       - name: Upload proof logs on failure
         if: always() && steps.proof_check.outcome == 'failure'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: proof-gate-logs
           path: |

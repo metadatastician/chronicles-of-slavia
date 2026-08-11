@@ -10,9 +10,9 @@ band = "green"
 proposed-action = "none — the descriptile self-model coapts with the contractile set-point within tolerance."
 
 [coverage]
-clauses-total = 50
+clauses-total = 51
 descriptile-witnessed = 4
-probe-deferred-to-hunt = 22
+probe-deferred-to-hunt = 23
 must-trust-unmeasured-gaps = 0
 note = "Yard sees descriptile evidence only; probe-deferred obligations need a Hunt-tier run for a full hard-gate."
 
@@ -21,7 +21,7 @@ grade = "boolean_gate / boolean_gate_provenance"
 witnessed = 3
 refuted = 0
 unmeasured-gaps = 0
-probe-deferred = 22
+probe-deferred = 23
 gate = "pass"
 
 [reading.adjust]
@@ -65,6 +65,7 @@ must.anchors-directory = witnessed
 must.self-validating-structure = probe-deferred
 must.identity-substituted = probe-deferred
 must.golden-path-executes = probe-deferred
+must.esm-is-float-free = probe-deferred
 must.no-untracked-contractiles = probe-deferred
 must.signed-commits = probe-deferred
 trust.no-secrets-committed = probe-deferred
@@ -96,5 +97,5 @@ bust.sync-drift-between-repos = latent
 bust.contractile-parse-error = latent
 
 [provenance]
-contractiles = "intend@b5248bb14c9b must@f2b3ff5a6fa5 trust@76884f439a88 adjust@8faad9ca0650 dust@8ce4f3c1efa0 bust@dd6a53e1fc9b"
-descriptiles = "clade@e40acdc1bef4 state@dffcb3f380f5 ecosystem@18d4ed93cc2d agentic@3ed91c6b7ec0 anchor@12e0302e7554"
+contractiles = "intend@fd9131fef026 must@21591fb71962 trust@85b28758625a adjust@c07a7ffe7605 dust@2a761641551e bust@bca91a1837b3"
+descriptiles = "clade@528116046c1c state@a781a5afcb51 ecosystem@f7146f57105f agentic@ee801572aa1e anchor@d5a5d6bf4f18"

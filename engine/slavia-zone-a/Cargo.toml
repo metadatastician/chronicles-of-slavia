@@ -18,6 +18,10 @@ render = ["dep:bevy"]
 
 [dependencies]
 slavia-core = { path = "../slavia-core" }
+# Save/load (native-only, unconditional — matches slavia-core's own use of
+# these for its SGS loader, not gated behind `render`).
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
 # x11 only (no `wayland`): wayland-sys needs libwayland-dev at build time, which
 # isn't guaranteed present. x11 loads at runtime (no build-time system lib) and
 # runs fine under WSLg via XWayland. Add "wayland" back if libwayland-dev is
@@ -27,6 +31,15 @@ bevy = { version = "0.15", default-features = false, features = [
     "bevy_render",
     "bevy_core_pipeline",
     "bevy_sprite",
+    # UI stack for the startup interface (menu/): layout+widgets, text
+    # rendering, the app-state machine, and the picking backend UI's
+    # Interaction component needs to update on hover/click in 0.15+.
+    "bevy_ui",
+    "bevy_text",
+    "bevy_state",
+    "bevy_picking",
+    "bevy_ui_picking_backend",
+    "default_font", # fallback only now — every Text uses MenuFont explicitly
     "x11",
     "multi_threaded",
 ], optional = true }

@@ -11,8 +11,8 @@ name         = "chronicles-of-slavia"
 display      = "Chronicles of Slavia"
 description  = "Prototype game"
 categories   = ["Game"]
-version      = "0.1.0"
-license      = "MPL-2.0"
+version      = "0.0.0"
+license      = "AGPL-3.0-or-later"
 
 [repo]
 # NOTE: repo-dir is resolved at runtime from the launcher script location.
