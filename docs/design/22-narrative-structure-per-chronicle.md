@@ -122,7 +122,7 @@ minimum a strong signal about its character.
 
 ## Conflicts with existing canon
 
-### 1. Chronicle I's tone — the real one
+### 1. Chronicle I's tone — **RESOLVED**
 
 `13-chronicles-trilogy-structure.md` currently states Chronicle I's tone as
 **"surreal, dangerous, fast-paced."**
@@ -141,10 +141,11 @@ final beat is a *"Fracture prelude — a foreshadowing tremor, not the rupture
 itself"*. The rupture is deferred to Zone B. What actually exists is Ki and Shō,
 with the Ten held back.
 
-The honest reading: **`13`'s "fast-paced" tone line may be the thing that's out
-of step**, not the blueprint. It describes a Chronicle I that has not been built
-and that the five-zone map does not plan. This wants an owner decision, and it is
-the most consequential one in this doc.
+**RULING: (a) Rule the calm / Kishōtenketsu reading canon for Chronicle I.**
+`13`'s tone line has been amended to "calm, folkloric, with a paradigm-breaking
+turn". The built Zone A and the owner-authored blueprint both back this reading;
+Kishōtenketsu does not forbid dread or rupture, it locates them (the *Ten*), so
+doc 24's terrible ending is fully available inside the calm form.
 
 ### 2. Where does mirroring live?
 
@@ -180,8 +181,13 @@ the imported material.
 3. **Mirror Levels vs. chiasmus** — disambiguate the vocabulary.
 4. **Chronicle III's register** — Fichtean body with a mythic Ketsu, or something
    else?
-5. **Does the Kishōtenketsu shape also apply at Level scale?** Zone A (calm
+5. **Does the Kishōtenketsu shape also apply at Level scale?** **RESOLVED** — Rule deliberately fractal at level scale. Zone A (calm
    introduction) → Zone B (the rupture) → Zones C/D (living the consequences
    apart) → Zone E (reunion: *"Two were needed"*) has a suspiciously four-part
-   feel. If the shape is meant to be fractal, that is worth stating deliberately
-   rather than discovering by accident.
+   feel. **RULING: Level 1 mapping: Ki = A1–A2 (inhabiting the world), Shō = A3–A5
+   (deepening into people, tools, and each other), Ten = Zone B, Ketsu = the
+   C/D/E arc, with Zone E the Ketsu proper.** Fractality applies at level scale
+   only; it does not oblige every individual zone to be internally four-part.
+   Zone B's B-i…B-v stays five beats. C and D get pacing guidance: consequence-
+dwelling (elaboration of the Ten). E is constrained to reframe, not defeat —
+   no boss-fight ending for Level 1.

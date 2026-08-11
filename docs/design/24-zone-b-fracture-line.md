@@ -4,11 +4,12 @@
 
 Zone B's story, developed from its single canon line in
 `08-level1-five-zone-map.md` ("The Rift ruptures for real; the girls are
-forced apart") into a beat-by-beat narrative design. **Status: first full
-draft for owner review — nothing here is settled canon.** It follows the
-pattern of `23-level-scope-and-pacing.md`: honest about what it resolves,
-explicit about what it leaves open, and written so the owner can answer the
-open questions conversationally rather than re-derive the whole zone.
+forced apart") into a beat-by-beat narrative design. **Status: draft now canon
+— all eight open questions resolved in `25-zone-b-decision-sheet.md`.** It
+follows the pattern of `23-level-scope-and-pacing.md`: honest about what it
+resolves, explicit about what it leaves open, and written so the owner can
+answer the open questions conversationally rather than re-derive the whole
+zone.
 
 Zone B follows **after all of A1–A5** (`23-level-scope-and-pacing.md`), not
 after the old 7-beat prototype. That matters twice over: the player arriving
@@ -19,17 +20,15 @@ idea (`06-attunement-and-modifiers.md`, *Zone A climax idea*) as a
 not replay that beat with the outcome flipped. Whatever separates the girls
 here has to be a different *kind* of thing, not a stronger marauder.
 
-## Tone — provisional, pending an owner ruling
+## Tone — **RESOLVED: calm, dread-building Kishōtenketsu register**
 
-**This draft is written in the calm, dread-building Kishōtenketsu register,
-not the "surreal, dangerous, fast-paced" register.** That is a provisional
-choice, not a resolution: `22-narrative-structure-per-chronicle.md` (open
-question 1) records the unresolved conflict between `13`'s tone line for
-Chronicle I and the Kishōtenketsu blueprint, notes that the built Zone A
-already backs the calm reading, and leaves the ruling to the owner. The
-owner has authorized drafting Zone B under the calm reading *for now*. If
-the ruling later goes the other way, this zone's pacing (not its underlying
-mechanism) would need redrafting.
+**This draft is written in the calm, dread-building Kishōtenketsu register**
+(as now ruled in `25-zone-b-decision-sheet.md` Q1 and applied in `13` and `22`).
+`22-narrative-structure-per-chronicle.md` (open question 1) previously recorded
+the unresolved conflict between `13`'s tone line for Chronicle I and the
+Kishōtenketsu blueprint, but this is now resolved in favor of the calm reading.
+The built Zone A backs this reading, and the owner-authored blueprint confirms
+it. Zone B's pacing stands as drafted.
 
 In Kishōtenketsu terms, Zone B is Level 1's ***Ten*** — and per `22`, the Ten
 "need not be violent: it can be a paradigm-shifting realization, or a deep
@@ -267,56 +266,27 @@ E. This draft's ending is built backwards from those requirements:
   (each girl seeing the other's distant progress) without introducing
   anything new.
 
-## Open questions for the owner
+## Open questions for the owner — **ALL RESOLVED**
 
-In the manner of `23`'s open-questions section — these need answers before
-Zone B is built; the draft above should be read as pending all of them.
+All eight questions below were resolved in `25-zone-b-decision-sheet.md`:
 
-1. **Chronicle I's tone (the standing one).** This draft assumes the calm /
-   Kishōtenketsu reading, per the owner's provisional authorization — but
-   the underlying conflict (`13`'s "surreal, dangerous, fast-paced" vs. the
-   Kishōtenketsu blueprint) is **still open**: see
-   `22-narrative-structure-per-chronicle.md`, open question 1. Not resolved
-   here, and deliberately not resolvable here. If the ruling goes fast/
-   dangerous, B-i through B-iii compress hard and B-iv expands.
-2. **Is the crux playable or authored?** B-iv's loyalty trap is written as
-   an inevitable outcome. Under ADR-0005 (fail-forward, no rollback —
-   `22`), what happens if a player *tries* to defect — sprints the birch
-   with Anya instead of saving Donna's ground? Options: (a) the grammar
-   genuinely forbids it (the crossing physically requires the act she's
-   forgoing — separation is systemic, not scripted); (b) the player can
-   try, and failing costs something durable that carries into C/D. (a) is
-   cleaner; (b) is braver. Owner call.
-3. **Which girl on which shore?** This draft sorts each girl onto her own
-   land (Anya → forest, over-agitated; Donna → mountain, over-ordered),
-   reading the tilt as "her own nature, unbalanced." The inverse — each
-   stranded in the *other's* land — is also defensible (estrangement
-   instead of excess) and `08` doesn't rule on geography. Owner call; it
-   shapes all of C and D's art direction.
-4. **The marauder thread — closed or dormant?** A1 repelled the marauder;
-   this draft deliberately does not reuse them. Do they reappear at all —
-   e.g. glimpsed on one shore during C/D (a human problem in an inhuman
-   time), or witnessed watching the fold from a ridge in B-iv? Or is that
-   thread fully spent at A1?
-5. **How legible is the Rift's intent in Zone B itself?** This draft lets
-   the player *infer* deliberateness ("it needed them apart") but never
-   states it. Is that reveal held for Zone E / later in Chronicle I ("the
-   Rift is calling them," `13`), or should Zone B say it out loud?
-6. **Zone B's size and room count.** Per `23`'s answered questions, zones
-   vary in length (majority long, minority short) and are built as
-   connected rooms. Is Zone B a *long* zone (the dread movement B-ii wants
-   room to breathe) or a deliberately short, terrible one? And does the
-   B-i…B-v structure map to rooms, to A-style internal segments with save
-   points, or to something else?
-7. **The A3 artefact across the split.** A5 *uses* the artefact
-   (`23`); nothing says whether it is spent. If it persists, which girl
-   carries it across the separation matters for C/D/E design — or does the
-   fold split *it* too?
-8. **Kishōtenketsu at level scale.** This draft treats Zone B as Level 1's
-   *Ten*, which quietly endorses the fractal reading flagged in `22` (open
-   question 5: A calm → B rupture → C/D consequences → E reunion). If the
-   shape is meant to be fractal, that should be stated deliberately;
-   flagged again here rather than assumed.
+1. **Chronicle I's tone (the standing one).** **RESOLVED: (a) calm / Kishōtenketsu reading.**
+   See Q1 ruling. `13`'s tone line amended to "calm, folkloric, with a paradigm-
+   breaking turn".
+2. **Is the crux playable or authored?** **RESOLVED: (a) Systemic-forbid via the verb hole.**
+   See Q2 ruling.
+3. **Which girl on which shore?** **RESOLVED: own land — Anya/forest, Donna/mountain.**
+   See Q3 ruling. Shapes all C/D art direction accordingly.
+4. **The marauder thread — closed or dormant?** **RESOLVED: (b) Dormant witness in B-iv.**
+   See Q4 ruling.
+5. **How legible is the Rift's intent in Zone B itself?** **RESOLVED: Hold the reveal.**
+   See Q5 ruling. Reveal held for Zone E.
+6. **Zone B's size and room count.** **RESOLVED: four rooms, one movement, no mid-crux save.**
+   See Q6 ruling.
+7. **The A3 artefact across the split.** **RESOLVED: (b) Persists, carried by one girl.**
+   See Q7 ruling. Carrier decided at A3 design.
+8. **Kishōtenketsu at level scale.** **RESOLVED: Rule deliberately fractal.**
+   See Q8 ruling. `22` open question 5 resolved with level-scale mapping.
 
 ## Scope of this doc
 
@@ -324,3 +294,6 @@ Documentation only. No SGS content, no engine change, no Zone B build is
 proposed or started by this doc — per `08`, nothing past Zone A is
 scheduled until Zone A holds. This exists so that when Zone B *is* scoped,
 it is scoped against an owner-reviewed story rather than a one-line entry.
+
+**Status update:** All eight open questions resolved in `25-zone-b-decision-sheet.md`
+and applied at source. This doc is now **canon**, no longer provisional.

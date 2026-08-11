@@ -7,12 +7,10 @@ statement that the draft "should be read as pending all of them." This doc
 puts each question in front of the owner as a decision: the context, the
 live options, a recommendation with its reasoning, and a blank ruling slot.
 
-**Status: decision sheet awaiting owner rulings — nothing here is canon
-until its ruling is filled in.** A recommendation is an argument, not a
-default; an unfilled slot means undecided, and doc 24 stays provisional
-until every slot is filled. Where a question here restates a standing
-question from another doc (Q1 and Q8 both live in
-`22-narrative-structure-per-chronicle.md`), the ruling should be recorded
+**Status: ALL EIGHT RULINGS COMPLETE — this sheet is now canon.** All
+ruling slots are filled. Doc 24 is no longer provisional. Where a question here
+restates a standing question from another doc (Q1 and Q8 both live in
+`22-narrative-structure-per-chronicle.md`), the ruling has been recorded
 there too — one ruling, applied at source, echoed here.
 
 Per doc 24's own scope line, none of this schedules a build: Zone B remains
@@ -49,7 +47,7 @@ zone. If (a) is ruled: edit `13`'s tone line for Chronicle I to "calm,
 folkloric, with a paradigm-breaking turn" (or the owner's words), and mark
 `22` open question 1 resolved.
 
-**RULING:**
+**RULING: (a) Rule the calm / Kishōtenketsu reading canon for Chronicle I.** Amend `13`'s tone line for Chronicle I to "calm, folkloric, with a paradigm-breaking turn". Mark `22` open question 1 resolved. The built Zone A and the owner-authored blueprint both back this reading; Kishōtenketsu does not forbid dread or rupture, it locates them (the *Ten*), so doc 24's terrible ending is fully available inside the calm form.
 
 ---
 
@@ -92,7 +90,7 @@ still allows: let the player *see* the self-saving act (the birch is right
 there) and understand, in their hands, that their girl has no verb for it.
 That understanding, not a refused button, is the trap landing.
 
-**RULING:**
+**RULING: (a) Systemic-forbid via the verb hole.** The grammar genuinely forbids defection — separation is systemic. Every act the player's active girl can perform at the crux targets the *other* girl's peril. The reciprocal act is authored. No input is ever rejected; defection is grammatically inexpressible. The player sees the self-saving act and understands their girl has no verb for it.
 
 ---
 
@@ -123,7 +121,7 @@ alienness; it comes from the familiar answering wrongly.
 Donna's low) and the tilt directions in the handoff contract stand as
 drafted.
 
-**RULING:**
+**RULING: Own land — Anya on Ukrainian forest (over-agitated), Donna on Bulgarian mountain (over-ordered).** This reads the tilt as "her own nature, unbalanced" and keeps each land's visual identity coherent with its tilt. Shapes all C/D art direction accordingly. Sub-ruling: B-v's shore hum (Anya's shore high, Donna's low) and tilt directions in handoff contract stand as drafted.
 
 ---
 
@@ -151,7 +149,7 @@ private weather), it keeps the human world alive through an inhuman event
 plants a free hook C/D/E may take or leave. It must stay non-interactive
 and unexplained in B — a figure, then gone.
 
-**RULING:**
+**RULING: (b) Dormant witness in B-iv, non-interactive.** Single non-interactive sighting: marauder witnessed watching the fold from a ridge in B-iv, no mechanical role. Keeps human world alive through an inhuman event, scale-checks the rupture, and plants a free hook C/D/E may take or leave.
 
 ---
 
@@ -177,7 +175,7 @@ game's general show-don't-tell contract (`21-manpu-legibility.md`) and the
 belief-not-fact epistemology the ESM runs on (`20`): the player holds a
 belief about the Rift, exactly as NPCs hold beliefs about the girls.
 
-**RULING:**
+**RULING: Hold the reveal — Zone B may raise the question, never answer it.** Everything inferential stays (two-pitch hum, seam feeding on Anya's stir, mirror-reversed votives, withdraw of animals). No diegetic text confirms intent. Girls may voice suspicion *as a question*. The line "the seam knew they would" remains authorial/design-doc voice, not surfaced narration. Reveal held for Zone E (Rift Node Chamber).
 
 ---
 
@@ -212,7 +210,7 @@ Save points at the three room boundaries, matching `23`'s
 segment-boundary convention. Not A-style internal segments: A1–A5 are five
 *lessons*; B is one *movement*, and its rooms are paragraphs, not chapters.
 
-**RULING:**
+**RULING: Medium — four rooms, one movement, no mid-crux save.** Room mapping: Room 1 = B-i (morning after), Room 2 = B-ii (wrong answers, largest exploratory room), Room 3 = B-iii + B-iv (seam and fold, one continuous planar room, no save point between seeing the seam and losing the birch), Room 4 = B-v (two shores). Save points at the three room boundaries only. B is one *movement*, rooms are paragraphs not chapters.
 
 ---
 
@@ -242,7 +240,7 @@ recommends: whichever girl's shore is farther from the artefact's origin
 carries it, so each solo zone holds one anchor of the other land. Decide
 the carrier when A3 is designed, not here.
 
-**RULING:**
+**RULING: (b) Persists, carried by one girl across the split.** Not spent at A5. The artefact lives through the whole level, making it the natural reunion token for E. Carrier sub-question: whichever girl's shore is farther from the artefact's origin carries it (decide at A3 design). The fold does not split it; the bond is already the thing the chasm cannot cut.
 
 ---
 
@@ -269,7 +267,7 @@ four-part (Zone B's own B-i…B-v is five beats and should stay whatever
 shape serves it). If ruled: mark `22` open question 5 resolved and note
 the mapping there.
 
-**RULING:**
+**RULING: Rule deliberately fractal at level scale.** Level 1 mapping: **Ki** = A1–A2 (inhabiting the world), **Shō** = A3–A5 (deepening into people, tools, and each other), **Ten** = Zone B, **Ketsu** = the C/D/E arc, with Zone E the Ketsu proper. Fractality applies at level scale only; it does not oblige every individual zone to be internally four-part. Zone B's B-i…B-v stays five beats. C and D get pacing guidance: consequence-dwelling (elaboration of the Ten). E is constrained to reframe, not defeat — no boss-fight ending for Level 1. Mark `22` open question 5 resolved.
 
 ---
 
