@@ -1,4 +1,3 @@
-# This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # This workflow is managed by gh actions-lock.
 # Rust CI — thin wrapper calling the shared estate reusable in
@@ -18,3 +17,12 @@ permissions:
 jobs:
   rust-ci:
     uses: hyperpolymath/standards/.github/workflows/rust-ci-reusable.yml@fcb8669169b4e9f5d9848608df880ae5fae812b4
+    with:
+      # This repository's Cargo workspace lives below the repository root.
+      # Without this input the reusable's checked-out detector truthfully sees
+      # no root Cargo.toml and skips check, clippy, fmt and test.
+      working_directory: engine
+      enable_audit: true
+      enable_coverage: true
+      # Establish the measurement before ratcheting it upward from evidence.
+      coverage_floor: "0"
