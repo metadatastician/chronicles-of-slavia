@@ -1,4 +1,3 @@
-# This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # This workflow is managed by gh actions-lock.
 name: OikosBot Sustainability Analysis
@@ -32,6 +31,10 @@ jobs:
           mode: report
           path: .
           output: results.sarif
+          # v0.1.1's default digest was never published and fails with
+          # `manifest unknown`. This is the immutable digest currently
+          # published by ghcr.io/hyperpolymath/oikos (verified 2026-08-28).
+          image: ghcr.io/hyperpolymath/oikos@sha256:35eb0aca8dd4baee3fdba9967c323ab17afc3911fda2b369ce61ac1aa75da03c
 
       - name: Upload SARIF to GitHub Security
         if: always()

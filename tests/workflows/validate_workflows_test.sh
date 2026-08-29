@@ -64,11 +64,13 @@ while IFS= read -r workflow_file; do
 
     WORKFLOW_NAME=$(basename "$workflow_file")
 
-    # TEST 1a: SPDX Header
-    if head -10 "$workflow_file" 2>/dev/null | grep -q "SPDX-License-Identifier"; then
-        log_pass "  $WORKFLOW_NAME: SPDX header present"
+    # TEST 1a: SPDX Header. The governance gate requires it on line one, so
+    # accepting it anywhere in the first ten lines would let this local test
+    # pass files that CI rejects (as happened after an actions-lock refresh).
+    if head -1 "$workflow_file" 2>/dev/null | grep -q "^# SPDX-License-Identifier:"; then
+        log_pass "  $WORKFLOW_NAME: SPDX header is on line 1"
     else
-        log_warning "  $WORKFLOW_NAME: No SPDX header"
+        log_error "  $WORKFLOW_NAME: SPDX header missing from line 1"
     fi
 
     # TEST 1b: Has 'name' field
@@ -99,8 +101,9 @@ REQUIRED_WORKFLOWS=(
     "security-policy.yml"
     "wellknown-enforcement.yml"
     "workflow-linter.yml"
-    "npm-bun-blocker.yml"
-    "ts-blocker.yml"
+    # Supersedes the obsolete npm-bun and TypeScript blockers. It enforces the
+    # current estate ordering without rejecting the preferred Bun runtime.
+    "runtime-policy.yml"
     "secret-scanner.yml"
 )
 
