@@ -14,8 +14,9 @@ Accepted. Tightens ADR-0002 (layered game-as-data). Bounded against ADR-0004
 ## Context
 
 Chronicles of Slavia is intended to be moddable through **UMS — the Universal
-Modding Studio** (started for IDApTIK at `metadatastician/idaptik-ums`, currently
-IDApTIK-shaped and requiring generalisation). The ambition is that authors can
+Modding Studio** (`metadatastician/universal-modding-studio`). IDApTIK is its
+primary proving profile and Chronicles of Slavia is its second bounded profile;
+shared surfaces are generalised from evidence across those lanes. The ambition is that authors can
 build **objects, skills, NPCs, plants, animals, levels, and maps** — so the game
 outlives its main story and a community can extend it.
 
