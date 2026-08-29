@@ -173,6 +173,18 @@ The original findings, retained for the record:
 | *The UMS panel is a static stub* in the menu, by design (doc 20). Listed so the
   gap is visible, not because it is wrong.
 | low
+
+| CODE-9
+| *The tracked ABI/FFI tree is vestigial and non-conformant.* Project metadata says
+  the Rust core deliberately has no FFI seam, but 21 inherited files remain under
+  `src/interface/` plus `abi.ipkg`, with no capability profile. The production Zig
+  file has unresolved `{{project}}` symbols, no unified Hexadeca API, and is not
+  compiled by its empty `build.zig`; the generated ABI directory contains no header.
+  Under the estate template-applicability policy this must be removed as vestigial or
+  explicitly declared, implemented, generated, wired, and proved. A compiling
+  placeholder integration test is not a third state. SNIF is currently not applicable:
+  the tracked tree has no BEAM/NIF implementation.
+| high
 |===
 
 == 4. Proof debt
@@ -190,12 +202,12 @@ The original findings, retained for the record:
 | high
 
 | PRF-2
-| *TLA+ verifies nothing.* `verification/proofs/tlaplus/StateMachine.tla` is
-  `quarantine` — _"tla2sany not available … proof cannot be verified"_ — and a
-  quarantined module passes the check by continuing to fail. A green board reads as
-  "five provers verified" when four did. The quarantine note may now be stale: the
-  Proof Gate installs `tla2tools.jar` and a JRE, so re-evaluate whether it can be
-  promoted to `gated`.
+| *TLA+ proves nothing about Slavia.* The stale quarantine was corrected on
+  2026-08-29 after the merged-main log confirmed that TLA+ Tools 1.8.0 SANY-parses
+  `StateMachine.tla`. Parsing establishes syntax/level correctness only. The file is
+  still a generic request-pipeline template with no `.cfg`, TLC state exploration,
+  recorded invariant result, or Slavia state. Do not report the green parser stage as
+  a model-checked proof.
 | high
 
 | PRF-3
@@ -203,6 +215,23 @@ The original findings, retained for the record:
   run in its entire history was 2026-08-04 (81 prior runs were `startup_failure`). It
   is real now, but it has no track record yet.
 | low
+
+| PRF-4
+| *Rust has no Creusot verification surface.* There are no Creusot/Why3 artefacts,
+  contracts, recipes, dependencies, or CI jobs in `engine/`. The 52 tests, Clippy,
+  audit, and coverage gates are useful conventional Rust evidence but do not meet the
+  estate's Rust/Creusot assurance rule. Earlier prose calling the core "proven" by
+  tests was corrected on 2026-08-29.
+| high
+
+| PRF-5
+| *The generic ABI proof model is not connected to the tracked interface scaffold.*
+  `verification/proofs/idris2/` typechecks constructive propositions, but the separate
+  `src/interface/Abi/Foreign.idr` declares `rsr_*` symbols while Zig exposes unresolved
+  `{{project}}_*` placeholders. No generated header or correspondence theorem connects
+  them. Compiler acceptance of the generic modules therefore proves no production
+  Slavia interface.
+| high
 |===
 
 == 5. CI/CD debt
@@ -324,11 +353,11 @@ These are open questions, not defects — but they block work and belong in one 
 
 | Licence (all resolved 08-07) | 0 | 0 | 0
 | Documentation | 0 | 2 | 2
-| Code | 2 | 4 | 2
-| Proof | 2 | 0 | 1
+| Code | 3 | 4 | 2
+| Proof | 4 | 0 | 1
 | CI/CD | 2 | 6 | 2
 | Design/canon | 1 | 2 | 1
-| *Total* | *7* | *14* | *8*
+| *Total* | *10* | *14* | *8*
 |===
 
 The two structural items worth reading twice: *CODE-1 and CODE-2* (no moving camera, no

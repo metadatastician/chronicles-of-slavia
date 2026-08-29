@@ -3,7 +3,7 @@
 = Chronicles of Slavia Component Readiness Assessment
 
 *Standard:* link:https://github.com/hyperpolymath/standards/tree/main/component-readiness-grades[Component Readiness Grades (CRG) v2.0 STRICT] +
-*Assessed:* 2026-08-07 +
+*Assessed:* 2026-08-29 +
 *Assessor:* Jonathan D.A. Jewell +
 *Previous assessment:* none — this is the first populated assessment (the file
 previously carried the unsubstituted template)
@@ -60,19 +60,19 @@ Below B, any publication must be explicitly abstract or provisional.
 
 '''
 
-== 2. Headline Evidence (as of 2026-08-07)
+== 2. Headline Evidence (as of 2026-08-29)
 
 [cols="2,3,3", options="header"]
 |===
 | Metric | Value | Source
 
-| Test count | 52 passing, 0 failing, 2 ignored doc-tests | live `cargo test --workspace`, 2026-08-07; mirrored in `STATE.a2ml [test-status]`
-| Formal-verification posture | 0 irreducible `believe_me` / `sorry` / `Admitted` | `verification/proofs/idris2/MANIFEST` records all 12 typed holes discharged constructively; `scripts/scan-dangerous.sh` gates it
-| Dangerous patterns (`assert_total`, `unsafeCoerce`, `Obj.magic`) | 0 | `just proof-scan-dangerous`, PASS in the 2026-08-04 Proof Gate run
-| Proof scope | 7/7 obligations mechanically verified — *all generic C ABI/FFI, none a Slavia invariant*; TLA+ module quarantined | `docs/status/PROOF-STATUS.adoc`
+| Test count | 52 passing, 0 failing under all Cargo targets | `cargo test --locked --all-targets`, local and PR #80 Rust CI, 2026-08-29
+| Formal-verification posture | *0 Slavia proofs; no Rust/Creusot surface*. Configured escape-hatch scan is clean in inherited proof modules | `docs/status/PROOF-STATUS.adoc`; merged-main Proof Gate, 2026-08-29
+| Configured dangerous proof patterns (`assert_total`, `unsafeCoerce`, `Obj.magic`, and peers) | 0 found | `scripts/scan-dangerous.sh`, local and merged-main Proof Gate, 2026-08-29; this scan is not proof coverage
+| Proof scope | *0 Slavia proofs*. Nine inherited modules are compiler-accepted as checked scaffolding; one generic TLA+ module SANY-parses but is not TLC-model-checked | `docs/status/PROOF-STATUS.adoc`; merged-main Proof Gate, 2026-08-29
 | Per-unit README coverage | 2 of ~8 source subtrees (`engine/`, `docs/*`); no per-file annotation sweep | filesystem scan
-| CI status | 18 of 19 workflows green on the 2026-08-04 wave; `governance` red (upstream cause) | `.github/workflows/`, run history
-| Proof Gate | first successful run in its history, 2026-08-04 (81 prior runs were `startup_failure`) | run history
+| CI status | PR #80 complete: 45 success, 3 intentional skips, 3 external failures; merged main: 40 success, 8 skips, same 3 failures | complete 51-context GraphQL rollups, 2026-08-29
+| Proof Gate | Green on merged main: nine inherited modules compiler-accepted, generic TLA+ scaffold SANY-parsed, dangerous-pattern scan clean | run `33251137974`; scope caveats in `PROOF-STATUS.adoc`
 | Third-party badges | OpenSSF Scorecard (live); previously-displayed SOC 3 / ISO 27001 / CIAQ badges were unattested and have been removed | `README.adoc`
 | LIVE deployment | none — Pages workflow is `disabled_manually` while a homepage URL is advertised | `.github/workflows/pages.yml`
 |===
@@ -91,45 +91,45 @@ unless noted.
 
 | `slavia-core` (L2 rules core)
 | D | `alpha-unstable`
-| 46 tests green (29 unit + 10 `esm_testbed` + 7 `zone_a`); dependencies are `serde` + `toml` only; deterministic by construction (no ambient RNG or clock); scope documented in ADR-0002 and `engine/README.adoc`.
-| No `[dogfooding-status]` in STATE.a2ml and no per-file annotation sweep. Also API-unstable by design: `Session` must gain rooms (DEBT CODE-2) before it can be called settled.
-| 2026-08-07
+| 46 tests green (29 unit + 10 `esm_testbed` + 7 `zone_a`); dependencies are `serde` + `toml` only; the design excludes ambient RNG and clocks and tested cases are deterministic; scope documented in ADR-0002 and `engine/README.adoc`.
+| No Creusot contracts/gate, no `[dogfooding-status]` in STATE.a2ml, and no per-file annotation sweep. Also API-unstable by design: `Session` must gain rooms (DEBT CODE-2) before it can be called settled.
+| 2026-08-29
 
 | L1 SGS data + schema
 | D | `alpha-unstable`
 | One zone authored (`slavia-core/data/zone-a.sgs.toml`), parsed and exercised by the 7 `zone_a.rs` tests; ADR-0006 makes it the public authoring schema.
 | Only one zone exists, so the schema has never been stressed by a second author or a second zone. No schema versioning story.
-| 2026-08-07
+| 2026-08-29
 
 | ESM (belief / kanren / intent / decay)
 | D | `alpha-unstable`
 | 10 testbed tests green; complete against its design in `docs/design/20`; ADR-0004 records the architecture.
 | *Wired to no scene.* Doctrine 8 — unwired is not done. Promotion needs it exercised in situ (planned for segment A5).
-| 2026-08-07
+| 2026-08-29
 
 | `slavia-zone-a` (L3 renderer + menu)
 | E | `pre-alpha`
 | Playable end-to-end; ~930-line renderer, paper-doll rig, 8-panel menu, TOML save/load. But only 6 tests exist, all covering `session.rs` — *no rendering, menu, input or save-file capability has a test*.
-| Per-capability tests are a hard D gate. Add coverage for menu navigation, save round-trip at the file layer, and input mapping. Also carries two known-false surfaces: accessibility toggles that drive nothing (CODE-4) and a static UMS stub.
-| 2026-08-07
+| Per-capability tests are a hard D gate, and Rust has no Creusot verification. Add menu navigation, save-file-layer, input-mapping, and formal transition-contract coverage. Also carries two known-false surfaces: accessibility toggles that drive nothing (CODE-4) and a static UMS stub.
+| 2026-08-29
 
 | Proof suite (`verification/proofs/`)
 | E | `pre-alpha`
-| 7/7 obligations mechanically verified, honestly gated, zero dangerous patterns — genuinely rigorous machinery.
-| It verifies *nothing about this project*: all obligations are generic C ABI/FFI inherited from the template (the Agda and Coq manifests say so themselves), and the TLA+ module is quarantined. Promotion needs at least one Slavia invariant proven — determinism or the opposition rule.
-| 2026-08-07
+| Nine inherited modules are accepted by their proof compilers with zero configured dangerous patterns; one generic TLA+ module SANY-parses. This is functioning checker machinery, not project proof coverage.
+| *Zero proofs concern this project.* The modules are generic ABI/API/template scaffolding, TLA+ has no TLC result, and the Rust game has no Creusot surface. Promotion needs at least one checked Slavia invariant—determinism or the opposition rule is the natural start.
+| 2026-08-29
 
 | CI/CD and gates
 | D | `alpha-unstable`
-| 19 workflows; 18 green; honest five-prover Proof Gate that treats a missing prover as fatal; lockfile-pinned actions; CodeQL, gitleaks, Scorecard, estate rules.
-| `governance` is red and blocks merges (upstream `standards#573`); `e2e.yml` never fires on `engine/**`; four `just` build recipes are silent no-ops.
-| 2026-08-07
+| 31 workflow files; PR #80 exercised all 51 reported contexts. Real Rust check/test/audit/coverage and the checker suite ran; actions are lockfile-pinned; CodeQL, gitleaks, Scorecard, and project gates passed.
+| Three external checks remain red: rejected Sonar token, missing `GH_TOKEN` in the upstream allowlist job, and an upstream linter incompatible with actions-lock. `e2e.yml` still does not test `engine/**`; no Creusot gate exists.
+| 2026-08-29
 
 | Design canon (`docs/design/`)
 | D | `alpha-unstable`
 | 26 cross-referenced documents with an explicit start point, ADR trail, and a decision sheet converting open questions into rulings. The most mature artefact in the repo.
 | Two unresolved canon contradictions (co-op vs switch-only; Chronicle I's tone) and 8 outstanding Zone B rulings mean downstream work cannot rely on it yet.
-| 2026-08-07
+| 2026-08-29
 |===
 
 *Project grade is E* — the weakest link sets the grade, and two components sit at E:

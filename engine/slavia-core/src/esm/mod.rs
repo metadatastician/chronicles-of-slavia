@@ -34,7 +34,7 @@
 //!
 //! **1. Determinism.** No ambient RNG, no clock, no global state. Randomness is
 //! *injected* as a seeded [`decay::Rng`]. Same seed + same inputs = same beliefs,
-//! always. This is what lets L2 be proven headlessly (ADR-0004), what makes
+//! always. This is what lets L2 be tested headlessly (ADR-0004), what makes
 //! authored content behave identically for every player (ADR-0006), and — for
 //! free — what any future lockstep netcode would require.
 //!
@@ -57,8 +57,9 @@
 //!
 //! ## Status — what is built, and what is deliberately not
 //!
-//! Built and proven against a synthetic cast in `tests/esm_testbed.rs`. Zone A's
-//! five beats are untouched; nothing here is wired to a zone yet, by design.
+//! Built and test-evidenced against a synthetic cast in
+//! `tests/esm_testbed.rs`. Zone A's five beats are untouched; nothing here is
+//! wired to a zone yet, by design. No Creusot contract proves these claims.
 //!
 //! **Deliberately not built** (each marked at its site where one exists):
 //!
@@ -77,7 +78,8 @@
 //!
 //! The Guilty Conscience trap (`20` §D) is *not* a module on purpose: it must
 //! **emerge** from belief + intent rather than be coded, or the design's central
-//! claim is false. It is proven as a test in `tests/esm_testbed.rs`.
+//! claim is false. It is exercised by a test in `tests/esm_testbed.rs`; that
+//! example does not constitute a formal proof.
 
 pub mod belief;
 pub mod decay;

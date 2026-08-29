@@ -1,5 +1,7 @@
 # TLA+ proof manifest — read by scripts/check-proofs.sh tlaplus
 # Format: <source-root>|<module-relative-to-source-root>|gated|quarantine|<note>
-# Note: TLA+ checking requires tla2sany which is not installed in this environment.
-# Ground-truthed 2026-07-26.
-verification/proofs/tlaplus|StateMachine.tla|quarantine| tla2sany not available in current environment; proof cannot be verified
+# The chronicles-specific TLA recipe does not consume this manifest; keep it
+# aligned with the actual live gate nonetheless. SANY parsing is a syntax/level
+# check, not TLC model checking and not evidence about Slavia.
+# Ground-truthed 2026-08-29 with TLA+ Tools 1.8.0 on merged main.
+verification/proofs/tlaplus|StateMachine.tla|gated| SANY parses; generic template state machine; no TLC configuration/model-check result and no Slavia invariant

@@ -323,8 +323,8 @@ mod tests {
     use super::*;
 
     /// The whole Zone A arc as a spatial walk — driven through the exact intents
-    /// the renderer calls. The headless proof that both the rules *and* the
-    /// traversal wiring are correct.
+    /// the renderer calls. A headless regression test for the rules and
+    /// traversal wiring; it is not a universal or formal proof.
     #[test]
     fn walks_zone_a_in_space() {
         let mut s = Session::new();

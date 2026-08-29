@@ -9,7 +9,8 @@
 #   L3  renderer                — a swappable skin (browser / Godot / native), later
 #
 # Only L2 lives here for now. L1 is the data it reads; L3 is deliberately absent
-# until Zone A's rules are proven (milestone M0, "lock the sacred logic first").
+# until Zone A's rules are test-evidenced (milestone M0, "lock the sacred logic
+# first"). Formal Rust verification still requires a Creusot surface.
 
 [workspace]
 resolver = "2"
