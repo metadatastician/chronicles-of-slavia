@@ -19,8 +19,9 @@ touching the design.
 | *L2 — `slavia-core`*
 | The pure rules core — the emotional grammar (Anya stirs / Donna settles / the
   animal's nature decides / Donna steadies what Anya crosses / the Rift
-  interrupts). Renders nothing. This is the *sacred logic*, and it is proven by
-  tests before any renderer exists.
+  interrupts). Renders nothing. This is the *sacred logic*, and it is exercised
+  by headless tests before any renderer exists. Those tests are evidence, not a
+  formal proof; no Creusot verification is wired today.
 
 | *L3 — renderer*
 | A thin skin over L2. `slavia-zone-a` is the selected **Bevy**
@@ -42,8 +43,8 @@ cargo test -p slavia-zone-a --no-default-features  # the play controller, no Bev
 `slavia-core/tests/zone_a.rs` encodes Zone A's five-beat prototype success
 condition (`docs/design/00-start-here.md`) as executable assertions; the
 `slavia-zone-a` session test walks the same five beats through the exact intents
-the renderer calls. If both are green, the sacred logic and its wiring hold —
-no display needed.
+the renderer calls. If both are green, the tested examples and traversal wiring
+behave as asserted—no display needed. They do not establish a universal theorem.
 
 == Play Zone A
 
@@ -81,7 +82,7 @@ Build note: uses Bevy's `x11` backend only (no `wayland`), so it builds without
 
 == Status
 
-Milestone *M2* — Bevy selected as the production renderer over the proven core.
+Milestone *M2* — Bevy selected as the production renderer over the tested core.
 The playable Zone A implementation remains deliberately bounded.
 
 See `docs/decisions/0002-layered-game-as-data-architecture.adoc` for the

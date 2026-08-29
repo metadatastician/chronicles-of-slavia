@@ -3,7 +3,7 @@
 = Test Status and Needs — Chronicles of Slavia
 :toc:
 
-*Measured:* 2026-08-29 on `fix/ci-honest-recovery` before live-CI submission. +
+*Measured:* 2026-08-29 locally and on merged `main` commit `5375889`. +
 *Observation horizon:* the tracked tree at this branch, the `engine/` Cargo
 workspace under default features, all Cargo targets, the 31 tracked workflow
 files, and the explicitly named shell controls below. This is not evidence for
@@ -24,6 +24,11 @@ platforms, features, or external services that were not exercised.
 | *PASS*
 | `cargo fmt --all -- --check`, `cargo check --locked --all-targets`, and
   `cargo clippy --locked --all-targets -- -D warnings` from `engine/`.
+
+| Rust formal verification
+| *ABSENT*
+| No Creusot/Why3 artefact, contract, command, dependency, or CI job is tracked.
+  Cargo checks and tests do not satisfy the estate's Rust/Creusot requirement.
 
 | Dependency audit
 | *PASS with 5 allowed warnings*
@@ -64,10 +69,10 @@ platforms, features, or external services that were not exercised.
   remained clean.
 
 | Oikos image
-| *EXECUTED successfully*
+| *GREEN locally and in live CI*
 | The pinned immutable image loaded `.oikos.yml`, exited 0, and produced a
-  237-element JSON array whose item shape was checked. This proves the image
-  executes locally; it does not prove the GitHub-hosted workflow yet.
+  237-element JSON array whose item shape was checked locally; `oikosbot` also
+  succeeded on PR #80's complete GitHub check rollup.
 |===
 
 == Legacy template tests
@@ -96,18 +101,20 @@ valid game-level E2E test.
 . Add renderer capability tests for menu navigation, input mapping, accessibility
   settings consumption, and save/load behavior. Six session tests do not cover
   those surfaces.
+. Add and gate Creusot contracts for the Rust core's named invariants; do not
+  translate selected passing examples into universal proof claims.
 . Replace the zero-assertion `tests/e2e.sh` path with a real game smoke test, and
   make `.github/workflows/e2e.yml` react to `engine/**` changes.
 . Add a non-renderer coverage view or targeted tests before raising the coverage
   floor; renderer-inclusive coverage is currently the measured contract.
 . Review and remove or remediate the five allowed RustSec warnings instead of
   treating the audit allowlist as permanent.
-. Exercise the recovery branch on GitHub-hosted runners. Local execution is not
-  evidence that credentials, reusable workflows, Sonar, or governance wiring work.
+. Resolve the ABI/FFI capability decision: remove the unused interface scaffold,
+  or implement and prove a real Idris2 ABI / Zig unified-Hexadeca boundary.
 
 == Status vocabulary
 
-In this document, *configured*, *executed locally*, and *green in live CI* are
-different states. The recovery branch is configured and locally exercised. It
-becomes live-CI evidence only after the pushed pull request reports its complete
-GraphQL check rollup.
+In this document, *configured*, *executed locally*, *green in live CI*, and
+*formally proved* are different states. PR #80 completed with 45 successful, 3
+intentional skipped, and 3 external-failure contexts; its project Rust jobs all
+passed. None of those results is a Creusot proof.

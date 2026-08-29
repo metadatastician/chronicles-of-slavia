@@ -3,7 +3,9 @@
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # Honest Proof Gate — Required by doctrine #8 (wire-first: unwired is not done).
-# Runs the formal proof suite across all five provers: Idris2, Lean4, Agda, Coq, TLA+.
+# Runs the configured proof/scaffold checkers across Idris2, Lean4, Agda, Coq,
+# and TLA+. A green job means the declared modules passed their configured
+# compiler/parser checks; it does not claim that any Slavia invariant is proved.
 #
 # A missing prover is FATAL, never a skip — an unrun prover means the proofs are
 # UNVERIFIED and this gate declines to certify them (doctrine #2: ground-truth

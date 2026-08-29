@@ -1,122 +1,144 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-// Template: rsr-template-repo/docs/status/PROOF-NEEDS.adoc
-// Authoritative master list: ~/Desktop/PROOF-REQUIREMENTS-MASTER.adoc
-= Proof Requirements — {{PROJECT}}
+= Proof Needs — Chronicles of Slavia
+:toc:
 
-== Proof Tier
+*Updated:* 2026-08-29. +
+*Rule:* only a checked theorem about a named project invariant counts as a
+project proof. Tests, typechecking, placeholder modules, quarantines, manifests,
+and generated-file scaffolds are evidence of their own narrower behavior only.
 
-// Assign one: T1 (Critical), T2 (High), T3 (Standard), T4 (Light), T5 (Exempt)
-*Tier*: T3 — Standard
+== Current baseline
 
-== Proof Categories
+* Slavia-specific checked proofs: *0*.
+* Rust/Creusot contracts and proofs: *0*.
+* Production ABI/FFI conformance proofs: *0*.
+* SANY-parsed generic TLA+ specifications: *1*; TLC-model-checked Slavia
+  specifications: *0*.
+* Gated inherited modules accepted by proof compilers: *9*, reported as checked
+  scaffolding rather than project proofs in `PROOF-STATUS.adoc`.
 
-[cols="1,3,1", options="header"]
+The interface/applicability findings were checked against live GraphQL blobs on
+2026-08-29: `hyperpolymath/standards` main `4d104d3` (language-policy blob
+`0256168`, applicability-policy blob `3440206`) and
+`hyperpolymath/cicd-suite` main `fc64172` (Zig-gate blob `19ab3fe`, Idris-gate
+blob `b1d552f`). This avoids treating a stale local standards checkout as the
+current policy horizon.
+
+== Obligation ledger
+
+[cols="1,3,1,1,3",options="header"]
 |===
-| Code | Meaning | Applies?
+| ID | Required proposition | Surface | Priority | Current gap
 
-| *TP* | Typing Proofs (type soundness, type safety) | Yes
-| *INV* | Invariant Proofs (state machines, monotonicity, bounds) |
-| *SEC* | Security Proofs (crypto, injection freedom, access control) |
-| *CONC* | Concurrency Proofs (linearizability, deadlock freedom) |
-| *ALG* | Algorithm Proofs (termination, correctness, bounds) |
-| *ABI* | ABI/FFI Proofs (memory layout, pointer safety, platform compat) | Yes
-| *DOM* | Domain-Specific Proofs (bespoke to this project) |
+| RUST-1
+| For equal initial core states and equal input sequences, all resulting core
+  states and observable outputs are equal.
+| Rust + Creusot
+| P0
+| No Creusot dependency, annotations, Why3 artefacts, recipe, or CI gate.
+
+| DOM-1
+| Anya may stir and may not settle; Donna may settle and may not stir, in every
+  reachable rule state.
+| Rust + Creusot
+| P0
+| Covered by selected examples in tests, not universally quantified.
+
+| DOM-2
+| An animal response is determined by both its nature and the acting character;
+  no character-only implementation satisfies the contract.
+| Rust + Creusot
+| P0
+| Test-evidenced cases only.
+
+| ESM-1
+| An entity's derived belief contains the global baseline plus only that
+  entity's deltas; another entity's private deltas cannot influence it.
+| Rust + Creusot
+| P1
+| Synthetic testbed coverage only; ESM is not wired to a scene.
+
+| ESM-2
+| Seeded decay is deterministic and preserves all instructions selected by the
+  retention contract.
+| Rust + Creusot
+| P1
+| Examples execute; no formal contract.
+
+| REF-1
+| Every renderer/session transition refines a permitted L2 transition and does
+  not invent rule state.
+| Rust + Creusot
+| P1
+| One headless traversal test; renderer capabilities remain mostly untested.
+
+| ABI-DECISION
+| Decide whether this game has a real external ABI/FFI capability.
+| Architecture
+| P0
+| Project metadata says zero-FFI by design, while 21 inherited interface files
+  and `abi.ipkg` remain tracked and no `rsr-profile.a2ml` declares capabilities.
+
+| ABI-1
+| If ABI capability is retained: every production foreign symbol, type, layout,
+  ownership rule, and error code is specified in Idris2 and matches the generated
+  transaction boundary.
+| Idris2 ABI
+| Conditional P0
+| Current `rsr_*` declarations do not match unresolved Zig
+  `{{project}}_*` exports; generated ABI directory contains no header.
+
+| FFI-1
+| If FFI capability is retained: the pure Zig transaction layer implements the
+  declared ABI through the unified Hexadeca API and is compiled and tested.
+| Zig + Hexadeca
+| Conditional P0
+| No Hexadeca dependency/reference; `build.zig` compiles no production module;
+  `zig test src/main.zig` fails at unresolved placeholders.
+
+| TLA-1
+| Any retained TLA+ state-machine claim parses and is model-checked under a
+  declared finite scope with recorded results.
+| TLA+
+| P2
+| Current generic template module SANY-parses, but has no `.cfg`, TLC run, or
+  Slavia state/invariant.
 |===
 
-== Mandatory Proofs (All RSR Repos)
+== Applicability decisions
 
-These proofs come from the rsr-template-repo and MUST be present in every repo:
+=== SNIF
 
-=== ABI/FFI Boundary Proofs (Idris2)
+Not applicable on the present tracked-source horizon: the repository contains
+no Erlang, Elixir, C/C++, or header source and no NIF implementation pattern.
+If a BEAM native boundary is introduced, it must use the estate SNIF isolation
+path; absence today is not a permanent exemption.
 
-[cols="1,3,1,3", options="header"]
-|===
-| # | Proof | Status | File
+=== ABI/FFI
 
-| ABI-1 | Non-null pointer proofs (`So (ptr /= 0)`) | Needed | `verification/proofs/idris2/ABI/Pointers.idr`
-| ABI-2 | Memory layout correctness (`HasSize`, `HasAlignment`) | Needed | `verification/proofs/idris2/ABI/Layout.idr`
-| ABI-3 | Platform type size proofs (per platform) | Needed | `verification/proofs/idris2/ABI/Platform.idr`
-| ABI-4 | FFI function return type proofs | Needed | `verification/proofs/idris2/ABI/Foreign.idr`
-| ABI-5 | C ABI compliance (`CABICompliant`, `FieldsAligned`) | Needed | `verification/proofs/idris2/ABI/Compliance.idr`
-|===
+The estate template-applicability policy requires capability-gated modules to
+exist if and only if the project declares the capability. The project currently
+has no `.machine_readable/rsr-profile.a2ml`, while its metadata calls the
+interface tree unused template scaffolding. Resolve this before authoring more
+generic ABI proof material:
 
-=== Typing Proofs (Prover Varies)
+. remove the vestigial ABI/FFI/generated/proof scaffolding and declare the game
+  as zero-FFI; or
+. declare `abi`/`ffi`, replace every placeholder with a real contract, use the
+  unified Hexadeca API, generate the boundary, wire it, and prove conformance.
 
-[cols="1,3,1,3", options="header"]
-|===
-| # | Proof | Status | File
+Merely keeping files that typecheck is not a capability implementation.
 
-| TP-1 | Core data type well-formedness | Needed | `verification/proofs/idris2/Types.idr`
-| TP-2 | Public API type safety (exported functions) | Needed | `verification/proofs/lean4/ApiTypes.lean`
-|===
+== Proof acceptance checklist
 
-== Project-Specific Proofs
+A future item may move from `Needed` to `Confirmed` only when all apply:
 
-// Fill in proofs specific to this project. Copy from PROOF-REQUIREMENTS-MASTER.adoc
-// Delete this section for T4/T5 repos
+* the theorem names a Slavia or retained interface invariant;
+* the implementation-to-model correspondence is explicit;
+* the authoritative prover/gate runs and rejects a planted broken proof;
+* no configured trust escape hatch is present;
+* the proof is wired to CI on the implementation paths it constrains;
+* the status record cites the exact module, checker, revision, and horizon.
 
-[cols="1,3,1,1,1,2", options="header"]
-|===
-| # | Proof Needed | Category | Prover | Priority | File(s)
-
-| | | | | |
-|===
-
-== Dangerous Patterns (BANNED)
-
-The following MUST NOT appear anywhere in proof files:
-
-[cols="2,2,3", options="header"]
-|===
-| Pattern | Language | Meaning
-
-| `believe_me` | Idris2 | Unsafe cast / trust-me
-| `assert_total` | Idris2 | Skip totality check
-| `postulate` | Idris2/Agda | Unproven axiom
-| `sorry` | Lean4 | Incomplete proof
-| `Admitted` | Coq | Incomplete proof
-| `unsafeCoerce` | Haskell | Unsafe type cast
-| `Obj.magic` | OCaml/ReScript | Unsafe type cast
-| `unsafe` (unaudited) | Rust | Unsafe block without safety comment
-|===
-
-CI will reject any PR introducing these patterns (enforced by `panic-attack assail`).
-
-== Prover Selection Guide
-
-[cols="2,2,3", options="header"]
-|===
-| Use Case | Recommended Prover | Why
-
-| ABI/FFI boundaries | *Idris2* | Dependent types model layouts precisely
-| Type system proofs | *Coq* or *Lean4* | Mature proof assistants for metatheory
-| Algebraic properties | *Lean4* | Good mathlib support
-| Inductive/coinductive | *Agda* | Native support for (co)induction
-| Distributed systems | *TLA+* | Model checking for protocols
-| Numerical properties | *Isabelle* | Strong real analysis library
-|===
-
-== Proof File Locations
-
-----
-verification/proofs/
-├── idris2/          # Idris2 proofs (ABI, dependent types)
-│   ├── ABI/         # ABI-specific proofs
-│   └── *.idr        # Project-specific Idris2 proofs
-├── lean4/           # Lean4 proofs (algebra, lattices)
-│   └── *.lean
-├── agda/            # Agda proofs (induction, metatheory)
-│   └── *.agda
-├── coq/             # Coq proofs (type systems, compilation)
-│   └── *.v
-└── tlaplus/         # TLA+ specs (distributed protocols)
-    └── *.tla
-----
-
-== References
-
-* Master list: `~/Desktop/PROOF-REQUIREMENTS-MASTER.adoc`
-* Proof status tracking: `PROOF-STATUS.adoc` (this repo)
-* Proven library: `proven` repo (Idris2 verified foundations)
-* Template: `rsr-template-repo/docs/status/PROOF-NEEDS.adoc`
+Compilation of unrelated scaffolding does not satisfy this checklist.

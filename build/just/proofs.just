@@ -63,7 +63,8 @@ proof-check-all:
         echo "RESULT: FAIL — one or more proof stages did not verify (see above)." >&2
         exit 1
     fi
-    echo "RESULT: PASS — every proof stage verified."
+    echo "RESULT: PASS — every configured proof/scaffold checker passed."
+    echo "This does not imply project proof coverage; see docs/status/PROOF-STATUS.adoc."
 
 # ── Idris2 ─────────────────────────────────────────────────────────────────
 proof-check-idris2:

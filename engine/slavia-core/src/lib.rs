@@ -31,9 +31,10 @@
 //! **witnesses**, and a witness is an entity with a private, partial record of
 //! what happened.
 //!
-//! It is deliberately **not wired to a zone yet** (ADR-0004): it is proven
-//! headlessly against a synthetic cast in `tests/esm_testbed.rs`, leaving Zone A's
-//! five beats untouched until it earns a place in a real scene.
+//! It is deliberately **not wired to a zone yet** (ADR-0004): it is exercised
+//! headlessly against a synthetic cast in `tests/esm_testbed.rs`, leaving Zone
+//! A's five beats untouched until it earns a place in a real scene. This is
+//! test evidence, not a Creusot proof.
 
 pub mod animal;
 pub mod character;
