@@ -24,5 +24,6 @@ jobs:
       working_directory: engine
       enable_audit: true
       enable_coverage: true
-      # Establish the measurement before ratcheting it upward from evidence.
-      coverage_floor: "0"
+      # Local renderer-inclusive measurement on 2026-08-29: 31.45% lines.
+      # Start just below observed evidence; ratchet upward, never lower.
+      coverage_floor: "31.0"

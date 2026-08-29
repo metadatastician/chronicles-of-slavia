@@ -164,8 +164,9 @@ REQUIRED_WORKFLOWS=(
     "security-policy.yml"
     "wellknown-enforcement.yml"
     "workflow-linter.yml"
-    "npm-bun-blocker.yml"
-    "ts-blocker.yml"
+    # Supersedes the obsolete npm-bun and TypeScript blockers. It enforces the
+    # current estate ordering without rejecting the preferred Bun runtime.
+    "runtime-policy.yml"
     "secret-scanner.yml"
 )
 

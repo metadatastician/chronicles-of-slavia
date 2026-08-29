@@ -1,118 +1,113 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= TEST-NEEDS: rsr-template-repo
+= Test Status and Needs — Chronicles of Slavia
+:toc:
 
-== CRG Grade: C — ACHIEVED 2026-04-04
+*Measured:* 2026-08-29 on `fix/ci-honest-recovery` before live-CI submission. +
+*Observation horizon:* the tracked tree at this branch, the `engine/` Cargo
+workspace under default features, all Cargo targets, the 31 tracked workflow
+files, and the explicitly named shell controls below. This is not evidence for
+platforms, features, or external services that were not exercised.
 
-== Current State (Updated 2026-04-04)
+== Current evidence
 
-[cols="2,1,4", options="header"]
+[cols="2,2,5",options="header"]
 |===
-| Category | Count | Details
+| Surface | Result | Exact evidence
 
-| *Source modules* | 6 | 3 Idris2 ABI (Foreign, Layout, Types), 2 Zig FFI (build, main), 1 Zig integration test template
-| *Unit tests* | 0 | None in main source (inline tests in main.zig)
-| *Integration tests* | 1 | `test/integration_test.zig` (documented template, 1 placeholder test)
-| *E2E tests* | 1 | `tests/e2e/template_instantiation_test.sh` (full instantiation + validation)
-| *Workflow tests* | 1 | `tests/workflows/validate_workflows_test.sh` (21 workflows validated)
-| *Validation tests* | 1 | `scripts/validate-template.sh` (8-phase comprehensive validation)
-| *Benchmarks* | 5 | `benches/template_bench.sh` (validation, Zig build, tests, workflows, instantiation)
-| *Fuzz tests* | 0 | `README.adoc` scaffold with harness instructions
+| Rust tests
+| *52 passed, 0 failed*
+| `cargo test --locked --all-targets` from `engine/`: 29 `slavia-core` unit,
+  10 ESM integration, 7 Zone A integration, and 6 `slavia-zone-a` unit tests.
+
+| Rust static gates
+| *PASS*
+| `cargo fmt --all -- --check`, `cargo check --locked --all-targets`, and
+  `cargo clippy --locked --all-targets -- -D warnings` from `engine/`.
+
+| Dependency audit
+| *PASS with 5 allowed warnings*
+| `cargo audit` examined 414 dependencies against 1,226 fetched advisories and
+  exited 0. The allowed warnings remain debt; a clean exit is not a clean bill
+  of health.
+
+| Line coverage
+| *31.45%*
+| `cargo llvm-cov --workspace --locked --json`: 853 of 2,712 lines, 158 of 283
+  functions, and 1,496 of 3,615 regions covered. CI begins at a 31.0% floor so
+  it can ratchet upward without claiming unmeasured coverage.
+
+| Workflow structure
+| *PASS: 31 files*
+| `tests/workflows/validate_workflows_test.sh`: SPDX on line 1 and `name:` in
+  all 31 workflow files; 12 of 12 current required workflows present.
+
+| Workflow negative control
+| *PASS*
+| A copied workflow with its SPDX header displaced from line 1 was rejected.
+  This proves the validator can observe the failure it claims to gate.
+
+| Action locking
+| *PASS*
+| `gh actions-lock --verify-local --no-fix --json=valid,findings` returned a
+  boolean `valid: true` and an empty findings array. The output shape was
+  checked rather than treating arbitrary output as success.
+
+| Docs allowlist
+| *PASS: 28 of 28*
+| `scripts/check-no-md-in-docs.sh .` found 28 Markdown files under `docs/`, all
+  with explicit justified allowlist entries.
+
+| Invisible-character scanner
+| *PASS with planted controls*
+| A C0-control fixture was blocked, an NBSP fixture was advised, and clean text
+  remained clean.
+
+| Oikos image
+| *EXECUTED successfully*
+| The pinned immutable image loaded `.oikos.yml`, exited 0, and produced a
+  237-element JSON array whose item shape was checked. This proves the image
+  executes locally; it does not prove the GitHub-hosted workflow yet.
 |===
 
-== Completed Work (CRG C - Testing & Benchmarking)
+== Legacy template tests
 
-=== Template Validation Script ✅
+`scripts/validate-template.sh` and
+`tests/e2e/template_instantiation_test.sh` were inherited from the generic RSR
+template. They are *not product E2E coverage* for the Bevy game and are not
+called by the current E2E workflow.
 
-* [x] `scripts/validate-template.sh` — 8-phase validation
-** Phase 1: Core repository structure (root files, directories)
-** Phase 2: Machine-readable metadata (`.machine_readable/`)
-** Phase 3: GitHub Actions workflows (17 required + all present)
-** Phase 4: Idris2 ABI and Zig FFI source files
-** Phase 5: Placeholder token replacement (skipped in template)
-** Phase 6: SPDX license headers (100% coverage, 6/6 files)
-** Phase 7: Build system verification (`zig build` + `idris2` syntax check)
-** Phase 8: Documentation requirements (TOPOLOGY, ABI-FFI-README, etc)
-* Status: *PASSING* (0 errors, 3 warnings about template placeholders)
+The recovery run corrected their obsolete workflow requirement
+(`runtime-policy.yml` supersedes `npm-bun-blocker.yml` and `ts-blocker.yml`) and
+made the temporary copy/cache boundaries safe. The isolated copy then passed
+structure validation, Zig builds, and Idris typechecking, before correctly
+revealing that the already-instantiated repository still contains generic
+template tokens and documents. Therefore the overall template-instantiation
+script remains *not applicable / not passing*; it must not be presented as a
+project test.
 
-=== E2E Template Instantiation Test ✅
+PR #77's repaired `find -exec` argument boundary was tested independently with
+a planted `{{PROJECT}}` token. The token was replaced and the expected value was
+observed. That validates the repair without pretending the legacy suite is a
+valid game-level E2E test.
 
-* [x] `tests/e2e/template_instantiation_test.sh` — full workflow
-** Clones template to temp directory
-** Replaces all `{{PLACEHOLDER}}` tokens with test values
-** Validates resulting structure with `scripts/validate-template.sh`
-** Verifies Zig build works after instantiation
-** Checks no remaining placeholders
-** Cleans up temp directory
-* Status: *READY TO TEST* (can be verified by CI)
+== Highest-priority gaps
 
-=== Workflow Validation Test ✅
+. Add renderer capability tests for menu navigation, input mapping, accessibility
+  settings consumption, and save/load behavior. Six session tests do not cover
+  those surfaces.
+. Replace the zero-assertion `tests/e2e.sh` path with a real game smoke test, and
+  make `.github/workflows/e2e.yml` react to `engine/**` changes.
+. Add a non-renderer coverage view or targeted tests before raising the coverage
+  floor; renderer-inclusive coverage is currently the measured contract.
+. Review and remove or remediate the five allowed RustSec warnings instead of
+  treating the audit allowlist as permanent.
+. Exercise the recovery branch on GitHub-hosted runners. Local execution is not
+  evidence that credentials, reusable workflows, Sonar, or governance wiring work.
 
-* [x] `tests/workflows/validate_workflows_test.sh`
-** Validates all 21 workflows exist and have proper structure
-** Checks SPDX headers, `name` field
-** Verifies all 15 required workflows present
-* Status: *PASSING* (0 errors, 15/15 required workflows found)
+== Status vocabulary
 
-=== Zig FFI Tests ✅
-
-* [x] `src/interface/ffi/test/integration_test.zig` — template with examples
-** Converted from `{{project}}` placeholders to "template" namespace
-** Added comprehensive comments for how to instantiate
-** Tests grouped by category (lifecycle, operations, strings, errors, version, memory safety, threading)
-** Compiles and passes placeholder test
-* Status: *PASSING* (1 test: `placeholder_test_implementation_required` passes)
-
-=== Benchmarks ✅
-
-* [x] `benches/template_bench.sh` — 5 benchmark suites
-** Validation script: ~5.8s average (3 runs)
-** Zig build: ~19ms (clean build)
-** Zig tests: ~20ms
-** Workflow validation: ~117ms
-** Template instantiation: ~427ms
-* Formats: human, json, csv
-* Status: *PASSING* (all benchmarks execute)
-
-=== Build System ✅
-
-* [x] `src/interface/ffi/build.zig` — updated for Zig 0.15.2
-** Simplified to test-only configuration
-** Supports both unit tests and integration tests
-** Works with `zig build` without errors
-* Status: *PASSING* (builds successfully)
-
-== Test Results Summary
-
-----
-Validation Script:    PASS (0 errors, 3 warnings)
-Workflow Validation:  PASS (21/21 workflows valid)
-Integration Tests:    PASS (1/1 placeholder test)
-E2E Instantiation:    READY (needs CI confirmation)
-Benchmarks:           PASS (5/5 benchmark suites)
-Build System:         PASS (zig build succeeds)
-----
-
-== CRG C Compliance
-
-* *Coverage*: 6/6 test categories (unit, integration, E2E, workflow, validation, benchmarks)
-* *Documentation*: All test files have SPDX headers + inline documentation
-* *Author Attribution*: Jonathan D.A. Jewell <6759885+hyperpolymath@users.noreply.github.com>
-* *License*: AGPL-3.0-or-later on new code/config/scripts; CC-BY-SA-4.0 on new prose docs
-* *Automation*: All scripts executable + working
-
-== FLAGGED ISSUES - ALL RESOLVED
-
-* [.line-through]#*Template repo used by ALL new repos has 0 validation tests*# → FIXED: 4 test suites + validation script
-* [.line-through]#*fuzz/placeholder.txt*# → FIXED: replaced with `README.adoc` containing real harness instructions
-* [.line-through]#*No E2E tests for template instantiation*# → FIXED: full E2E test suite
-* [.line-through]#*Zig FFI integration tests are placeholders*# → FIXED: converted to documented template format
-
-== Next Steps (Future Sessions)
-
-* [ ] Integrate test scripts into CI/CD workflows
-* [ ] Generate test coverage reports
-* [ ] Add more specialized benchmarks (memory, threading stress)
-* [ ] Document test instantiation patterns for new repos
-
-== Priority: P0 (COMPLETE) ✅
+In this document, *configured*, *executed locally*, and *green in live CI* are
+different states. The recovery branch is configured and locally exercised. It
+becomes live-CI evidence only after the pushed pull request reports its complete
+GraphQL check rollup.

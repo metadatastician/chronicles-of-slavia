@@ -77,16 +77,17 @@ log_pass "Test directory created"
 
 log_step "Cloning template from $TEMPLATE_ROOT"
 
-# Copy template to test location (simulating git clone)
+# Materialise exactly the tracked tree, matching a fresh clone. `cp -r` copied
+# ignored build output too; after a real Bevy build that meant 6+ GiB of
+# engine/target was duplicated into /tmp before the test exercised one line of
+# template logic.
 TEST_REPO_PATH="$TEST_DIR/$TEST_REPO_NAME"
-cp -r "$TEMPLATE_ROOT" "$TEST_REPO_PATH"
+mkdir -p "$TEST_REPO_PATH"
+git -C "$TEMPLATE_ROOT" archive --format=tar HEAD | tar -x -C "$TEST_REPO_PATH"
+# Keep compiler cache writes inside the disposable test boundary. This makes
+# the test work in read-only-home CI sandboxes and guarantees cleanup on exit.
+export ZIG_GLOBAL_CACHE_DIR="$TEST_DIR/zig-global-cache"
 log_pass "Template cloned to $TEST_REPO_PATH"
-
-# Remove .git directory for clean state
-if [ -d "$TEST_REPO_PATH/.git" ]; then
-    rm -rf "$TEST_REPO_PATH/.git"
-    log_pass ".git directory removed (fresh clone)"
-fi
 
 #==============================================================================
 # PHASE 3: PLACEHOLDER REPLACEMENT
