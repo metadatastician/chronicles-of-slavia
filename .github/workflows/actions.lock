@@ -47,7 +47,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'actions/upload-artifact@v7.0.1'
     '.github/workflows/push-email-notify.yml':
-        - 'dawidd6/action-send-mail@v3.12.0'
+        - 'hyperpolymath/smtp-notify-action@v0.2.0'
     '.github/workflows/quality.yml':
         - 'actions/checkout@v7.0.1'
         - 'editorconfig-checker/action-editorconfig-checker@v2.2.0'
@@ -150,11 +150,6 @@ dependencies:
         repo_id: 496012378
         uses:
             - 'actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f'
-    'dawidd6/action-send-mail@v3.12.0':
-        ref: 'v3.12.0'
-        commit: 'sha1-94de994a9f6fffee200243214e17002e2920bb59'
-        owner_id: 9713907
-        repo_id: 222439721
     'denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed':
         ref: 'v2.0.5'
         commit: 'sha1-22d081ff2d3a40755e97629de92e3bcbfa7cf2ed'
@@ -210,6 +205,11 @@ dependencies:
         commit: 'sha1-f00dec4597dde6071a7f0fe38414c13b5847f316'
         owner_id: 6759885
         repo_id: 1274526902
+    'hyperpolymath/smtp-notify-action@v0.2.0':
+        ref: 'v0.2.0'
+        commit: 'sha1-ede1191ef6ff3ac02c4f4d9efdf837ee517e11d7'
+        owner_id: 6759885
+        repo_id: 1352485172
     'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4':
         ref: 'fcb8669169b4e9f5d9848608df880ae5fae812b4'
         commit: 'sha1-fcb8669169b4e9f5d9848608df880ae5fae812b4'
