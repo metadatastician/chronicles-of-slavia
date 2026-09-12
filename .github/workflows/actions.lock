@@ -7,7 +7,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
     '.github/workflows/codeql.yml':
         - 'actions/checkout@v7.0.1'
-        - 'github/codeql-action@v4.37.8'
+        - 'github/codeql-action@v4.37.9'
     '.github/workflows/container-build.yml':
         - 'actions/checkout@v7.0.1'
     '.github/workflows/dependabot-automerge.yml':
@@ -32,15 +32,15 @@ workflows:
         - 'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4'
     '.github/workflows/oikosbot.yml':
         - 'actions/checkout@v7.0.1'
-        - 'github/codeql-action@v4.37.8'
-        - 'hyperpolymath/oikosbot@v0.1.1'
+        - 'github/codeql-action@v4.37.9'
+        - 'hyperpolymath/oikosbot@v0.1.3'
     '.github/workflows/openssf-compliance.yml':
         - 'actions/checkout@v7.0.1'
     '.github/workflows/pages.yml':
         - 'actions/cache@v6.1.0'
         - 'actions/checkout@v7.0.1'
         - 'actions/configure-pages@v6.0.0'
-        - 'actions/deploy-pages@v5.0.0'
+        - 'actions/deploy-pages@v5.0.1'
         - 'actions/upload-pages-artifact@v5.0.0'
         - 'haskell-actions/setup@v2.12.0'
     '.github/workflows/proof-gate.yml':
@@ -50,18 +50,16 @@ workflows:
         - 'hyperpolymath/smtp-notify-action@v0.2.0'
     '.github/workflows/quality.yml':
         - 'actions/checkout@v7.0.1'
-        - 'editorconfig-checker/action-editorconfig-checker@v2.2.0'
+        - 'editorconfig-checker/action-editorconfig-checker@v3.0.0'
     '.github/workflows/release.yml':
         - 'actions/attest-build-provenance@v4.2.2'
         - 'actions/checkout@v7.0.1'
         - 'actions/upload-artifact@v7.0.1'
-        - 'softprops/action-gh-release@v3.0.2'
+        - 'softprops/action-gh-release@v3.0.3'
     '.github/workflows/rhodibot.yml':
         - 'actions/checkout@v7.0.1'
     '.github/workflows/runtime-policy.yml':
         - 'actions/checkout@v7.0.1'
-    '.github/workflows/rust-ci.yml':
-        - 'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4'
     '.github/workflows/scorecard.yml':
         - 'hyperpolymath/standards@fcb8669169b4e9f5d9848608df880ae5fae812b4'
     '.github/workflows/secret-scanner.yml':
@@ -118,9 +116,9 @@ dependencies:
         commit: 'sha1-45bfe0192ca1faeb007ade9deae92b16b8254a0d'
         owner_id: 44036562
         repo_id: 513659658
-    'actions/deploy-pages@v5.0.0':
-        ref: 'v5.0.0'
-        commit: 'sha1-cd2ce8fcbc39b97be8ca5fce6e763baed58fa128'
+    'actions/deploy-pages@v5.0.1':
+        ref: 'v5.0.1'
+        commit: 'sha1-368f82528645a54fb793d4d04e342629a3f51346'
         owner_id: 44036562
         repo_id: 438112499
     'actions/download-artifact@v8.0.1':
@@ -170,9 +168,9 @@ dependencies:
         commit: 'sha1-840e866d93b8e032123c23bac69dece044d4d84c'
         owner_id: 26415196
         repo_id: 297874902
-    'editorconfig-checker/action-editorconfig-checker@v2.2.0':
-        ref: 'v2.2.0'
-        commit: 'sha1-840e866d93b8e032123c23bac69dece044d4d84c'
+    'editorconfig-checker/action-editorconfig-checker@v3.0.0':
+        ref: 'v3.0.0'
+        commit: 'sha1-51f63319f592f97930c73d9c46184d20bd206393'
         owner_id: 26415196
         repo_id: 297874902
     'erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124':
@@ -190,9 +188,9 @@ dependencies:
         commit: 'sha1-f205ea1c3313d32999d8d6a48b4f6530d4437b38'
         owner_id: 9919
         repo_id: 259445878
-    'github/codeql-action@v4.37.8':
-        ref: 'v4.37.8'
-        commit: 'sha1-db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28'
+    'github/codeql-action@v4.37.9':
+        ref: 'v4.37.9'
+        commit: 'sha1-cdf488f595d80d6e07e03d4674febd5ab45fa938'
         owner_id: 9919
         repo_id: 259445878
     'haskell-actions/setup@v2.12.0':
@@ -200,9 +198,9 @@ dependencies:
         commit: 'sha1-6037f33647c3f17758a2356c80fc4a53d7e0685d'
         owner_id: 75048950
         repo_id: 623796603
-    'hyperpolymath/oikosbot@v0.1.1':
-        ref: 'v0.1.1'
-        commit: 'sha1-f00dec4597dde6071a7f0fe38414c13b5847f316'
+    'hyperpolymath/oikosbot@v0.1.3':
+        ref: 'v0.1.3'
+        commit: 'sha1-3fdad0c2b027f328e784ecf08caf62bf80a784c1'
         owner_id: 6759885
         repo_id: 1274526902
     'hyperpolymath/smtp-notify-action@v0.2.0':
@@ -237,9 +235,9 @@ dependencies:
         commit: 'sha1-28959ce8df70de7be546dd1250a005dd32156697'
         owner_id: 18365890
         repo_id: 220359305
-    'softprops/action-gh-release@v3.0.2':
-        ref: 'v3.0.2'
-        commit: 'sha1-3d0d9888cb7fd7b750713d6e236d1fcb99157228'
+    'softprops/action-gh-release@v3.0.3':
+        ref: 'v3.0.3'
+        commit: 'sha1-efb35369e0ad2afab669f228072c1b0d510eae64'
         owner_id: 2242
         repo_id: 204253808
     'sonarsource/sonarqube-scan-action@v8.2.1':
