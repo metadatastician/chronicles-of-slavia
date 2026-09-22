@@ -154,7 +154,8 @@ FNR == 1 { wf = FILENAME }
     raw = m[1]
     gsub(/[[:space:]]+$/, "", raw)
     gsub(/^["']|["']$/, "", raw)
-    if (raw ~ /^\$\//) { dollar[wf] = dollar[wf] " " raw; next }   # known corruption
+    if (raw ~ /^\$\/[^@]+$/) next
+    if (raw ~ /^\$\//) { dollar[wf] = dollar[wf] " " raw; next }
     n = norm(raw)
     if (n != "") { uses[wf, ck(n)] = 1; useslist[wf] = useslist[wf] " " n }
   }
