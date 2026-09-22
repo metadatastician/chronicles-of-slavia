@@ -138,6 +138,109 @@ YAML
     expect_pass "$FIXTURE"
 }
 
+test_accepts_listed_workflow_without_uses() {
+    new_fixture listed-zero-uses
+    cat > "$FIXTURE/maintenance.yml" <<'YAML'
+name: Maintenance
+on:
+  workflow_dispatch:
+jobs:
+  maintain:
+    steps:
+      - run: true
+YAML
+    cat > "$FIXTURE/actions.lock" <<'YAML'
+version: 1
+workflows:
+    '.github/workflows/maintenance.yml': []
+dependencies:
+YAML
+
+    expect_pass "$FIXTURE" || return 1
+    [[ "$LAST_OUTPUT" == *"every workflow file has a lockfile key"* ]] || {
+        printf 'success output did not confirm workflow coverage:\n%s\n' "$LAST_OUTPUT" >&2
+        return 1
+    }
+}
+
+test_rejects_unlisted_workflow_without_uses() {
+    new_fixture unlisted-zero-uses
+    cat > "$FIXTURE/listed.yml" <<'YAML'
+name: Listed
+jobs:
+  test:
+    steps:
+      - run: true
+YAML
+    cat > "$FIXTURE/unlisted.yml" <<'YAML'
+name: Unlisted
+jobs:
+  test:
+    steps:
+      - run: true
+YAML
+    cat > "$FIXTURE/actions.lock" <<'YAML'
+version: 1
+workflows:
+    '.github/workflows/listed.yml': []
+dependencies:
+YAML
+
+    expect_failure_containing "$FIXTURE" "FAIL actions.lock: UNLISTED WORKFLOWS" || return 1
+    [[ "$LAST_OUTPUT" == *"1 workflow file(s) have no key"* ]] || {
+        printf 'expected an exact missing-workflow count:\n%s\n' "$LAST_OUTPUT" >&2
+        return 1
+    }
+    [[ "$LAST_OUTPUT" == *".github/workflows/unlisted.yml"* ]] || {
+        printf 'expected the missing workflow path in diagnostics:\n%s\n' "$LAST_OUTPUT" >&2
+        return 1
+    }
+    [[ "$LAST_OUTPUT" == *"'.github/workflows/x.yml': []"* ]] || {
+        printf 'expected empty-list remediation guidance:\n%s\n' "$LAST_OUTPUT" >&2
+        return 1
+    }
+}
+
+test_reports_every_unlisted_workflow() {
+    new_fixture multiple-unlisted
+    cat > "$FIXTURE/listed.yml" <<'YAML'
+name: Listed
+jobs:
+  test:
+    steps:
+      - run: true
+YAML
+    cat > "$FIXTURE/first.yml" <<'YAML'
+name: First unlisted workflow
+jobs:
+  test:
+    steps:
+      - run: true
+YAML
+    cat > "$FIXTURE/second.yaml" <<'YAML'
+name: Second unlisted workflow
+jobs:
+  test:
+    steps:
+      - run: true
+YAML
+    cat > "$FIXTURE/actions.lock" <<'YAML'
+version: 1
+workflows:
+    '.github/workflows/listed.yml': []
+dependencies:
+YAML
+
+    expect_failure_containing "$FIXTURE" "2 workflow file(s) have no key" || return 1
+    for missing in first.yml second.yaml; do
+        if [[ "$LAST_OUTPUT" != *".github/workflows/$missing"* ]]; then
+            printf 'expected %s in missing-workflow diagnostics:\n%s\n' \
+                "$missing" "$LAST_OUTPUT" >&2
+            return 1
+        fi
+    done
+}
+
 test_rejects_ref_case_mismatch() {
     new_fixture ref-case
     cat > "$FIXTURE/build.yml" <<'YAML'
@@ -428,6 +531,10 @@ test_gate_remains_self_protecting_and_wired() {
         printf 'gate workflow must run for every pull request, without path filters\n' >&2
         return 1
     fi
+    if ! grep -Eq '^  workflow_dispatch:[[:space:]]*$' "$GATE_WORKFLOW"; then
+        printf 'gate workflow must support manual dispatch\n' >&2
+        return 1
+    fi
     if ! grep -Fq './scripts/check-lock-sync.sh' "$GATE_WORKFLOW"; then
         printf 'gate workflow does not execute the lock synchronisation validator\n' >&2
         return 1
@@ -442,6 +549,12 @@ run_test "accepts a synchronised lockfile" test_accepts_synchronised_lockfile
 run_test "parses .yaml job refs, comments, subpaths, and repository-name case" \
     test_parses_yaml_job_refs_comments_subpaths_and_case
 run_test "ignores valid local actions" test_ignores_valid_local_actions
+run_test "accepts a listed workflow without uses directives" \
+    test_accepts_listed_workflow_without_uses
+run_test "rejects an unlisted workflow without uses directives" \
+    test_rejects_unlisted_workflow_without_uses
+run_test "reports every unlisted .yml and .yaml workflow" \
+    test_reports_every_unlisted_workflow
 run_test "keeps refs case-sensitive" test_rejects_ref_case_mismatch
 run_test "rejects a missing lockfile" test_rejects_missing_lockfile
 run_test "rejects a directory without workflow files" test_rejects_directory_without_workflows
