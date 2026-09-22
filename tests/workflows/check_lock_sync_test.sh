@@ -318,14 +318,33 @@ YAML
     expect_failure_containing "$FIXTURE" "example/child@v2"
 }
 
-test_rejects_dollar_local_action_rewrite() {
+test_ignores_valid_dollar_local_action_reference() {
     new_fixture dollar-local-action
     cat > "$FIXTURE/build.yml" <<'YAML'
 name: Build
 jobs:
   build:
     steps:
-      - uses: $/actions/build
+YAML
+    printf '%s\n' '      - uses: "$/actions/build"   ' >> "$FIXTURE/build.yml"
+    cat > "$FIXTURE/actions.lock" <<'YAML'
+version: 1
+workflows:
+    '.github/workflows/build.yml': []
+dependencies:
+YAML
+
+    expect_pass "$FIXTURE"
+}
+
+test_rejects_dollar_local_action_reference_with_ref() {
+    new_fixture dollar-local-action-ref
+    cat > "$FIXTURE/build.yml" <<'YAML'
+name: Build
+jobs:
+  build:
+    steps:
+      - uses: $/actions/build@main
 YAML
     cat > "$FIXTURE/actions.lock" <<'YAML'
 version: 1
@@ -433,8 +452,10 @@ run_test "rejects a stale workflow ref" test_rejects_stale_workflow_ref
 run_test "rejects a deleted workflow entry" test_rejects_deleted_workflow_entry
 run_test "rejects a dangling workflow dependency" test_rejects_dangling_workflow_dependency
 run_test "rejects a dangling nested dependency" test_rejects_dangling_nested_dependency
-run_test "rejects a dollar-prefixed local-action rewrite" \
-    test_rejects_dollar_local_action_rewrite
+run_test "ignores valid dollar-prefixed local-action references" \
+    test_ignores_valid_dollar_local_action_reference
+run_test "rejects dollar-prefixed local-action references with refs" \
+    test_rejects_dollar_local_action_reference_with_ref
 run_test "allows an unreferenced dependency record with a note" \
     test_allows_unreferenced_dependency_record
 run_test "fails closed when GNU awk is unavailable" test_fails_closed_without_gnu_awk
