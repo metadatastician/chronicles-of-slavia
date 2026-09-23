@@ -12,16 +12,25 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 PASS_COUNT=0
 FAIL_COUNT=0
 
+# Records a passing check.
+# Args: $1 - description of the check.
+# Prints "PASS: <description>" to stdout and increments PASS_COUNT; no return value.
 pass() {
     printf 'PASS: %s\n' "$1"
     PASS_COUNT=$((PASS_COUNT + 1))
 }
 
+# Records a failing check.
+# Args: $1 - description of the check.
+# Prints "FAIL: <description>" to stderr and increments FAIL_COUNT; no return value.
 fail() {
     printf 'FAIL: %s\n' "$1" >&2
     FAIL_COUNT=$((FAIL_COUNT + 1))
 }
 
+# Asserts that two strings are equal.
+# Args: $1 - description, $2 - expected value, $3 - actual value.
+# Delegates to pass/fail; no return value of its own.
 assert_equals() {
     local description="$1"
     local expected="$2"
@@ -34,6 +43,9 @@ assert_equals() {
     fi
 }
 
+# Asserts that a string matches an extended regular expression.
+# Args: $1 - description, $2 - ERE pattern, $3 - string to test.
+# Delegates to pass/fail; no return value of its own.
 assert_matches() {
     local description="$1"
     local pattern="$2"
@@ -46,6 +58,10 @@ assert_matches() {
     fi
 }
 
+# Extracts the normalised list of `uses:` references from a workflow file.
+# Args: $1 - path to the workflow YAML file.
+# Prints one reference per line to stdout, with leading `uses:` syntax,
+# trailing comments, and surrounding quotes stripped.
 workflow_uses() {
     local workflow="$1"
 
@@ -59,6 +75,11 @@ workflow_uses() {
     ' "$workflow"
 }
 
+# Asserts that every external `uses:` reference across the given workflows
+# is pinned to a full 40-character lowercase hexadecimal commit SHA.
+# Args: $1 - description, remaining args - workflow file paths to check.
+# Delegates to pass/fail, printing any invalid refs to stderr on failure;
+# no return value of its own.
 assert_all_refs_are_immutable() {
     local description="$1"
     shift
