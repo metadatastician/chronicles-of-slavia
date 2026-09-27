@@ -13,4 +13,4 @@ publish = false
 # wasm32-unknown-unknown unchanged when the first renderer (L3) arrives.
 [dependencies]
 serde = { version = "1", features = ["derive"] }
-toml = "0.8"
+toml = "1.1"
