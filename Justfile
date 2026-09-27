@@ -129,6 +129,7 @@ test *args:
     # confidence is the solver's solution count, and that the Guilty Conscience
     # trap stays emergent rather than coded.
     cd engine && cargo test -p slavia-core {{ args }}
+    cd engine && cargo test -p slavia-renderer {{ args }}
     # L3 — the play controller. --no-default-features drops Bevy so this runs
     # headless (no display, no libwayland). See engine/README.adoc.
     cd engine && cargo test -p slavia-zone-a --no-default-features {{ args }}
@@ -137,6 +138,7 @@ test *args:
 test-verbose:
     @echo "Running tests (verbose)..."
     cd engine && cargo test -p slavia-core -- --nocapture
+    cd engine && cargo test -p slavia-renderer -- --nocapture
     cd engine && cargo test -p slavia-zone-a --no-default-features -- --nocapture
 
 # Smoke test — the five beats alone; the fastest proof the core still holds
@@ -250,6 +252,7 @@ fmt-check:
 lint:
     @echo "Linting source files..."
     cd engine && cargo clippy -p slavia-core --all-targets -- -D warnings
+    cd engine && cargo clippy -p slavia-renderer --all-targets -- -D warnings
     cd engine && cargo clippy -p slavia-zone-a --no-default-features --all-targets -- -D warnings -A dead_code
 
 # ═══════════════════════════════════════════════════════════════════════════════

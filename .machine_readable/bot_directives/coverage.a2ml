@@ -59,3 +59,8 @@ coverage-percent = 0
 # easy-low-completed = 2
 # hard-low-deferred = 4
 # assessment = "Correctly prioritised — all MUST items addressed before COULDs"
+
+[coverage.visited.session-2026-09-27]
+date = "2026-09-27"
+ring = 2
+notes = "Recon of design canon, workspace, #98/#100 and default-branch check evidence. Repaired local CI wiring, lock closure and Hypatia false-green path. Implemented bounded room/camera substrate; Rust execution blocked. Evidence: docs/reports/ci/issue-100-triage-2026-09-27.md and engine/README.adoc."

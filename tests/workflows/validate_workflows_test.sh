@@ -64,13 +64,14 @@ while IFS= read -r workflow_file; do
 
     WORKFLOW_NAME=$(basename "$workflow_file")
 
-    # TEST 1a: SPDX Header. The governance gate requires it on line one, so
-    # accepting it anywhere in the first ten lines would let this local test
-    # pass files that CI rejects (as happened after an actions-lock refresh).
-    if head -1 "$workflow_file" 2>/dev/null | grep -q "^# SPDX-License-Identifier:"; then
-        log_pass "  $WORKFLOW_NAME: SPDX header is on line 1"
+    # Match the pinned governance policy: the leading comment block, not
+    # line one (actions-lock inserts its own marker before an existing SPDX).
+    # A licence mentioned inside a run: script must not satisfy this test.
+    if awk '/^---[[:space:]]*$/ { next } /^#/ { print; next } { exit }' "$workflow_file" \
+        | grep -q "^# SPDX-License-Identifier:"; then
+        log_pass "  $WORKFLOW_NAME: SPDX header is in the leading comment block"
     else
-        log_error "  $WORKFLOW_NAME: SPDX header missing from line 1"
+        log_error "  $WORKFLOW_NAME: SPDX header missing from the leading comment block"
     fi
 
     # TEST 1b: Has 'name' field

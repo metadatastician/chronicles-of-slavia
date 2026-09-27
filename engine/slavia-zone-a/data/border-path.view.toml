@@ -1,0 +1,6 @@
+# L3 staging only. Room membership and exits live in the renderer-neutral SGS.
+room = "border-path"
+world_min = [-620.0, -320.0]
+world_max = [620.0, 320.0]
+beat_x = [-520.0, -300.0, -150.0, 0.0, 150.0, 350.0, 550.0]
+camera_response = 8.0

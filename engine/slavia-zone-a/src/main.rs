@@ -9,6 +9,7 @@
 // `Session` is the sole bridge between renderer and rules core, in both the
 // headless build (below) and the M2 Bevy renderer (`render.rs`/`menu/`).
 mod session;
+mod view;
 // Save/load — engine-agnostic like `session`, so it's available (if unused)
 // in the headless build too, matching how `slavia-core` itself pulls in
 // serde/toml unconditionally for its own SGS loader.

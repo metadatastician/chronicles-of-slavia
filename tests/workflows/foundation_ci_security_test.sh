@@ -121,7 +121,7 @@ for workflow in \
 done
 
 CODEQL_USES="$(workflow_uses "$CODEQL_WORKFLOW")"
-EXPECTED_CODEQL_USES=$'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1\ngithub/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938\ngithub/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938'
+EXPECTED_CODEQL_USES=$'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1\ngithub/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63\ngithub/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63'
 assert_equals \
     "CodeQL uses the reviewed checkout, init, and analyze revisions" \
     "$EXPECTED_CODEQL_USES" \
@@ -139,17 +139,17 @@ assert_matches \
 
 assert_equals \
     "governance calls the reviewed standards revision" \
-    "hyperpolymath/standards/.github/workflows/governance-reusable.yml@8f31a5a4ba591d544b65f91f6d78b136e07756f0" \
+    "hyperpolymath/standards/.github/workflows/governance-reusable.yml@2479cf769ed5f0481ccf64860a2ab954514c2b59" \
     "$(workflow_uses "$GOVERNANCE_WORKFLOW")"
 
 assert_equals \
     "Hypatia calls the reviewed standards revision" \
-    "hyperpolymath/standards/.github/workflows/hypatia-scan-reusable.yml@cc58c0cb23f73fc2019ce85a56a468e5248a93b3" \
+    "hyperpolymath/standards/.github/workflows/hypatia-scan-reusable.yml@fcb8669169b4e9f5d9848608df880ae5fae812b4" \
     "$(workflow_uses "$HYPATIA_WORKFLOW")"
 
 assert_equals \
     "Scorecard calls the reviewed standards revision" \
-    "hyperpolymath/standards/.github/workflows/scorecard-reusable.yml@8750b94ac1bbe8c51ad13fe106669b13478f0b62" \
+    "hyperpolymath/standards/.github/workflows/scorecard-reusable.yml@fcb8669169b4e9f5d9848608df880ae5fae812b4" \
     "$(workflow_uses "$SCORECARD_WORKFLOW")"
 
 # Negative/boundary coverage: reject tags, branches, abbreviated hashes, and

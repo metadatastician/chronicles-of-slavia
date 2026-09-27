@@ -33,3 +33,8 @@ items = [
   { agent = "GEMINI", task = "estate audits, cross-repo sweeps, long-context triage, pattern detection" },
   { agent = "VIBE", task = "UI/frontend, PanLL panels, ReScript components, theming, rapid prototyping" },
 ]
+
+[session-2026-09-27]
+status = "Local CI repair and room/camera substrate patch; verification incomplete, not a release."
+evidence = "docs/reports/ci/issue-100-triage-2026-09-27.md"
+next = "Run provisioned Rust validation and real CI. Issue #100 remains open; do not reuse historical test counts as a new result."

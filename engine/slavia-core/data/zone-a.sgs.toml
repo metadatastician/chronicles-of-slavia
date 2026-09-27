@@ -69,3 +69,9 @@ text = "For a moment, the world feels whole."
 id = "fracture"
 title = "Fracture prelude"
 text = "The Rift awakens. The birds stop answering normally."
+
+# A1 remains one room. Future segments add rooms and explicit exits, rather
+# than extending a global corridor. No A2-A5 content is implied by this model.
+[[rooms]]
+id = "border-path"
+beats = ["forest-entrance", "bird-grove", "shrine", "stream-bridge", "ridge-path", "overlook", "fracture"]

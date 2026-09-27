@@ -50,8 +50,9 @@ permissions:
   # NB: keep narrow — do NOT add secrets: read or id-token: write here.
 jobs:
   automerge:
-    # Only run for PRs actually authored by Dependabot.
-    if: github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
+    # Authenticate the PR's author and source, not the user triggering a run.
+    # Fork PRs must never reach the approval/auto-merge steps.
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

@@ -154,34 +154,17 @@ jobs:
           fetch-depth: 0
       - name: Setup Elixir for Hypatia scanner
         id: beam
-        continue-on-error: true
         uses: erlef/setup-beam@v1.24.1
         with:
           elixir-version: '1.19.4'
           otp-version: '28.3'
       - name: Clone and build Hypatia
-        id: build
-        continue-on-error: true
-        run: |
-          git clone https://github.com/hyperpolymath/hypatia.git "$HOME/hypatia" 2>/dev/null || true
-          if [ -f "$HOME/hypatia/mix.exs" ]; then
-            cd "$HOME/hypatia"
-            # Build escript if neither hypatia nor hypatia-v2 exists
-            if [ ! -f hypatia ] && [ ! -f hypatia-v2 ]; then
-              mix deps.get
-              mix escript.build
-            fi
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::Hypatia scanner not available — skipping scan"
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          fi
+        run: bash scripts/build-hypatia.sh "$RUNNER_TEMP/hypatia"
       - name: Run Hypatia scan
         id: scan
-        if: steps.build.outputs.ready == 'true'
         run: |
           set +e
-          HYPATIA_FORMAT=json "$HOME/hypatia/hypatia-cli.sh" scan . --exit-zero > hypatia-findings.json
+          HYPATIA_FORMAT=json "$RUNNER_TEMP/hypatia/hypatia-cli.sh" scan . --exit-zero > hypatia-findings.json
           HYP_EXIT=$?
           set -e
 
@@ -217,7 +200,6 @@ jobs:
           echo "medium=$MEDIUM" >> "$GITHUB_OUTPUT"
           echo "low=$LOW" >> "$GITHUB_OUTPUT"
       - name: Emit check annotations
-        if: steps.build.outputs.ready == 'true'
         run: |
           # Findings carry no `.message` (keys: action,file,line,reason,rule_module,
           # severity,type), so every annotation read "null". `.file` is an absolute
@@ -233,9 +215,8 @@ jobs:
             else
               "::warning file=\($f),line=\(.line // 1)::[hypatia] \($m)"
             end
-          ' hypatia-findings.json || true
+          ' hypatia-findings.json
       - name: Write step summary
-        if: steps.build.outputs.ready == 'true'
         run: |
           cat <<EOF >> "$GITHUB_STEP_SUMMARY"
           ## Hypatia Scan Results
@@ -248,13 +229,6 @@ jobs:
           | Low      | ${{ steps.scan.outputs.low }} |
           | **Total**| ${{ steps.scan.outputs.total }} |
           EOF
-      - name: Create stub findings (when Hypatia unavailable)
-        if: steps.build.outputs.ready != 'true'
-        run: |
-          echo "[]" > hypatia-findings.json
-          echo "## Hypatia Scan" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Skipped: Hypatia scanner not available in this environment." >> "$GITHUB_STEP_SUMMARY"
       - name: Upload hypatia findings
         uses: actions/upload-artifact@v7.0.1
         with:
@@ -262,7 +236,7 @@ jobs:
           path: hypatia-findings.json
           retention-days: 90
       - name: Fail on critical security findings
-        if: steps.build.outputs.ready == 'true' && steps.scan.outputs.critical > 0
+        if: steps.scan.outputs.critical > 0
         run: |
           echo "::error::Hypatia found ${{ steps.scan.outputs.critical }} critical security issue(s) — blocking merge"
           exit 1

@@ -124,3 +124,13 @@ do-not = [
   "Do not make Slavia depend on the UMS user interface",
   "Do not let the UMS profile become authoritative over Slavia canon",
 ]
+
+[session-2026-09-27]
+# This checkpoint supersedes old assertions of current CI/test health above;
+# historical test counts are intentionally not relabelled as a fresh run.
+branch = "arena/01a0e227-chronicles-of-slavia"
+base = "e9922a759bd181a1e63bc4b158b9858f5f16c6b9"
+ci-triage = "Issue #100 remains open: repair all four checks, no retirements/exemptions. Local repairs and evidence in docs/reports/ci/issue-100-triage-2026-09-27.md; hosted green runs still required."
+implementation = "Room-aware SGS/Session, legacy save migration, shared camera/landmark math and A1 camera wiring added. Multi-room scene staging, transition input and checkpoints remain; A2-A5 not built."
+verification = "35 shell regression assertions pass plus 31-file workflow validation and lock closure. Rust syntax parse passes; Cargo test commands exit 127 (toolchain absent, downloads blocked). No new Rust passing-test count claimed."
+next = "Provision Rust; fmt/test/clippy/render-check and manual camera checks; canonical actions-lock verification; diagnose Sonar log; run CI before any fixed/default-branch-green claim. Owner CAN-1 through CAN-4 unchanged."

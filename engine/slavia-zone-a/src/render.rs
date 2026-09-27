@@ -12,7 +12,7 @@
 //! renderer and rules core (see `session.rs`'s own doc comment). This renderer
 //! owns only what's genuinely its concern: continuous pixel movement and water
 //! physics. Beat position is *derived* from that pixel space each frame
-//! (`beat_units_for_x`) and fed back into `Session`, so interaction gating
+//! (`RoomView::path`) and fed back into `Session`, so interaction gating
 //! (bird approach, bridge crossing, the Rift) is answered by the rules core,
 //! not by ad hoc pixel-proximity checks.
 //!
@@ -26,12 +26,13 @@ use crate::menu::{LaunchMode, SaveSlot};
 use crate::save;
 use crate::session::{BirdState, Crossing, Session, Settle};
 use crate::state::AppState;
+use crate::view::RoomView;
+use slavia_renderer::camera::CameraFollow;
 use bevy::prelude::*;
 
 const GROUND_Y: f32 = -140.0; // feet level
 const GROVE_X: f32 = -300.0;
 const BRIDGE_X: f32 = 0.0; // centre of the gorge
-const ENTRANCE_X: f32 = -520.0;
 const GORGE_HALF: f32 = 100.0; // water spans BRIDGE_X ± GORGE_HALF
 const WADE: f32 = 40.0; // wadeable band width from each bank; beyond = abyss
 /// Was 54.0 for the single flat-block sprite. M2.3's paper-doll rig (below)
@@ -59,38 +60,11 @@ fn jump_speed(verve: f32) -> f32 {
 /// for the reactive rig below — not a real per-girl jump height.
 const JUMP_V_REF: f32 = 380.0;
 
-// Zone A's later beats (shrine onward) have no dedicated visuals yet in
-// M2.1 — these landmarks only need to be monotonic and roughly plausible.
-// They exist so the renderer can derive `Session`'s beat-space position
-// from the continuous pixel space it actually simulates.
-const SHRINE_X: f32 = -150.0;
-const RIDGE_X: f32 = 150.0;
-const OVERLOOK_X: f32 = 350.0;
-const FRACTURE_X: f32 = 550.0;
-
-/// Pixel X for each of Zone A's seven beats, in beat order (`docs/design/02`).
-const BEAT_X: [f32; 7] = [
-    ENTRANCE_X, GROVE_X, SHRINE_X, BRIDGE_X, RIDGE_X, OVERLOOK_X, FRACTURE_X,
-];
-
-/// The beat-unit position (possibly fractional, between two beats) for a
-/// pixel X, via piecewise-linear interpolation across `BEAT_X` (monotonic
-/// by construction).
-fn beat_units_for_x(x: f32) -> f32 {
-    let x = x.clamp(BEAT_X[0], BEAT_X[BEAT_X.len() - 1]);
-    for i in 0..BEAT_X.len() - 1 {
-        let (x0, x1) = (BEAT_X[i], BEAT_X[i + 1]);
-        if x <= x1 {
-            let t = if x1 > x0 { (x - x0) / (x1 - x0) } else { 0.0 };
-            return i as f32 + t;
-        }
-    }
-    (BEAT_X.len() - 1) as f32
-}
-
 #[derive(Resource)]
 struct Game {
     session: Session,
+    view: RoomView,
+    camera_follow: CameraFollow,
     /// The last-announced count of Zone A's five understanding-beats
     /// (`Session::beats`), so progress prints once per change, not per frame.
     last_beat_count: usize,
@@ -190,10 +164,10 @@ pub struct ZoneAPlugin;
 impl Plugin for ZoneAPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(AppState::Playing), (print_controls, setup))
-            .add_systems(OnExit(AppState::Playing), teardown)
+            .add_systems(OnExit(AppState::Playing), (teardown, reset_camera))
             .add_systems(
                 Update,
-                (input, physics, reactive_rig, sync, announce_progress, quit)
+                (input, physics, reactive_rig, sync, follow_camera, announce_progress, quit)
                     .chain()
                     .run_if(in_state(AppState::Playing)),
             );
@@ -223,6 +197,8 @@ fn setup(mut commands: Commands, launch: Res<LaunchMode>, save_slot: Res<SaveSlo
             .unwrap_or_default(),
         LaunchMode::New => Session::new(),
     };
+
+    let view = RoomView::border_path(session.active_room());
 
     // lands: forest (left), mountains (right)
     commands.spawn((
@@ -322,7 +298,7 @@ fn setup(mut commands: Commands, launch: Res<LaunchMode>, save_slot: Res<SaveSlo
     // (`prototype/zone-a/index.html`), not invented fresh.
     for c in session.characters().iter() {
         let id: &'static str = if c.id == "anya" { "anya" } else { "donna" };
-        let x = ENTRANCE_X + if id == "anya" { 22.0 } else { -14.0 };
+        let x = view.path.x_for_beat(session.pos_of(id));
         let y = GROUND_Y + GIRL_H / 2.0; // physics' own center-referenced y
         let verve = if id == "anya" { 1.0 } else { 0.42 };
         let anya = id == "anya";
@@ -492,6 +468,8 @@ fn setup(mut commands: Commands, launch: Res<LaunchMode>, save_slot: Res<SaveSlo
 
     commands.insert_resource(Game {
         session,
+        view,
+        camera_follow: CameraFollow::default(),
         last_beat_count: 0,
     });
 }
@@ -553,6 +531,41 @@ fn input(keys: Res<ButtonInput<KeyCode>>, mut game: ResMut<Game>) {
     }
 }
 
+/// Follow the active heroine after physics. The projection's actual view area
+/// accounts for viewport size and orthographic scaling, including window resize.
+fn follow_camera(
+    time: Res<Time>,
+    mut game: ResMut<Game>,
+    girls: Query<&Girl>,
+    mut cameras: Query<(&Projection, &mut Transform), With<Camera2d>>,
+) {
+    let Some(girl) = girls.iter().find(|g| g.id == game.session.active_id()) else {
+        return;
+    };
+    let target = [girl.x, girl.y];
+    for (projection, mut transform) in &mut cameras {
+        let Projection::Orthographic(projection) = projection else { continue };
+        let half_view = [projection.area.width() * 0.5, projection.area.height() * 0.5];
+        let Game { view, camera_follow, .. } = &mut *game;
+        if let Some(center) = camera_follow.update(
+            target, view.bounds, half_view, view.camera_response, time.delta_secs(),
+        ) {
+            transform.translation.x = center[0];
+            transform.translation.y = center[1];
+            // Preserve Z: camera depth belongs to Bevy, not the tracking math.
+        }
+    }
+}
+
+/// The same camera draws the menu. Never leave its world-space origin offset
+/// after Escape, New Chronicle, or Continue. A fresh Game resets the tracker.
+fn reset_camera(mut cameras: Query<&mut Transform, With<Camera2d>>) {
+    for mut transform in &mut cameras {
+        transform.translation.x = 0.0;
+        transform.translation.y = 0.0;
+    }
+}
+
 fn physics(
     keys: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
@@ -583,8 +596,9 @@ fn physics(
                 g.x = cx;
             }
             g.depth = water_at(g.x, bridge).0.max(depth);
-            g.x = g.x.clamp(-620.0, 620.0);
-            game.session.set_active_pos(beat_units_for_x(g.x));
+            g.x = game.view.bounds.clamp_point([g.x, g.y])[0];
+            let local_beat = game.view.path.beat_for_x(g.x);
+            game.session.set_active_pos(local_beat);
 
             let floor = GROUND_Y + GIRL_H / 2.0;
             if g.depth > 0.02 {
