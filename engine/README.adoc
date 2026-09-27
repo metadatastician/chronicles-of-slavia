@@ -88,3 +88,63 @@ The playable Zone A implementation remains deliberately bounded.
 See `docs/decisions/0002-layered-game-as-data-architecture.adoc` for the
 layering and `docs/decisions/0003-adopt-bevy-as-the-l3-engine.adoc` for the
 renderer decision.
+
+== Room and camera substrate (2026-09-27 working patch)
+
+The canonical embedded SGS is still `slavia-core/data/zone-a.sgs.toml`, not
+its historical copy under `data/zones/`. A1's seven beats now belong to the
+`border-path` room. No A2–A5 scenes or exits have been authored.
+
+`[[rooms]]` carries an `id`, an ordered list of beat IDs, and optional
+`[[rooms.exits]]` entries (`id`, `at`, `to`, `arrival`). `at` and `arrival` are
+*local beat indices*. Exits are directed; a return path must be declared.
+Every beat belongs to exactly one nonempty room. Parsing rejects duplicate IDs,
+missing beat references, invalid destinations and out-of-range exit indices.
+An older flat SGS is interpreted as one room named `main`.
+
+`Session` stores `{ room, beat }` per heroine. Movement clamps within the
+active room; only `take_exit` crosses a declared link, at its declared beat.
+Switching characters preserves their independent positions. Reveals remain
+indexed by the narrative beat table, and crossing a room does not undo birds,
+cooperation, or Rift state. These links are exercised in synthetic headless
+fixtures, not invented production segments. Door visuals, a transition input,
+scene replacement, and per-segment checkpoints remain for the first authored
+multi-room scene; this patch does not claim that renderer work is complete.
+
+Old scalar A1 saves migrate to the first SGS room. New saves encode each
+heroine's room and local beat position. Invalid cast, room, reveal-vector or
+non-finite/out-of-range position data is rejected before Continue is offered.
+The existing save format still does not capture jump velocity or every physics
+coordinate; the inverse landmark mapping restores the saved *beat position*.
+
+L3 staging lives separately in `slavia-zone-a/data/border-path.view.toml`:
+world bounds, horizontal landmarks and camera response. It is validated against
+the room ID and beat count. `slavia-renderer` contains dependency-free camera
+math and bidirectional landmark interpolation. The Bevy system follows the
+active heroine after physics, clamps using the orthographic viewport, snaps on
+session entry, smooths character switches, and resets the persistent camera
+when returning to the menu. A1's authored extent is unchanged; larger-room
+tracking is covered by synthetic tests rather than by silently stretching A1.
+
+=== Required verification (not run successfully in the editing sandbox)
+
+[source,bash]
+----
+cd engine
+cargo fmt --all --check
+cargo test -p slavia-core
+cargo test -p slavia-renderer
+cargo test -p slavia-zone-a --no-default-features
+cargo clippy -p slavia-core -p slavia-renderer --all-targets -- -D warnings
+cargo clippy -p slavia-zone-a --no-default-features --all-targets -- -D warnings -A dead_code
+cargo check -p slavia-zone-a --all-targets
+cargo run -p slavia-zone-a
+----
+
+Manually check New/Continue spawn, Tab tracking, viewport resizing, both room
+edges and Escape back to the menu. `just test` and `just quality` now include
+the shared renderer math. The 52-test count in older status documents is a
+historical baseline, not evidence for this patch. Rust/Cargo are unavailable in
+the editing sandbox; source syntax parsing alone cannot establish correctness.
+The actual Cargo manifest selects Bevy 0.17, despite the session prompt's 0.15
+wording; a rendered build must also check pre-existing API migration debt.

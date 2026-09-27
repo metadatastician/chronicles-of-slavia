@@ -5,6 +5,22 @@
 
 ---
 
+## Verification checkpoint — 2026-09-27
+
+Read `docs/reports/ci/issue-100-triage-2026-09-27.md` and the room/camera section
+of `engine/README.adoc` before using the historical snapshot below. Issue #100
+is **still open**, and the claim that all infrastructure is resolved is not
+supported by current default-branch runs. The actual manifest selects **Bevy
+0.17**, not 0.15. The 52 passing tests below are a historical baseline.
+
+The current working patch adds room-aware SGS/Session state, save migration,
+shared camera math and A1 camera following. Rust tests/build/formatting could
+not run in the editing environment (no Rust/Cargo; downloads blocked). **First
+validate this patch**, including the real renderer; do not treat syntax parsing
+as a passing Rust build. Multi-room scene transitions and segment checkpoints
+remain to be wired when a second room is authored. Do not skip directly to
+A2–A5 on an unverified substrate. Owner-only rulings remain outstanding.
+
 ## Context
 
 You are working on **Chronicles of Slavia** — a mythic 2D puzzle-platformer

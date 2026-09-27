@@ -42,12 +42,17 @@ pub struct Spec {
     pub animals: Vec<Animal>,
     #[serde(default)]
     pub beats: Vec<Beat>,
+    /// Spatial grouping and directed traversal links, authored in the SGS.
+    #[serde(default)]
+    pub rooms: Vec<crate::room::Room>,
 }
 
 impl Spec {
     /// Parse a spec from TOML source.
     pub fn from_toml(source: &str) -> Result<Self, SpecError> {
-        toml::from_str(source).map_err(SpecError::from)
+        let mut spec: Self = toml::from_str(source).map_err(SpecError::from)?;
+        crate::room::prepare(&mut spec).map_err(SpecError::Rooms)?;
+        Ok(spec)
     }
 
     /// Look up a character by id.

@@ -25,22 +25,31 @@ impl std::error::Error for CrossError {}
 
 /// Why a Slavia Game Spec could not be loaded.
 #[derive(Debug)]
-pub struct SpecError(pub toml::de::Error);
+pub enum SpecError {
+    Parse(toml::de::Error),
+    Rooms(String),
+}
 
 impl fmt::Display for SpecError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "invalid Slavia Game Spec: {}", self.0)
+        match self {
+            Self::Parse(error) => write!(f, "invalid Slavia Game Spec: {error}"),
+            Self::Rooms(error) => write!(f, "invalid SGS room topology: {error}"),
+        }
     }
 }
 
 impl std::error::Error for SpecError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        Some(&self.0)
+        match self {
+            Self::Parse(error) => Some(error),
+            Self::Rooms(_) => None,
+        }
     }
 }
 
 impl From<toml::de::Error> for SpecError {
     fn from(e: toml::de::Error) -> Self {
-        SpecError(e)
+        Self::Parse(e)
     }
 }

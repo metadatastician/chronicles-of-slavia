@@ -38,13 +38,13 @@ jobs:
           failed=0
           for file in .github/workflows/*.yml .github/workflows/*.yaml; do
             [ -f "$file" ] || continue
-            if ! head -1 "$file" | grep -q "^# SPDX-License-Identifier:"; then
+            if ! awk '/^---[[:space:]]*$/ { next } /^#/ { print; next } { exit }' "$file" | grep -q "^# SPDX-License-Identifier:"; then
               echo "ERROR: $file missing SPDX header"
               failed=1
             fi
           done
           if [ $failed -eq 1 ]; then
-            echo "Add '# SPDX-License-Identifier: AGPL-3.0-or-later' as first line"
+            echo "Add '# SPDX-License-Identifier: AGPL-3.0-or-later' in the leading comment block"
             exit 1
           fi
           echo "All workflows have SPDX headers"

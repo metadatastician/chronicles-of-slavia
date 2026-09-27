@@ -41,6 +41,7 @@ pub mod animal;
 pub mod character;
 pub mod error;
 pub mod esm;
+pub mod room;
 pub mod spec;
 pub mod world;
 

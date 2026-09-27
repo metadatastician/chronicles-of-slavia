@@ -47,3 +47,17 @@ last-updated = "2026-09-27"
 # effort = "easy"
 # impact = "low"
 # discovered = "2026-03-23"
+
+[[debt.should]]
+component = "issue-100-and-engine-substrate"
+issue = "Local repair/implementation patch needs provisioned Rust fmt/test/clippy/render check, canonical lock verification, real hosted scans, Sonar diagnosis and successful default-branch runs. No closure or green claim yet. See docs/reports/ci/issue-100-triage-2026-09-27.md."
+effort = "medium"
+impact = "high"
+discovered = "2026-09-27"
+
+[[debt.should]]
+component = "first-authored-multi-room-scene"
+issue = "Session topology and A1 tracking are wired; multi-room scene replacement, door input and segment checkpoints are not yet built. Author A2 against the existing canon only after validating the substrate. Do not build gated Zones B-E."
+effort = "hard"
+impact = "high"
+discovered = "2026-09-27"

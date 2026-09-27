@@ -11,6 +11,15 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::{fs, io};
 
+/// Read old scalar A1 saves as well as room-aware snapshots. New saves always
+/// write the room form; a legacy scalar is migrated to the SGS's first room.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum SavedPosition {
+    Room(slavia_core::room::Position),
+    Legacy(f32),
+}
+
 /// Everything needed to reconstruct a [`crate::session::Session`]. Does not
 /// save `Spec` — it's reconstructed fresh from `zone_a()` on every load, the
 /// same as a new session does.
@@ -22,7 +31,7 @@ pub struct SaveData {
     pub crossed: bool,
     pub birds: BirdState,
     pub beats: Beats,
-    pub pos: HashMap<String, f32>,
+    pub pos: HashMap<String, SavedPosition>,
     pub revealed: Vec<bool>,
     /// A human-readable line describing where this save left off (e.g.
     /// "Anya, at the grove"), computed once at save time so the menu never
@@ -51,5 +60,10 @@ pub fn write(data: &SaveData) -> io::Result<()> {
 /// are both treated as "no save" — not worth distinguishing yet.
 pub fn read() -> Option<SaveData> {
     let text = fs::read_to_string(save_path()).ok()?;
-    toml::from_str(&text).ok()
+    let data = toml::from_str(&text).ok()?;
+    if let Err(error) = crate::session::Session::try_restore(&data) {
+        eprintln!("Cannot continue from this save: {error}");
+        return None;
+    }
+    Some(data)
 }

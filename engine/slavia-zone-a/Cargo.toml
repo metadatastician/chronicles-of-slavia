@@ -18,6 +18,7 @@ render = ["dep:bevy"]
 
 [dependencies]
 slavia-core = { path = "../slavia-core" }
+slavia-renderer = { path = "../slavia-renderer" }
 # Save/load (native-only, unconditional — matches slavia-core's own use of
 # these for its SGS loader, not gated behind `render`).
 serde = { version = "1", features = ["derive"] }

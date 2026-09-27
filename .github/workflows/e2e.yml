@@ -36,18 +36,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7.0.1
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c
+        with:
+          toolchain: stable
       - name: Install system dependencies for Bevy
         run: |
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev
       - name: Rust cache
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6
         with:
           workspaces: engine
       - name: Build
         run: cd engine && cargo build --all-targets
       - name: Run E2E smoke test (headless)
+        working-directory: engine
         run: |
-          cd engine && cargo test -p slavia-core --all-targets
-          cd engine && cargo test -p slavia-zone-a --no-default-features --all-targets
+          cargo test -p slavia-core --all-targets
+          cargo test -p slavia-renderer --all-targets
+          cargo test -p slavia-zone-a --no-default-features --all-targets
