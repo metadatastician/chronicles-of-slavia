@@ -26,7 +26,7 @@ toml = "0.8"
 # isn't guaranteed present. x11 loads at runtime (no build-time system lib) and
 # runs fine under WSLg via XWayland. Add "wayland" back if libwayland-dev is
 # installed and a native Wayland backend is wanted.
-bevy = { version = "0.15", default-features = false, features = [
+bevy = { version = "0.17", default-features = false, features = [
     "bevy_winit",
     "bevy_render",
     "bevy_core_pipeline",
