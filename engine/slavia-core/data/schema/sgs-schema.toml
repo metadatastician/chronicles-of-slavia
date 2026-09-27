@@ -1,0 +1,10 @@
+# SGS Schema Definition
+# The declarative format for all game data in Chronicles of Slavia.
+# See ADR-0006 (SGS is the public authoring schema).
+
+[schema]
+version = "0.1.0"
+description = "Slavia Game Spec schema"
+
+[types]
+# Schema types will be formally defined here.

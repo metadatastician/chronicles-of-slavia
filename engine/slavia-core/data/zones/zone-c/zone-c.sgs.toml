@@ -1,0 +1,11 @@
+# zone-c — placeholder SGS data.
+# Gated on Zone A holding (docs/design/08).
+
+[zone]
+id = "zone-c"
+name = "zone-c"
+chronicle = "chronicle-i"
+status = "placeholder"
+
+[beats]
+beats = []

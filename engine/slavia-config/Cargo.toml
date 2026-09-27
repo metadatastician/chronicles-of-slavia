@@ -1,0 +1,10 @@
+[package]
+name = "slavia-config"
+version = "0.0.0"
+edition = "2021"
+description = "Game settings and configuration for Chronicles of Slavia"
+license = "AGPL-3.0-or-later"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"

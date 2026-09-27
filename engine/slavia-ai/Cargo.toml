@@ -1,0 +1,10 @@
+[package]
+name = "slavia-ai"
+version = "0.0.0"
+edition = "2021"
+description = "Game AI and Enaction Engine integration for Chronicles of Slavia"
+license = "AGPL-3.0-or-later"
+
+[dependencies]
+slavia-core = { path = "../slavia-core" }
+serde = { version = "1", features = ["derive"] }

@@ -87,7 +87,7 @@ current policy horizon.
 | Idris2 ABI
 | Conditional P0
 | Current `rsr_*` declarations do not match unresolved Zig
-  `{{project}}_*` exports; generated ABI directory contains no header.
+  `chronicles-of-slavia_*` exports; generated ABI directory contains no header.
 
 | FFI-1
 | If FFI capability is retained: the pure Zig transaction layer implements the

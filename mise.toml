@@ -1,57 +1,19 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Chronicles of Slavia — mise tool configuration
+# This is a Rust/Bevy game project. Only Rust-relevant tools are declared.
+
 [tools]
-# Language runtimes
-node = "latest"
-python = "latest"
+# Language runtime
 rust = "latest"
-go = "latest"
-zig = "latest"
-java = "latest"
-bun = "latest"
-denojs = "latest"
 
-# Package managers
-npm = "latest"
-yarn = "latest"
-pnpm = "latest"
-pip = "latest"
-cargo = "latest"
-go-task = "latest"
-
-# Formatting & Linting
-gofmt = "latest"
-black = "latest"
-isort = "latest"
-ruff = "latest"
-prettier = "latest"
-shfmt = "latest"
-stylua = "latest"
-
-# Build tools
-cmake = "latest"
-make = "latest"
-ninja = "latest"
-
-# Shell tools
-git = "latest"
-gnu-sed = "latest"
-gnu-tar = "latest"
-gnu-grep = "latest"
-
-# Testing
-vitest = "latest"
-pytest = "latest"
-jest = "latest"
+# Build and quality
+cargo-audit = "latest"
+cargo-llvm-cov = "latest"
+cargo-watch = "latest"
+just = "latest"
+git-cliff = "latest"
 
 [env]
-# Common environment variables
-NODE_ENV = "development"
-PYTHONDONTWRITEBYTECODE = "1"
-PYTHONUNBUFFERED = "1"
-
-# Task runner alias
-[alias]
-task = "go-task"
-build = "cargo build --release || npm run build || go build"
-test = "cargo test || npm test || go test ./..."
-lint = "ruff check . || prettier --check . || black --check ."
-fmt = "ruff format . || prettier --write . || black ."
+# Rust-specific
+CARGO_TERM_COLOR = "always"
+RUST_BACKTRACE = "1"

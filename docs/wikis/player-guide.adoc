@@ -1,0 +1,4 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Player Guide
+
+Placeholder — player-facing wiki for when the game is published.

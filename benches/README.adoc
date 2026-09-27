@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Benchmarks
+
+Performance benchmarks for Chronicles of Slavia.
+
+== Planned benchmarks
+
+* ESM solver performance (microKanren solution counting)
+* Attunement aura radius queries
+* Room/area transition latency
+* SGS parsing throughput

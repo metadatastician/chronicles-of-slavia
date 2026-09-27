@@ -1,0 +1,12 @@
+[package]
+name = "slavia-ffi"
+version = "0.0.0"
+edition = "2021"
+description = "Cleave-aligned integration surface for Chronicles of Slavia"
+license = "AGPL-3.0-or-later"
+
+# This crate is optional — behind a feature flag.
+# The game is pure Rust today; when FFI is needed, it follows the
+# cleave spectrum: raw FFI-ABI → SNIF → unified protocol.
+
+[dependencies]

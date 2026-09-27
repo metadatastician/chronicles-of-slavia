@@ -36,12 +36,28 @@
 //! A's five beats untouched until it earns a place in a real scene. This is
 //! test evidence, not a Creusot proof.
 
+// ── Existing modules (Zone A, proven by 52 tests) ──────────────────────
 pub mod animal;
 pub mod character;
 pub mod error;
 pub mod esm;
 pub mod spec;
 pub mod world;
+
+// ── New game systems (stub modules — ready to be filled in) ────────────
+// Each module below corresponds to a documented game system in docs/design/.
+// They are empty stubs that compile but implement nothing yet.
+// The next development phase fills them in, segment by segment.
+pub mod abilities;
+pub mod attunement;
+pub mod clothing;
+pub mod emotional;
+pub mod flora;
+pub mod items;
+pub mod npc;
+pub mod progression;
+pub mod rift;
+pub mod spirits;
 
 pub use animal::{Animal, Nature, Response};
 pub use character::{Character, Taxis};

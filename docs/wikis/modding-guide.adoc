@@ -1,0 +1,5 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Modding Guide
+
+Placeholder — UMS modding guide for when the runtime loader exists.
+See ADR-0007.

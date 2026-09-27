@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= ADR-0010: Integration surface follows the cleave spectrum
+:status: accepted
+:date: 2026-09-27
+
+== Context
+
+The vestigial `src/interface/` tree (Idris2 ABI types, Zig FFI stubs)
+was inherited from the RSR template and documented no real capability.
+The game is pure Rust (ADR-0003) with no current FFI requirement.
+
+== Decision
+
+Remove the vestigial tree. Replace with `engine/slavia-ffi/`, an
+optional crate that follows the cleave transmutable integration surface:
+
+1. *Raw FFI-ABI* — direct, fast, for trusted in-process consumers
+2. *SNIF* — sandboxed (native → WASM → wasmtime), crash-isolated
+3. *Unified protocol* — feels like an internal API call
+
+The spectrum is a dial, not a choice. Different consumers sit at
+different points simultaneously.
+
+== Consequences
+
+* No FFI seam exists today — the game is pure Rust end-to-end.
+* When a seam is needed, it follows cleave rather than inheriting
+  a template's generic ABI.
+* The estate's cleave project (metadatastician/cleave) is the
+  reference implementation.

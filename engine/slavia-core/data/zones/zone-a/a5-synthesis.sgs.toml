@@ -1,0 +1,13 @@
+# Zone A — a5-synthesis
+# Placeholder SGS data for Zone A segment.
+# See docs/design/23-level-scope-and-pacing.md for segment content.
+
+[zone]
+id = "a5-synthesis"
+name = "Zone A — a5-synthesis"
+chronicle = "chronicle-i"
+status = "placeholder"
+
+[beats]
+# Beats will be defined when this segment is designed.
+beats = []

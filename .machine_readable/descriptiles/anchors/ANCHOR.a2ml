@@ -4,9 +4,9 @@
 # ANCHOR.a2ml - authoritative anchor for this repository
 #
 # FILLED IN 2026-07-16. Every field below was previously an unsubstituted
-# {{PLACEHOLDER}} token — `just init` was never run, or never finished. The
-# attribution line above was `{{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}})
-# <{{AUTHOR_EMAIL}}>`; it is filled from the identical string used by every
+# TODO token — `just init` was never run, or never finished. The
+# attribution line above was `2026 Jonathan D.A. Jewell (metadatastician)
+# <j.d.a.jewell@open.ac.uk>`; it is filled from the identical string used by every
 # sibling descriptile in this repo (a copy, not an invention). The
 # SPDX-License-Identifier is untouched.
 

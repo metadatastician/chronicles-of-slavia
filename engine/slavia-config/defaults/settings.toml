@@ -1,0 +1,14 @@
+# Default game settings for Chronicles of Slavia
+
+[graphics]
+fullscreen = false
+vsync = true
+resolution_width = 1280
+resolution_height = 720
+
+[audio]
+master_volume = 1.0
+music_volume = 0.8
+sfx_volume = 1.0
+ambient_volume = 0.6
+voice_volume = 1.0

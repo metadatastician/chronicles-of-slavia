@@ -1,0 +1,10 @@
+[package]
+name = "slavia-renderer"
+version = "0.0.0"
+edition = "2021"
+description = "Shared rendering infrastructure for Chronicles of Slavia"
+license = "AGPL-3.0-or-later"
+
+[dependencies]
+# Bevy will be added when rendering is implemented
+# bevy = "0.15"

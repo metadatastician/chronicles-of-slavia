@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Chronicles of Slavia — Encyclopedia (Game Bible)
+:toc:
+
+This is the authoritative reference for the game world of Slavia.
+It collects everything a developer, writer, or artist needs to know
+about the world, its inhabitants, its mechanics, and its cultures.
+
+== Sections
+
+* link:world/[World] — Slavia itself, the Rift, geography, folklore, history
+* link:characters/[Characters] — Anya, Donna, the Guardian Spirit, NPCs
+* link:creatures/[Creatures] — Animals, spirits, Rift creatures
+* link:mechanics/[Mechanics] — Attunement, abilities, clothing, emotional state
+* link:items/[Items] — Consumables, artefacts, materials
+* link:culture/[Culture] — Ukrainian and Bulgarian cultural grounding
+
+== Principles
+
+* The encyclopedia is *descriptive*, not prescriptive — it records what
+  the design canon has decided, not new decisions.
+* Every entry should link back to the design document that authorised it.
+* The encyclopedia is for humans — clear prose, not code.

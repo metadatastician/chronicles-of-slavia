@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Narrative Documentation
+
+Scripts, outlines, and dialogue for each Chronicle and zone.
+
+== Structure
+
+* `chronicle-i/` — The Broken Frontier (currently in development)
+* `chronicle-ii/` — The Echo Engine (outline only)
+* `chronicle-iii/` — The Two Who Were Needed (outline only)
+* `dialogue/` — Character voice and register guides

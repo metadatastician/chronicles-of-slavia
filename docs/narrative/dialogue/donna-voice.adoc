@@ -1,0 +1,5 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Donna's Voice
+
+Register, vocabulary, and speech patterns for Donna's dialogue.
+Placeholder — to be developed from docs/design/09-anya-and-donna-backstories.md.

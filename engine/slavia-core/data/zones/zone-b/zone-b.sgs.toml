@@ -1,0 +1,11 @@
+# zone-b — placeholder SGS data.
+# Gated on Zone A holding (docs/design/08).
+
+[zone]
+id = "zone-b"
+name = "zone-b"
+chronicle = "chronicle-i"
+status = "placeholder"
+
+[beats]
+beats = []

@@ -1,0 +1,7 @@
+# berehynia embroidery motif — placeholder.
+# See docs/design/17-clothing-repair-and-pattern-weaving.md.
+
+[motif]
+id = "berehynia"
+culture = "placeholder"
+prerequisites = []

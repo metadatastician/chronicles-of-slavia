@@ -1,0 +1,4 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= abilities
+
+Placeholder — see the corresponding design documents.

@@ -1,0 +1,8 @@
+# Ordinary animals — full taxis effect, nature-gated.
+# See docs/design/07-species-essence-and-control.md
+
+[[animals]]
+id = "grove-birds"
+essence = "birdness"
+tier = "ordinary"
+natural_response = { raise = "stir, sing louder, fly actively", lower = "settle, quieten, rest" }

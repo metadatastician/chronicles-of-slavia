@@ -1,0 +1,4 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= spirits
+
+Placeholder — see docs/design/03-living-taxis.md and docs/design/07-species-essence-and-control.md.

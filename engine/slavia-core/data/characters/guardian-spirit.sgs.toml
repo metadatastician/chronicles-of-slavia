@@ -1,0 +1,8 @@
+# Guardian Spirit — the spirit that split into chaos and order.
+# See docs/design/01-world-principle.md § Why the Rift chose both.
+
+[character]
+id = "guardian-spirit"
+name = "The Guardian Spirit"
+nature = "supernatural"
+status = "placeholder"

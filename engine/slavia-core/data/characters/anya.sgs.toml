@@ -1,0 +1,25 @@
+# Anya — character definition.
+# See docs/characters/the-little-book-of-anya.adoc
+
+[character]
+id = "anya"
+name = "Anya"
+heritage = "ukrainian"
+nature = "chaos"
+polarity = "raise"  # raises taxis
+
+[movement]
+speed = 1.2
+agility = 1.3
+
+[abilities]
+roster = ["dash_burst", "impulse_jump", "time_flicker", "chaos_pulse", "momentum_chains"]
+
+[attunement]
+direction = "raise"
+native_terrain = "forest"
+complement_terrain = "tundra"
+
+[recharge]
+signature_item = "ukrainian_honey"
+recharge_type = "foraged"

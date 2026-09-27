@@ -92,7 +92,7 @@ script remains *not applicable / not passing*; it must not be presented as a
 project test.
 
 PR #77's repaired `find -exec` argument boundary was tested independently with
-a planted `{{PROJECT}}` token. The token was replaced and the expected value was
+a planted `chronicles-of-slavia` token. The token was replaced and the expected value was
 observed. That validates the repair without pretending the legacy suite is a
 valid game-level E2E test.
 

@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Chronicle I — The Broken Frontier: Outline
+
+See docs/design/14-chronicle-i-rift-between-nations.md for the full design.
+
+== Three-act arc
+
+* *Act I — The Tear.* Pulled in; discover Slavia; learn the world reacts.
+* *Act II — The Unstable Frontier.* Explore chaos/order zones; sense they were chosen.
+* *Act III — The First Stabilization.* Reach the Rift Core; "Two were needed."
