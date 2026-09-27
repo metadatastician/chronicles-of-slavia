@@ -1,0 +1,1 @@
+//! Rift corruption — placeholder.

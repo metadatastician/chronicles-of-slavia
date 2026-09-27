@@ -1,0 +1,4 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= history
+
+Placeholder — to be populated from the design canon.

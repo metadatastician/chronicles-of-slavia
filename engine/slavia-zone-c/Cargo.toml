@@ -1,0 +1,11 @@
+[package]
+name = "slavia-zone-c"
+version = "0.0.0"
+edition = "2021"
+description = "Zone C — stub crate for Chronicles of Slavia"
+license = "AGPL-3.0-or-later"
+
+[dependencies]
+slavia-core = { path = "../slavia-core" }
+slavia-renderer = { path = "../slavia-renderer" }
+# bevy = "0.15"  # Uncomment when rendering is implemented

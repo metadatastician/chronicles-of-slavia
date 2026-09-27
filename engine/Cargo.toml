@@ -14,4 +14,15 @@
 
 [workspace]
 resolver = "2"
-members = ["slavia-core", "slavia-zone-a"]
+members = [
+    "slavia-core",        # L2 — the sacred logic
+    "slavia-config",      # Configuration
+    "slavia-renderer",    # Shared rendering infrastructure
+    "slavia-ai",          # Game AI and Enaction integration
+    "slavia-ffi",         # Cleave-aligned integration surface (optional)
+    "slavia-zone-a",      # Zone A — Border Path (L3)
+    "slavia-zone-b",      # Zone B — Fracture Line (L3, stub)
+    "slavia-zone-c",      # Zone C — Anya's Chaos Zone (L3, stub)
+    "slavia-zone-d",      # Zone D — Donna's Order Zone (L3, stub)
+    "slavia-zone-e",      # Zone E — Rift Node Chamber (L3, stub)
+]

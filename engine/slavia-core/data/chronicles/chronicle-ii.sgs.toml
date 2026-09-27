@@ -1,0 +1,7 @@
+# Chronicle ii — placeholder.
+# See docs/design/13-chronicles-trilogy-structure.md.
+
+[chronicle]
+id = "chronicle-ii"
+status = "placeholder"
+zones = []

@@ -1,0 +1,25 @@
+# Donna — character definition.
+# See docs/characters/the-little-book-of-donna.adoc
+
+[character]
+id = "donna"
+name = "Donna"
+heritage = "bulgarian"
+nature = "order"
+polarity = "lower"  # lowers taxis
+
+[movement]
+speed = 0.9
+agility = 0.8
+
+[abilities]
+roster = ["brace", "anchor_step", "heavy_lift", "reinforce", "logic_link"]
+
+[attunement]
+direction = "lower"
+native_terrain = "mountain"
+complement_terrain = "swamp"
+
+[recharge]
+signature_item = "bulgarian_yogurt"
+recharge_type = "crafted"

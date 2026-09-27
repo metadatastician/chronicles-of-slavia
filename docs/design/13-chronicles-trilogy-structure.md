@@ -9,7 +9,7 @@ platforming mechanics and the same two personalities.
 Nations" — same Chronicle, name not yet settled)
 
 **Theme:** worlds merging, cultures colliding, instability.
-**Tone:** calm, folkloric, with a paradigm-breaking turn.
+**Tone:** calm, folkloric, with a paradigm-breaking turn (Kishōtenketsu — see `22-narrative-structure-per-chronicle.md`).
 **Focus:** Anya's impulsiveness vs. Donna's stability.
 **Core question:** *why were they chosen?*
 

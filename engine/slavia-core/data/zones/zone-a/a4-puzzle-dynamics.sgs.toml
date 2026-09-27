@@ -1,0 +1,13 @@
+# Zone A — a4-puzzle-dynamics
+# Placeholder SGS data for Zone A segment.
+# See docs/design/23-level-scope-and-pacing.md for segment content.
+
+[zone]
+id = "a4-puzzle-dynamics"
+name = "Zone A — a4-puzzle-dynamics"
+chronicle = "chronicle-i"
+status = "placeholder"
+
+[beats]
+# Beats will be defined when this segment is designed.
+beats = []

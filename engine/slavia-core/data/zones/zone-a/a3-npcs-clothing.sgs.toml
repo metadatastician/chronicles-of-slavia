@@ -1,0 +1,13 @@
+# Zone A — a3-npcs-clothing
+# Placeholder SGS data for Zone A segment.
+# See docs/design/23-level-scope-and-pacing.md for segment content.
+
+[zone]
+id = "a3-npcs-clothing"
+name = "Zone A — a3-npcs-clothing"
+chronicle = "chronicle-i"
+status = "placeholder"
+
+[beats]
+# Beats will be defined when this segment is designed.
+beats = []

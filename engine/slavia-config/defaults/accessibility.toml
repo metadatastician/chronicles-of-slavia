@@ -1,0 +1,15 @@
+# Default accessibility settings
+
+[visual]
+reduce_motion = false
+high_contrast = false
+colourblind_mode = "none"  # none, protanopia, deuteranopia, tritanopia
+subtitle_size = "medium"
+
+[motor]
+auto_repeat_delay_ms = 500
+hold_instead_of_mash = false
+
+[cognitive]
+simplified_ui = false
+extended_timers = false

@@ -78,10 +78,10 @@ The original findings, retained for the record:
 | ID | Item | Severity
 
 | DOC-1
-| *52 files still contain unsubstituted `{{TOKEN}}` placeholders* from the RSR template
-  — including `docs/status/READINESS.adoc` (`{{PROJECT_NAME}}`, `{{FORGE}}`, `{{OWNER}}`,
-  `{{CURRENT_DATE}}`, `{{AUTHOR}}`, and a literal grade of `X`) and
-  `docs/status/PROOF-NEEDS.adoc` (`{{PROJECT}}`). Files whose *purpose* is to be a
+| *52 files still contain unsubstituted `PLACEHOLDER` placeholders* from the RSR template
+  — including `docs/status/READINESS.adoc` (`Chronicles of Slavia`, `github.com/metadatastician/chronicles-of-slavia`, `metadatastician`,
+  `2026-09-27`, `Jonathan D.A. Jewell`, and a literal grade of `X`) and
+  `docs/status/PROOF-NEEDS.adoc` (`chronicles-of-slavia`). Files whose *purpose* is to be a
   template (`docs/decisions/0000-template.adoc`, `docs/governance/CRG-AUDIT-TEMPLATE.adoc`)
   are correct as-is and are not part of this count's problem.
 | medium
@@ -178,7 +178,7 @@ The original findings, retained for the record:
 | *The tracked ABI/FFI tree is vestigial and non-conformant.* Project metadata says
   the Rust core deliberately has no FFI seam, but 21 inherited files remain under
   `src/interface/` plus `abi.ipkg`, with no capability profile. The production Zig
-  file has unresolved `{{project}}` symbols, no unified Hexadeca API, and is not
+  file has unresolved `chronicles-of-slavia` symbols, no unified Hexadeca API, and is not
   compiled by its empty `build.zig`; the generated ABI directory contains no header.
   Under the estate template-applicability policy this must be removed as vestigial or
   explicitly declared, implemented, generated, wired, and proved. A compiling
@@ -228,7 +228,7 @@ The original findings, retained for the record:
 | *The generic ABI proof model is not connected to the tracked interface scaffold.*
   `verification/proofs/idris2/` typechecks constructive propositions, but the separate
   `src/interface/Abi/Foreign.idr` declares `rsr_*` symbols while Zig exposes unresolved
-  `{{project}}_*` placeholders. No generated header or correspondence theorem connects
+  `chronicles-of-slavia_*` placeholders. No generated header or correspondence theorem connects
   them. Compiler acceptance of the generic modules therefore proves no production
   Slavia interface.
 | high

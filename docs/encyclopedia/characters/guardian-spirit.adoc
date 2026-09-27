@@ -1,0 +1,4 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= guardian-spirit
+
+Placeholder — see docs/characters/ and docs/design/09-anya-and-donna-backstories.md.

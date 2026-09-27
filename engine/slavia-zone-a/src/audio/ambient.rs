@@ -1,0 +1,1 @@
+//! Audio ambient — placeholder.

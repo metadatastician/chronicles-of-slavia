@@ -1,0 +1,14 @@
+# Default keybindings for Chronicles of Slavia
+
+[movement]
+left = "A"
+right = "D"
+jump = "Space"
+
+[actions]
+interact = "E"
+switch_character = "Tab"
+
+[ui]
+pause = "Escape"
+restart = "R"

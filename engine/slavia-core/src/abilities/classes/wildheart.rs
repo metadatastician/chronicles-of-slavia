@@ -1,0 +1,1 @@
+//! wildheart class path — placeholder.

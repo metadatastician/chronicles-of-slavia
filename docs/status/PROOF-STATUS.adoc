@@ -104,7 +104,7 @@ The two Idris2 trees have different roles:
   typechecks as `abi.ipkg`, but uses `IO`, `PrimIO`, and `primIO` and declares
   `rsr_*` foreign symbols.
 
-The Zig scaffold exports unresolved `{{project}}_*` names, is not compiled by
+The Zig scaffold exports unresolved `chronicles-of-slavia_*` names, is not compiled by
 its empty `build.zig`, and has no unified Hexadeca API dependency. No generated
 header exists under `src/interface/generated/abi/`. Consequently there is no
 evidence that the generic Idris proofs describe, preserve, or even name the Zig

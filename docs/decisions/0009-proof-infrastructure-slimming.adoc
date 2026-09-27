@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= ADR-0009: Slim proof infrastructure to Creusot + TLA+
+:status: accepted
+:date: 2026-09-27
+
+== Context
+
+The verification/proofs/ tree inherited from the RSR template carries
+five provers (Idris2, Lean4, Agda, Coq, TLA+), but zero proofs concern
+Slavia. All nine modules are generic ABI/API scaffolding. The five-prover
+gate adds CI time without adding Slavia-specific assurance.
+
+== Decision
+
+* *Creusot* is adopted as the primary Rust verification tool. Contracts
+  will be added for Slavia's named invariants: determinism, the opposition
+  rule, living taxis soundness, and ESM belief locality.
+* *TLA+* is retained for state machine modeling — specifically the
+  SGS → World → Session flow and the ESM's belief/delta transitions.
+* *Idris2, Lean4, Agda, Coq* modules are quarantined with honest labelling.
+  They are removed from the required proof gate. If a future need arises
+  for any of them (e.g., a dependent-type proof that Creusot cannot express),
+  they can be reactivated.
+
+== Consequences
+
+* The proof gate workflow is simplified to Creusot + TLA+.
+* CI time is reduced.
+* The estate's multi-prover doctrine is respected via honest quarantine
+  rather than pretending the modules prove something about Slavia.

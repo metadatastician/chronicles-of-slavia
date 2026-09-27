@@ -19,11 +19,11 @@ set positional-arguments := true
 import? "build/contractile.just"
 
 # Project metadata — customize these
-project := "rsr-template-repo"
-OWNER := "hyperpolymath"
-REPO := "rsr-template-repo"
-version := "0.1.0"
-tier := "infrastructure"  # 1 | 2 | infrastructure
+project := "chronicles-of-slavia"
+OWNER := "metadatastician"
+REPO := "chronicles-of-slavia"
+version := "0.0.0"
+tier := "game"  # game | infrastructure | library
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEFAULT & HELP
@@ -88,38 +88,25 @@ import? "build/just/assess.just"
 # Build the project (debug mode)
 build *args:
     @echo "Building {{project}} (debug)..."
-    # TODO: Replace with your build command
-    # Examples:
-    #   cargo build {{args}}                    # Rust
-    #   mix compile {{args}}                    # Elixir
-    #   zig build {{args}}                      # Zig
-    #   deno task build {{args}}                # Deno/ReScript
+    cd engine && cargo build {{args}}
     @echo "Build complete"
 
 # Build in release mode with optimizations
 build-release *args:
     @echo "Building {{project}} (release)..."
-    # TODO: Replace with your release build command
-    # Examples:
-    #   cargo build --release {{args}}
-    #   MIX_ENV=prod mix compile {{args}}
-    #   zig build -Doptimize=ReleaseFast {{args}}
+    cd engine && cargo build --release {{args}}
     @echo "Release build complete"
 
 # Build and watch for changes (requires entr or similar)
 build-watch:
     @echo "Watching for changes..."
-    # TODO: Customize file patterns for your language
-    # Examples:
-    #   find src -name '*.rs' | entr -c just build
-    #   mix compile --force --warnings-as-errors
-    #   deno task dev
+    cd engine && cargo watch -x build
 
 # Clean build artifacts [reversible: rebuild with `just build`]
 clean:
     @echo "Cleaning..."
-    # TODO: Customize for your build system
-    rm -rf target/ _build/ build/ dist/ out/ obj/ bin/
+    cd engine && cargo clean
+    @echo "Clean complete"
 
 # Deep clean including caches [reversible: rebuild]
 clean-all: clean
@@ -271,18 +258,16 @@ lint:
 
 # Run the application
 run *args: build
-    # TODO: Replace with your run command
-    echo "Run not configured yet"
+    cd engine && cargo run -p slavia-zone-a -- {{args}}
 
 # Run with verbose output
 run-verbose *args: build
-    # TODO: Replace with verbose run command
-    echo "Run not configured yet"
+    cd engine && RUST_LOG=debug cargo run -p slavia-zone-a -- {{args}}
 
 # Install to user path
 install: build-release
     @echo "Installing {{project}}..."
-    # TODO: Replace with your install command
+    cd engine && cargo install --path slavia-zone-a
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEPENDENCIES
@@ -291,21 +276,13 @@ install: build-release
 # Install/check all dependencies
 deps:
     @echo "Checking dependencies..."
-    # TODO: Replace with your dependency check
-    # Examples:
-    #   cargo check
-    #   mix deps.get
-    #   gleam deps download
+    cd engine && cargo check --all-targets
     @echo "All dependencies satisfied"
 
 # Audit dependencies for vulnerabilities
 deps-audit:
     @echo "Auditing for vulnerabilities..."
-    # TODO: Replace with your audit command
-    # Examples:
-    #   cargo audit
-    #   mix audit
-    @command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL --quiet . || true
+    cd engine && cargo audit
     @echo "Audit complete"
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -563,37 +540,38 @@ assail:
 
 # Self-diagnostic — checks dependencies, permissions, paths
 doctor:
-    @echo "Running diagnostics for rsr-template-repo..."
+    @echo "Running diagnostics for chronicles-of-slavia..."
     @echo "Checking required tools..."
     @command -v just >/dev/null 2>&1 && echo "  [OK] just" || echo "  [FAIL] just not found"
     @command -v git >/dev/null 2>&1 && echo "  [OK] git" || echo "  [FAIL] git not found"
+    @command -v cargo >/dev/null 2>&1 && echo "  [OK] cargo" || echo "  [FAIL] cargo not found"
+    @command -v rustc >/dev/null 2>&1 && echo "  [OK] rustc ($(rustc --version 2>/dev/null))" || echo "  [FAIL] rustc not found"
     @echo "Checking for hardcoded paths..."
-    @grep -rn '$HOME\|$ECLIPSE_DIR' --include='*.rs' --include='*.ex' --include='*.res' --include='*.gleam' --include='*.sh' . 2>/dev/null | head -5 || echo "  [OK] No hardcoded paths"
+    @grep -rn '$HOME\|$ECLIPSE_DIR' --include='*.rs' --include='*.sh' . 2>/dev/null | head -5 || echo "  [OK] No hardcoded paths"
     @echo "Diagnostics complete."
 
 # Guided tour of key features
 tour:
-    @echo "=== rsr-template-repo Tour ==="
+    @echo "=== Chronicles of Slavia Tour ==="
     @echo ""
-    @echo "1. Project structure:"
-    @ls -la
-    @echo ""
+    @echo "1. Project structure: engine/ (Rust/Bevy game), docs/ (design canon), assets/ (art/audio)"
     @echo "2. Available commands: just --list"
-    @echo ""
     @echo "3. Read README.adoc for full overview"
-    @echo "4. Read EXPLAINME.adoc for architecture decisions"
-    @echo "5. Run 'just doctor' to check your setup"
+    @echo "4. Read ARCHITECTURE.md for the three-layer design"
+    @echo "5. Read docs/design/00-start-here.md for the game's grip"
+    @echo "6. Run 'just doctor' to check your setup"
+    @echo "7. Run 'just test' to verify the core logic"
     @echo ""
     @echo "Tour complete! Try 'just --list' to see all available commands."
 
 # Open feedback channel with diagnostic context
 help-me:
-    @echo "=== rsr-template-repo Help ==="
+    @echo "=== Chronicles of Slavia Help ==="
     @echo "Platform: $(uname -s) $(uname -m)"
     @echo "Shell: $SHELL"
     @echo ""
     @echo "To report an issue:"
-    @echo "  https://github.com/hyperpolymath/rsr-template-repo/issues/new"
+    @echo "  https://github.com/metadatastician/chronicles-of-slavia/issues/new"
     @echo ""
     @echo "Include the output of 'just doctor' in your report."
 

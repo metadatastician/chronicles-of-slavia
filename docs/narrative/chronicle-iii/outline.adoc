@@ -1,0 +1,4 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Chronicle iii — Outline
+
+Placeholder — see docs/design/13-chronicles-trilogy-structure.md.

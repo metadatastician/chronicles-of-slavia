@@ -1,0 +1,871 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Chronicles of Slavia — Ultraplan 2026-09-27
+:toc:
+:toclevels: 3
+:sectanchors:
+:sectlinks:
+
+== Purpose
+
+This document is the comprehensive plan to take the Chronicles of Slavia
+repository from its current state — a prototype with extensive design canon,
+working Zone A segment A1, and significant infrastructure debt — to a
+repository that *looks structurally like the finished game will look*, with
+all standards/debt/CI/CD issues resolved and every game system having a
+clear home in the directory tree.
+
+The goal is that after this plan is executed, the owner can concentrate
+exclusively on game content — art, narrative, level design, sound — without
+being blocked by repository infrastructure, missing directories, broken CI,
+vestigial template scaffolding, or unclear architecture.
+
+== Current state summary
+
+* *Built:* Zone A segment A1 (52 tests, playable Bevy renderer, ESM complete
+  but unwired, SGS data schema for Zone A)
+* *Design canon:* 26 cross-referenced design documents, 8 ADRs, extensive
+  world/character/mechanics specification
+* *Debt:* 10 high, 14 medium, 8 low items in DEBT.adoc (across docs, code,
+  proof, CI/CD, canon)
+* *Template residue:* 94 files with unsubstituted `+PLACEHOLDER+` placeholders,
+  vestigial Idris2/Zig FFI tree, banned-language toolchains in mise.toml,
+  docs-template/ shipped inside a real project
+* *Proof infrastructure:* 5 provers (Idris2, Lean4, Agda, Coq, TLA+) but
+  zero proofs concern Slavia
+* *CI/CD:* 31 workflow files, 3 disabled, several broken or misconfigured
+* *Open issues:* 1 GitHub issue (#100 — 4 pre-existing red CI checks)
+
+== Phase 1: Resolve listed issues (DEBT.adoc + GitHub issue #100)
+
+=== 1.1 Documentation debt
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Action | Status
+
+| DOC-1
+| Substitute `+PLACEHOLDER+` placeholders in all 52+ affected files.
+  Project name: `chronicles-of-slavia`. Owner: `metadatastician`.
+  Forge: `github.com/metadatastician/chronicles-of-slavia`.
+  Author: `Jonathan D.A. Jewell`. Date: current. Grade: per READINESS.adoc.
+| TO DO
+
+| DOC-2
+| Remove `docs-template/` entirely — it is instantiation residue that
+  duplicates and contradicts the real docs.
+| TO DO
+
+| DOC-3
+| Move `SECURITY_FIXES_20260726.md` from root to `docs/reports/security/`.
+| TO DO
+
+| DOC-4
+| Remove root-level duplicates: `AFFIRMATION.adoc`, `AUDIT.adoc`,
+  `RSR-PHILOSOPHY.adoc`, `MAINTAINERS.adoc` — all have `docs/` equivalents.
+  Keep root `README.adoc`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
+  `SECURITY.md`, `GOVERNANCE.md` as the standard root files.
+| TO DO
+
+| DOC-5
+| Wiki was resolved 2026-08-07. No action needed.
+| DONE
+
+| DOC-6
+| Unverified compliance badges removed 2026-08-07. No action needed.
+| DONE
+|===
+
+=== 1.2 Code debt
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Action | Status
+
+| CODE-1
+| Implement a camera-follow system in `render.rs`. The camera tracks the
+  active girl with smoothing. Remove the hard ±620 clamp. This is a
+  prerequisite for A2-A5 and Zone B.
+| TO DO
+
+| CODE-2
+| Add room/area concept to `Session`. Two levels of position: which room
+  the girls are in, and where within that room. This replaces the single
+  float along a flat `Vec<Beat>`.
+| TO DO
+
+| CODE-3
+| ESM is complete but unwired. This is deliberate under ADR-0004 and is
+  scheduled for segment A5. No action needed now — tracked in ROADMAP.
+| TRACKED
+
+| CODE-4
+| Accessibility toggles drive nothing. Either wire them to real
+  motion/contrast/subtitle systems, or disable/hide them with an honest
+  "Coming soon" label. A control that appears to work and does nothing is
+  worse than absent.
+| TO DO
+
+| CODE-5
+| Move save file to OS-appropriate directory (e.g., `dirs::data_local_dir`).
+  Keep TOML format.
+| TO DO
+
+| CODE-6
+| Zone A beats 5-7 have no dedicated visuals. Create placeholder sprite
+  positions for shrine, ridge, overlook, and fracture in the assets tree.
+| TO DO
+
+| CODE-7
+| Two doc-tests in `kanren.rs` use `+```ignore+` fences. Either make them
+  compile or demote to plain text.
+| TO DO
+
+| CODE-8
+| UMS panel is a static stub by design. No action needed — tracked in
+  design docs.
+| TRACKED
+
+| CODE-9
+| Remove the vestigial `src/interface/` tree and `abi.ipkg`. Replace with
+  a cleave-aligned integration surface strategy document. The game is pure
+  Rust and needs no FFI seam today; when one is needed, it follows the
+  cleave spectrum (raw FFI-ABI → SNIF → unified protocol).
+| TO DO
+|===
+
+=== 1.3 Proof debt
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Action | Status
+
+| PRF-1
+| Add Creusot contracts for at least one Slavia invariant — determinism
+  (same seed + same inputs = same result) is the natural first target
+  since ADR-0004 already forbids ambient RNG and clocks.
+| TO DO
+
+| PRF-2
+| TLA+ `StateMachine.tla` is generic template content. Replace with a
+  Slavia-specific state machine model (the SGS → World → Session flow)
+  or quarantine honestly.
+| TO DO
+
+| PRF-3
+| Proof gate has never gated a Slavia change. Will resolve naturally
+  when PRF-1 lands.
+| TRACKED
+
+| PRF-4
+| Add Creusot verification surface to `engine/slavia-core`. Add
+  dependency, CI job, and initial contracts.
+| TO DO
+
+| PRF-5
+| Generic ABI proof model disconnected from tracked interface. Will be
+  resolved by CODE-9 (removing the vestigial tree) and replacing with
+  Slavia-specific proofs.
+| TO DO
+|===
+
+=== 1.4 CI/CD debt
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Action | Status
+
+| CI-1
+| `governance` workflow red due to upstream linter issue. Not fixable
+  here — tracked upstream as `standards#573`. Document the exemption.
+| EXEMPT
+
+| CI-2
+| Remove banned-language toolchains from `mise.toml` — node, python, go,
+  npm, pnpm, pip, denojs, go-task, gofmt, isort, vitest, pytest, jest.
+  None of these build a Rust/Bevy game.
+| TO DO
+
+| CI-3
+| Wire `just build`, `build-release`, `build-watch`, `clean` to actual
+  cargo commands in `engine/`.
+| TO DO
+
+| CI-4
+| Fix `just changelog` — the `OWNER` variable is undefined. Set it to
+  `metadatastician`.
+| TO DO
+
+| CI-5
+| Fix `e2e.yml` path filter from `src/**` and `tests/**` to include
+  `engine/**`.
+| TO DO
+
+| CI-6
+| `just e2e` and `just aspect` are honest non-gates. Wire them to real
+  checks or keep as honest non-gates with clear documentation.
+| TO DO
+
+| CI-7
+| `gh actions-lock` fights SPDX linter. Add a post-lock hook to re-hoist
+  SPDX headers.
+| TO DO
+
+| CI-8
+| Dependabot stalled and ecosystems are template residue. Trim
+  `dependabot.yml` to Rust and GitHub Actions only.
+| TO DO
+
+| CI-9
+| Three disabled workflows. Re-enable Pages if a homepage is wanted;
+  retire the others honestly.
+| TO DO
+
+| CI-10
+| `release.yml` has never run. Fine — documented as deliberate.
+| TRACKED
+
+| CI-11
+| `check-root-shape.sh` ignores `.gitignore`. Fix to respect it.
+| TO DO
+|===
+
+=== 1.5 Design/canon debt
+
+[cols="1,4,1",options="header"]
+|===
+| ID | Action | Status
+
+| CAN-1
+| Co-op vs switch-only contradiction. Record a ruling: switch-only is
+  canon for Chronicle I (matches built engine). Chronicle II's
+  "Dual-Character Simultaneous" is a future decision.
+| TO DO
+
+| CAN-2
+| Chronicle I tone. Already ruled calm/Kishōtenketsu per doc 22.
+  Amend doc 13 to match.
+| TO DO
+
+| CAN-3
+| Zone B's eight rulings. These are OWNER decisions — document as
+  outstanding, do not attempt to resolve.
+| OWNER
+
+| CAN-4
+| `gv-clade-index` registration. OWNER — outward-facing.
+| OWNER
+|===
+
+=== 1.6 GitHub issue #100
+
+The 4 pre-existing red CI checks (SonarQube, Allowlist Preflight, Hypatia
+neurosymbolic scan, Workflow security linter) each need a determination:
+fix, retire, or exempt. For each:
+
+* *SonarQube*: Retire — Sonar token rejected, not applicable to a Rust
+  game project at this stage.
+* *Allowlist Preflight*: Exempt — upstream issue, not fixable here.
+* *Hypatia neurosymbolic scan*: Exempt — upstream scanner configuration.
+* *Workflow security linter*: Fix or exempt — check if fixable locally.
+
+== Phase 2: Security and quality
+
+=== 2.1 Security
+
+* Run `cargo audit` and address or document the 5 allowed RustSec warnings
+* Ensure `gitleaks` configuration is current
+* Review `.envrc` for any secrets
+* Ensure `.gitignore` covers build artifacts, save files, IDE files
+* Review all workflow permissions for least-privilege
+
+=== 2.2 Quality — tests and benchmarks
+
+* Add renderer capability tests: menu navigation, input mapping,
+  accessibility settings, save/load round-trip
+* Add E2E smoke test for the game binary
+* Add Creusot contracts for slavia-core invariants
+* Replace zero-assertion `tests/e2e.sh` with real game smoke test
+* Add benchmarks for ESM solver performance (microKanren)
+* Review and raise coverage floor from 31.45%
+
+=== 2.3 Quality — proven tests and benchmarks alignment
+
+The `hyperpolymath/proven-tests-and-benches` framework grades tests into three
+provenance tiers (Actually-Proven, Provisionally-Proven, Unproven) over a
+category-by-aspect lattice. Align the test suite to this framework:
+
+* Mark all 52 existing tests as Actually-Proven (they run and pass)
+* Add Creusot-proven tests as a separate tier
+* Document test coverage in the lattice format
+
+== Phase 3: RSR template and standards compliance
+
+=== 3.1 Template token substitution
+
+Systematically substitute `+PLACEHOLDER+` placeholders across all 94 affected
+files:
+
+* `+Chronicles of Slavia+` → `Chronicles of Slavia`
+* `+chronicles-of-slavia+` → `chronicles-of-slavia`
+* `+metadatastician+` → `metadatastician`
+* `+github.com/metadatastician/chronicles-of-slavia+` → `github.com/metadatastician/chronicles-of-slavia`
+* `+Jonathan D.A. Jewell+` → `Jonathan D.A. Jewell`
+* `+2026-09-27+` → current date at substitution time
+* `+chronicles-of-slavia+` → `chronicles-of-slavia`
+
+Files that are *intentionally* templates (`docs/decisions/0000-template.adoc`,
+`docs/governance/CRG-AUDIT-TEMPLATE.adoc`) are excluded.
+
+=== 3.2 Vestigial tree removal
+
+* Remove `src/` tree entirely (Idris2 ABI types, Zig FFI stubs)
+* Remove `abi.ipkg`
+* Remove `docs-template/` (DOC-2)
+* Remove vestigial test files (`tests/e2e/template_instantiation_test.sh`,
+  `scripts/validate-template.sh`)
+* Remove `features/` if empty or vestigial
+
+=== 3.3 Justfile alignment
+
+* Fix project metadata: `project := "chronicles-of-slavia"`,
+  `OWNER := "metadatastician"`, `REPO := "chronicles-of-slavia"`
+* Wire build/test/run commands to actual cargo invocations
+* Fix changelog generation
+* Fix version to match Cargo.toml (0.0.0)
+
+=== 3.4 mise.toml cleanup
+
+* Remove all banned-language toolchains
+* Keep only Rust-relevant tools: `rust`, `cargo-audit`, `cargo-llvm-cov`,
+  `just`, `git-cliff`, etc.
+
+=== 3.5 Proof infrastructure slimming
+
+* Keep Creusot (to be added) as the primary Rust verification tool
+* Keep TLA+ for state machine modeling (to be rewritten for Slavia)
+* Keep the proof gate workflow but simplify to Creusot + TLA+
+* Quarantine Idris2, Lean4, Agda, Coq modules with honest labelling
+  (they prove nothing about Slavia and add CI time)
+* Document the slimming decision in a new ADR
+
+== Phase 4: Mathematical theory extensions
+
+=== 4.1 Relevant theory from the estate
+
+* *proven-tests-and-benches* — the 17×14 lattice for test provenance
+  grading. Adopt the three-tier model for Slavia's test reporting.
+* *echo-types* — proof-relevant fibers as typed witnesses for structured
+  information loss. Relevant to the ESM's belief/delta model — a belief
+  is a fiber over the baseline truth.
+* *knot-knot* — knot theory for mathematical tangles. Relevant to the
+  clothing pattern system's prerequisite tree (motifs combining).
+* *phi-LAM* — typed action sequences and scheduling. Relevant to the
+  ability system's type safety.
+
+=== 4.2 Theory integration points
+
+* The ESM's belief model (`baseline + deltas`) maps naturally to the
+  echo-types framework — beliefs are typed witnesses of partial observation
+* The opposition rule (stir/still) is a candidate for formal proof:
+  `stir(still(x)) = x` and `still(stir(x)) = x`
+* The determinism invariant is provable via Creusot contracts
+* The living taxis diagnostic rule is a formal property: if
+  `taxis_response(animal) ≠ expected(animal.nature)`, then
+  `animal.state ∈ {possessed, corrupted, false, enchanted, afraid}`
+
+== Phase 5: Game structure scaffolding
+
+=== 5.1 Engine restructuring
+
+The current `engine/` has two crates: `slavia-core` (L2) and `slavia-zone-a`
+(L3). The full game needs:
+
+==== L2 — slavia-core (the sacred logic)
+
+[source]
+----
+engine/slavia-core/
+├── src/
+│   ├── lib.rs              # Public API
+│   ├── world.rs            # World state (existing)
+│   ├── character.rs        # Character state (existing)
+│   ├── animal.rs           # Animal behaviour (existing)
+│   ├── spec.rs             # SGS parsing (existing)
+│   ├── error.rs            # Error types (existing)
+│   ├── esm/                # Epistemic State Machine (existing)
+│   │   ├── mod.rs
+│   │   ├── belief.rs
+│   │   ├── kanren.rs
+│   │   ├── intent.rs
+│   │   └── decay.rs
+│   ├── attunement/         # NEW: Aura and taxis system
+│   │   ├── mod.rs          # Attunement API
+│   │   ├── aura.rs         # Aura radius, strength, control
+│   │   ├── taxis.rs        # Living taxis mechanics
+│   │   ├── terrain.rs      # Terrain affinity modifiers
+│   │   └── mastery.rs      # Mastery progression
+│   ├── emotional/          # NEW: Emotional state system
+│   │   ├── mod.rs          # Emotional state API
+│   │   ├── personal.rs     # Per-girl emotional state
+│   │   ├── relational.rs   # Bond state (trust, conflict, etc.)
+│   │   └── reaction.rs     # World reaction to emotional state
+│   ├── abilities/          # NEW: Ability system
+│   │   ├── mod.rs          # Ability API
+│   │   ├── anya/           # Anya's abilities
+│   │   │   ├── mod.rs
+│   │   │   ├── dash_burst.rs
+│   │   │   ├── impulse_jump.rs
+│   │   │   ├── time_flicker.rs
+│   │   │   ├── chaos_pulse.rs
+│   │   │   └── momentum_chains.rs
+│   │   ├── donna/          # Donna's abilities
+│   │   │   ├── mod.rs
+│   │   │   ├── brace.rs
+│   │   │   ├── anchor_step.rs
+│   │   │   ├── heavy_lift.rs
+│   │   │   ├── reinforce.rs
+│   │   │   └── logic_link.rs
+│   │   ├── combined/       # Duo and resonance abilities
+│   │   │   ├── mod.rs
+│   │   │   ├── synergy.rs
+│   │   │   ├── duo_actions.rs
+│   │   │   └── resonance.rs
+│   │   └── classes/        # Class path modifiers
+│   │       ├── mod.rs
+│   │       ├── runner.rs
+│   │       ├── flicker.rs
+│   │       ├── wildheart.rs
+│   │       ├── pillar.rs
+│   │       ├── architect.rs
+│   │       └── guardian.rs
+│   ├── clothing/           # NEW: Clothing and pattern system
+│   │   ├── mod.rs          # Clothing API
+│   │   ├── repair.rs       # Axis 1: Physical state
+│   │   ├── patterns.rs     # Axis 2: Pattern weaving
+│   │   ├── motifs.rs       # Motif definitions (Berehynia, Kanatitsa, etc.)
+│   │   └── social.rs       # Social reading of clothing
+│   ├── flora/              # NEW: Plant system
+│   │   ├── mod.rs          # Flora API
+│   │   ├── harvest.rs      # Food, craft, pattern plants
+│   │   ├── tropism.rs      # Late-game flora taxis (dormant)
+│   │   └── folk_symbols.rs # Sacred/ritual plants
+│   ├── spirits/            # NEW: Spirit/supernatural system
+│   │   ├── mod.rs          # Spirits API
+│   │   ├── ukrainian.rs    # Leshy, rusalka, domovyk, etc.
+│   │   ├── bulgarian.rs    # Samodiva, stopan, gorski, etc.
+│   │   └── rift.rs         # Corrupted/rift spirits
+│   ├── items/              # NEW: Item system
+│   │   ├── mod.rs          # Items API
+│   │   ├── consumables.rs  # Honey, yogurt, food plants
+│   │   ├── artefacts.rs    # Story-critical items
+│   │   └── crafting.rs     # Craft materials
+│   ├── npc/                # NEW: NPC system (beyond ESM)
+│   │   ├── mod.rs          # NPC API
+│   │   ├── disposition.rs  # NPC reactions to the girls
+│   │   ├── dialogue.rs     # Dialogue state machine
+│   │   └── faction.rs      # Factional reputation (parked)
+│   ├── rift/               # NEW: Rift mechanics
+│   │   ├── mod.rs          # Rift API
+│   │   ├── corruption.rs   # Corruption/inversion/severance
+│   │   ├── node.rs         # Rift nodes and stabilization
+│   │   └── distortion.rs   # Environmental distortion
+│   └── progression/        # NEW: Save state and progression
+│       ├── mod.rs          # Progression API
+│       ├── marking.rs      # Moral/world marking (ADR-0005)
+│       ├── memory.rs       # Place memory
+│       └── chronicle.rs    # Chronicle-level state
+├── data/
+│   ├── zones/              # NEW: All zone SGS data
+│   │   ├── zone-a/         # Segments A1-A5
+│   │   │   ├── a1-border-path.sgs.toml      # (existing as zone-a.sgs.toml)
+│   │   │   ├── a2-animals-plants.sgs.toml
+│   │   │   ├── a3-npcs-clothing.sgs.toml
+│   │   │   ├── a4-puzzle-dynamics.sgs.toml
+│   │   │   └── a5-synthesis.sgs.toml
+│   │   ├── zone-b/         # Fracture Line
+│   │   │   └── fracture-line.sgs.toml
+│   │   ├── zone-c/         # Anya's Chaos Zone
+│   │   │   └── chaos-zone.sgs.toml
+│   │   ├── zone-d/         # Donna's Order Zone
+│   │   │   └── order-zone.sgs.toml
+│   │   └── zone-e/         # Rift Node Chamber
+│   │       └── node-chamber.sgs.toml
+│   ├── chronicles/         # NEW: Chronicle-level data
+│   │   ├── chronicle-i.sgs.toml
+│   │   ├── chronicle-ii.sgs.toml
+│   │   └── chronicle-iii.sgs.toml
+│   ├── characters/         # NEW: Character definitions
+│   │   ├── anya.sgs.toml
+│   │   ├── donna.sgs.toml
+│   │   └── guardian-spirit.sgs.toml
+│   ├── bestiary/           # NEW: Animal and spirit definitions
+│   │   ├── ordinary.sgs.toml
+│   │   ├── domesticated.sgs.toml
+│   │   ├── supernatural.sgs.toml
+│   │   └── rift-touched.sgs.toml
+│   ├── flora/              # NEW: Plant definitions
+│   │   ├── food-plants.sgs.toml
+│   │   ├── craft-plants.sgs.toml
+│   │   ├── pattern-plants.sgs.toml
+│   │   └── sacred-plants.sgs.toml
+│   ├── motifs/             # NEW: Embroidery motif definitions
+│   │   ├── berehynia.sgs.toml
+│   │   ├── kanatitsa.sgs.toml
+│   │   └── elbetitsa.sgs.toml
+│   └── schema/             # NEW: SGS schema definitions
+│       ├── sgs-schema.toml
+│       └── schema-version.toml
+└── tests/
+    ├── zone_a.rs           # (existing)
+    ├── esm_testbed.rs      # (existing)
+    ├── attunement.rs       # NEW: Attunement system tests
+    ├── emotional.rs        # NEW: Emotional state tests
+    ├── abilities.rs        # NEW: Ability system tests
+    ├── clothing.rs         # NEW: Clothing system tests
+    ├── opposition_rule.rs  # NEW: Formal opposition rule tests
+    └── determinism.rs      # NEW: Determinism invariant tests
+----
+
+==== L3 — Renderer crates (one per zone initially, shared renderer)
+
+[source]
+----
+engine/slavia-renderer/     # NEW: Shared rendering infrastructure
+├── Cargo.toml
+├── src/
+│   ├── lib.rs
+│   ├── camera.rs           # Camera follow system (CODE-1 fix)
+│   ├── room.rs             # Room/area management (CODE-2 fix)
+│   ├── sprite.rs           # Sprite rendering
+│   ├── parallax.rs         # Parallax backgrounds
+│   ├── particles.rs        # Particle effects
+│   ├── manpu.rs            # Manpu overlays (ESM legibility, doc 21)
+│   ├── animation.rs        # Character animation
+│   ├── lighting.rs         # Lighting and mood
+│   └── transitions.rs      # Room/zone transitions
+
+engine/slavia-zone-a/       # (existing, restructured)
+├── Cargo.toml
+├── assets/
+│   ├── fonts/              # (existing)
+│   ├── sprites/            # NEW: Character and environment sprites
+│   │   ├── anya/
+│   │   ├── donna/
+│   │   ├── animals/
+│   │   ├── environment/
+│   │   └── ui/
+│   ├── tilemaps/           # NEW: Tile map data
+│   └── shaders/            # NEW: Custom shaders
+├── src/
+│   ├── main.rs             # (existing)
+│   ├── state.rs            # (existing)
+│   ├── session.rs          # (existing, enhanced with rooms)
+│   ├── render.rs           # (existing, enhanced with camera)
+│   ├── save.rs             # (existing, fixed save location)
+│   ├── input.rs            # NEW: Input handling
+│   ├── menu/               # (existing)
+│   │   ├── mod.rs
+│   │   ├── shell.rs
+│   │   ├── nav.rs
+│   │   ├── fonts.rs
+│   │   ├── theme.rs
+│   │   ├── background.rs
+│   │   ├── heroine.rs
+│   │   ├── opening.rs
+│   │   └── panels/
+│   │       ├── mod.rs
+│   │       ├── new_chronicle.rs
+│   │       ├── continue_chronicle.rs
+│   │       ├── chapters.rs
+│   │       ├── bond.rs
+│   │       ├── world_book.rs
+│   │       ├── settings.rs
+│   │       └── credits.rs
+│   ├── ui/                 # NEW: In-game UI
+│   │   ├── mod.rs
+│   │   ├── hud.rs          # Heads-up display
+│   │   ├── dialogue.rs     # Dialogue boxes
+│   │   ├── manpu.rs        # Manpu thought bubbles
+│   │   ├── indicators.rs   # Emotional/attunement indicators
+│   │   └── inventory.rs    # Item display (when implemented)
+│   ├── audio/              # NEW: Audio system
+│   │   ├── mod.rs
+│   │   ├── music.rs        # Background music
+│   │   ├── sfx.rs          # Sound effects
+│   │   ├── ambient.rs      # Ambient sound
+│   │   └── voice.rs        # Voice lines (if any)
+│   ├── cutscenes/          # NEW: Cut scene system
+│   │   ├── mod.rs
+│   │   └── zone_a/
+│   └── zones/              # NEW: Zone-specific logic
+│       ├── mod.rs
+│       ├── a1/
+│       ├── a2/
+│       ├── a3/
+│       ├── a4/
+│       └── a5/
+
+engine/slavia-zone-b/       # NEW: Zone B crate (stub)
+engine/slavia-zone-c/       # NEW: Zone C crate (stub)
+engine/slavia-zone-d/       # NEW: Zone D crate (stub)
+engine/slavia-zone-e/       # NEW: Zone E crate (stub)
+----
+
+=== 5.2 Assets structure
+
+[source]
+----
+assets/
+├── README.md
+├── art/
+│   ├── concept/            # Concept art and reference
+│   │   ├── characters/
+│   │   │   ├── anya/
+│   │   │   ├── donna/
+│   │   │   ├── animals/
+│   │   │   ├── spirits/
+│   │   │   └── npcs/
+│   │   ├── environments/
+│   │   │   ├── zone-a/
+│   │   │   ├── zone-b/
+│   │   │   ├── zone-c/
+│   │   │   ├── zone-d/
+│   │   │   └── zone-e/
+│   │   ├── ui/
+│   │   └── cutscenes/
+│   ├── sprites/            # Production sprite
+│   │   ├── characters/
+│   │   │   ├── anya/       # Paper-doll rig frames
+│   │   │   └── donna/
+│   │   ├── animals/
+│   │   ├── spirits/
+│   │   ├── environment/
+│   │   │   ├── zone-a/
+│   │   │   ├── zone-b/
+│   │   │   ├── zone-c/
+│   │   │   ├── zone-d/
+│   │   │   └── zone-e/
+│   │   ├── items/
+│   │   ├── ui/
+│   │   └── effects/
+│   ├── tiles/              # Tileset data
+│   │   ├── zone-a/
+│   │   ├── zone-b/
+│   │   ├── zone-c/
+│   │   ├── zone-d/
+│   │   └── zone-e/
+│   └── patterns/           # Embroidery pattern art
+│       ├── berehynia/
+│       ├── kanatitsa/
+│       ├── elbetitsa/
+│       └── reference/      # Real-world folk art reference
+├── audio/
+│   ├── music/
+│   │   ├── zone-a/
+│   │   ├── zone-b/
+│   │   ├── zone-c/
+│   │   ├── zone-d/
+│   │   ├── zone-e/
+│   │   ├── menu/
+│   │   └── chronicles/
+│   ├── sfx/
+│   │   ├── abilities/
+│   │   ├── environment/
+│   │   ├── ui/
+│   │   ├── animals/
+│   │   └── rift/
+│   ├── ambient/
+│   │   ├── zone-a/
+│   │   ├── zone-b/
+│   │   ├── zone-c/
+│   │   ├── zone-d/
+│   │   └── zone-e/
+│   └── voice/              # If voice acting is added
+├── video/
+│   ├── cutscenes/          # Pre-rendered cutscenes (if any)
+│   └── reference/          # Reference video
+├── fonts/
+│   ├── PT-Serif/           # (existing, shared)
+│   └── custom/             # Custom fonts if needed
+└── branding/
+    ├── logos/
+    ├── colour-palette/
+    └── style-guide/
+----
+
+=== 5.3 Game documentation and encyclopedia structure
+
+[source]
+----
+docs/
+├── design/                 # (existing — 26 design documents)
+├── characters/             # (existing — Anya and Donna little books)
+├── decisions/              # (existing — ADRs)
+├── encyclopedia/           # NEW: The game bible / encyclopedia
+│   ├── README.adoc
+│   ├── world/
+│   │   ├── slavia.adoc         # The world itself
+│   │   ├── the-rift.adoc       # The Rift explained
+│   │   ├── geography.adoc      # Zones, terrains, places
+│   │   ├── folklore.adoc       # Ukrainian + Bulgarian folklore
+│   │   └── history.adoc        # World history/lore
+│   ├── characters/
+│   │   ├── anya.adoc
+│   │   ├── donna.adoc
+│   │   ├── guardian-spirit.adoc
+│   │   └── npcs/
+│   ├── creatures/
+│   │   ├── animals.adoc
+│   │   ├── spirits.adoc
+│   │   └── rift-creatures.adoc
+│   ├── mechanics/
+│   │   ├── attunement.adoc
+│   │   ├── living-taxis.adoc
+│   │   ├── abilities.adoc
+│   │   ├── clothing.adoc
+│   │   ├── emotional-state.adoc
+│   │   └── rift-mechanics.adoc
+│   ├── items/
+│   │   ├── consumables.adoc
+│   │   ├── artefacts.adoc
+│   │   └── materials.adoc
+│   └── culture/
+│       ├── ukrainian.adoc      # Ukrainian cultural grounding
+│       ├── bulgarian.adoc      # Bulgarian cultural grounding
+│       └── shared-slavic.adoc  # Shared Slavic elements
+├── wikis/                  # (existing — expand)
+│   ├── README.adoc
+│   ├── player-guide.adoc       # NEW: Player-facing wiki
+│   ├── developer-guide.adoc    # NEW: Developer wiki
+│   └── modding-guide.adoc     # NEW: UMS modding guide
+└── narrative/              # NEW: Narrative-specific documentation
+    ├── README.adoc
+    ├── chronicle-i/
+    │   ├── outline.adoc
+    │   ├── zone-a-script.adoc
+    │   ├── zone-b-script.adoc
+    │   ├── zone-c-script.adoc
+    │   ├── zone-d-script.adoc
+    │   └── zone-e-script.adoc
+    ├── chronicle-ii/
+    │   └── outline.adoc
+    ├── chronicle-iii/
+    │   └── outline.adoc
+    └── dialogue/
+        ├── anya-voice.adoc     # Anya's voice/register
+        └── donna-voice.adoc    # Donna's voice/register
+----
+
+=== 5.4 Settings, saves, and configuration
+
+[source]
+----
+engine/slavia-config/       # NEW: Configuration crate
+├── Cargo.toml
+├── src/
+│   ├── lib.rs
+│   ├── settings.rs         # Game settings (graphics, audio, controls)
+│   ├── accessibility.rs    # Accessibility settings
+│   ├── keybindings.rs      # Key binding configuration
+│   └── profiles.rs         # Player profiles
+└── defaults/
+    ├── settings.toml       # Default settings
+    ├── keybindings.toml    # Default keybindings
+    └── accessibility.toml  # Default accessibility options
+----
+
+=== 5.5 AI and coprocessor infrastructure
+
+[source]
+----
+engine/slavia-ai/           # NEW: Game AI crate
+├── Cargo.toml
+├── src/
+│   ├── lib.rs
+│   ├── director.rs         # AI director (pacing, difficulty)
+│   ├── npc_brain.rs        # NPC decision-making (FSM body, calls ESM mind)
+│   ├── animal_ai.rs        # Animal behaviour AI
+│   ├── pathfinding.rs      # Pathfinding utilities
+│   └── enaction/           # Enaction Engine integration point
+│       ├── mod.rs
+│       ├── events.rs       # Event primitives
+│       ├── appraisal.rs    # Appraisal domains
+│       ├── relationships.rs # Relationship tracking
+│       ├── influence.rs    # Influence and memory
+│       └── fields.rs       # Fields and place memory
+----
+
+=== 5.6 Workspace restructuring
+
+[source]
+----
+engine/Cargo.toml           # Workspace manifest
+# members = [
+#   "slavia-core",          # L2 — the sacred logic
+#   "slavia-config",        # Configuration
+#   "slavia-renderer",      # Shared rendering
+#   "slavia-ai",            # Game AI
+#   "slavia-zone-a",        # Zone A (L3)
+#   "slavia-zone-b",        # Zone B (L3, stub)
+#   "slavia-zone-c",        # Zone C (L3, stub)
+#   "slavia-zone-d",        # Zone D (L3, stub)
+#   "slavia-zone-e",        # Zone E (L3, stub)
+#   "slavia-launcher",      # Binary entrypoint
+# ]
+----
+
+=== 5.7 Integration surface (replacing vestigial src/)
+
+[source]
+----
+engine/slavia-ffi/          # NEW: Cleve-aligned integration surface
+├── Cargo.toml              # Optional crate, behind feature flag
+├── README.adoc             # Explains the cleave spectrum strategy
+└── src/
+    └── lib.rs              # Empty — placeholder for future FFI if needed
+----
+
+== Phase 6: Summary of what changes
+
+=== Files to remove
+* `src/` (entire tree — vestigial RSR template FFI)
+* `abi.ipkg`
+* `docs-template/` (entire tree)
+* `SECURITY_FIXES_20260726.md` (move to docs/reports/security/)
+* `AFFIRMATION.adoc` (root duplicate)
+* `AUDIT.adoc` (root duplicate)
+* `RSR-PHILOSOPHY.adoc` (root duplicate)
+* `MAINTAINERS.adoc` (root duplicate, docs/attribution/MAINTAINERS.adoc exists)
+* `tests/e2e/template_instantiation_test.sh` (vestigial)
+* `scripts/validate-template.sh` (vestigial)
+
+=== Files to create (new structure)
+* ~150+ placeholder files across the new directory tree
+* New ADR (0009) for proof infrastructure slimming
+* New ADR (0010) for integration surface strategy
+* ULTRAPLAN execution log
+
+=== Files to modify
+* `Justfile` — fix project metadata, wire cargo commands
+* `mise.toml` — remove banned toolchains
+* `engine/Cargo.toml` — add new workspace members
+* `.github/workflows/e2e.yml` — fix path filter
+* `.github/dependabot.yml` — trim to Rust + GitHub Actions
+* Multiple files with `+PLACEHOLDER+` substitution
+* `docs/design/13-chronicles-trilogy-structure.md` — fix tone line
+* Various CI/CD and standards files
+
+== What this plan deliberately does NOT do
+
+* *Does not build game content.* No art, no music, no level design, no
+  dialogue. This is infrastructure only.
+* *Does not resolve owner-only decisions.* Zone B's eight rulings,
+  co-op vs switch-only for Chronicle II, the guardian spirit's exact
+  form — these are creative decisions for the owner.
+* *Does not add new game systems to the running code.* All new Rust
+  modules are stubs with `todo!()` or empty trait definitions. The
+  existing 52 tests must continue to pass.
+* *Does not change the design canon.* The 26 design documents are the
+  authoritative source; this plan creates homes for their implementation,
+  not new design.

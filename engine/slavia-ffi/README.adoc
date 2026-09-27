@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= slavia-ffi — Integration Surface Strategy
+
+This crate is intentionally empty. The game is pure Rust (ADR-0003)
+and has no FFI requirement today.
+
+== When to add FFI
+
+Only when a concrete integration need arises:
+- A modding API that requires a stable ABI
+- Integration with Universal Modding Studio's runtime loader
+- A coprocessor or external tool that needs direct access
+
+== The cleave spectrum
+
+When FFI is added, it follows the cleave transmutable integration surface:
+
+1. *Raw FFI-ABI* — direct, fast, for trusted in-process consumers
+2. *SNIF* — sandboxed (native → WASM → wasmtime), crash-isolated
+3. *Unified protocol* — feels like an internal API call, for remote consumers
+
+The spectrum is a dial, not a choice. Different consumers can sit at
+different points on the spectrum simultaneously.
