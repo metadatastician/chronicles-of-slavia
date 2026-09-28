@@ -82,6 +82,7 @@ LICENSE-INTENT.md          # licence-per-layer explanation (code/docs/vendored) 
 MAINTAINERS                # this repo's own variant of MAINTAINERS.adoc (no extension)
 RSR-PHILOSOPHY.adoc        # RSR working-method documentation
 SECURITY_FIXES_20260726.md # dated incident/fix record
+ULTRAPLAN-2026-09-27.adoc  # dated plan document; referenced from docs/prompts/next-ai-session-prompt.md and engine tests (added by #106; root-allow missed it, estate-rules red from then on)
 assets/                    # game/site assets
 chronicles-of-slavia-launcher.sh   # game launcher script
 chronicles-of-slavia.launcher.a2ml # launcher config manifest

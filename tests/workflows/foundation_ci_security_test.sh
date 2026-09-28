@@ -120,8 +120,15 @@ for workflow in \
     fi
 done
 
+# Reviewed revision: github/codeql-action v4.38.2.
+# Provenance check 2026-09-28: refs/tags/v4.38.2 (annotated) dereferences to
+# 2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 (merge of github/codeql-action#4168,
+# "update-v4.38.2"); owner/repo is the upstream github org. This is the review
+# step the ratchet exists for — bumping here without that check is the defect,
+# not the bump itself. v4.38.1 remains estate-blocked (nexia-list#100) and is
+# not a candidate.
 CODEQL_USES="$(workflow_uses "$CODEQL_WORKFLOW")"
-EXPECTED_CODEQL_USES=$'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1\ngithub/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63\ngithub/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63'
+EXPECTED_CODEQL_USES=$'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1\ngithub/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2\ngithub/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2'
 assert_equals \
     "CodeQL uses the reviewed checkout, init, and analyze revisions" \
     "$EXPECTED_CODEQL_USES" \

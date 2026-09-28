@@ -32,6 +32,19 @@ DOCS_DIR="$REPO_ROOT/docs"
 # editorial decision with its own risk (broken cross-references, lost
 # review history) — not something to do as a side effect of a CI fix.
 # Revisit if/when a dedicated conversion pass is actually scoped.
+#
+# docs/prompts/next-ai-session-prompt.md, docs/reports/ci/issue-100-triage-
+# 2026-09-27.md, docs/reports/security/SECURITY_FIXES_20260726.md: added by
+# #111 while estate-rules was already red, so the second step never got to
+# judge them. The first two are operational/dated artifacts of the active
+# issue-#100 workflow; the third is the dated incident snapshot whose move
+# from repo root to docs/reports/security/ was itself mandated by
+# ULTRAPLAN-2026-09-27.adoc (root could keep the .md; the dated name is the
+# point). All three paths are referenced from .machine_readable/*.a2ml
+# descriptors and 0-AI-MANIFEST.a2ml — renaming them to .adoc would desync
+# the machine-readable layer as a side effect of a CI repair, which is the
+# exact "side effect of a CI fix" conversion this allowlist exists to avoid.
+# Revisit with the same dedicated conversion pass as the design corpus.
 ALLOWED=(
   "docs/design/00-start-here.md"
   "docs/design/01-world-principle.md"
@@ -61,6 +74,9 @@ ALLOWED=(
   "docs/design/24-zone-b-fracture-line.md"
   "docs/design/25-zone-b-decision-sheet.md"
   "docs/prompts/repo-build-prompt.md"
+  "docs/prompts/next-ai-session-prompt.md"
+  "docs/reports/ci/issue-100-triage-2026-09-27.md"
+  "docs/reports/security/SECURITY_FIXES_20260726.md"
 )
 
 if [ ! -d "$DOCS_DIR" ]; then
