@@ -1,0 +1,134 @@
+= Issue #100 — determinations and closure evidence, 2026-09-28
+:toc:
+
+Supersedes the working note `issue-100-triage-2026-09-27.md` (kept as dated
+evidence). Issue: https://github.com/metadatastician/chronicles-of-slavia/issues/100
+
+== Determination table (the four named checks)
+
+[cols="1,2,2,3",options="header"]
+|===
+| Exact context | Red on default branch? | Determination | Evidence / fix
+
+| `SonarQube`
+| Yes — red on `main` on every run in the last 20 (incl. after #98, at the
+  session base, and at `a3dd9bef`, 2026-09-28T07:50Z).
+| *Exempt — documented, with review date 2026-10-05.* Not muted: the workflow
+  still runs and still reports red until the credential is rotated.
+| Root cause read from the scanner log (full log, not an annotation): the very
+  first authenticated call fails —
+  `GET https://api.sonarcloud.io/analysis/jres -> HTTP 403 Forbidden. Please
+  check ... SONAR_TOKEN.` The `SONAR_TOKEN` repo secret is set but *rejected*
+  (expired/revoked/insufficient scope). No in-repo change can repair a
+  credential; rotation by a maintainer with SonarCloud access is required
+  (token value never handled here). Secondary check after rotation: the
+  project key `metadatastician_chronicles-of-slavia` does not resolve via the
+  anonymous API, so provisioning must be confirmed too. Owner action tracked
+  in the issue thread; diagnosis recipe fed to standards#994 (class note).
+
+| `governance / Allowlist Preflight`
+| Was (post-#98 and on `main` 2026-09-23T12:30Z); *no longer* — green on
+  `main` runs 2026-09-27T09:48Z and 2026-09-28T07:50Z (per-job `success`).
+| *Fixed.* Green on the default branch.
+| Fixed by adopting the verified upstream reusable
+  `hyperpolymath/standards@2479cf769ed5f0481ccf64860a2ab954514c2b59`
+  (landed via #111): the old reusable ran the live-policy checker with the
+  wrong interface and fetched scripts from moving `main`. The pin is ratcheted
+  by `tests/workflows/foundation_ci_security_test.sh`.
+
+| `Hypatia neurosymbolic scan`
+| Yes — red on `main` on every run since the check started reporting again.
+| *Fixed.* Root cause was upstream of this repo; fix is in this repo (pin).
+| The job fails at `Clone and build Hypatia`: the pinned scanner revision
+  `43124f02` *does not compile* — `MismatchedDelimiterError` in
+  `hyperpolymath/hypatia` `lib/rules/pin_integrity.ex:56` (bare `/` inside a
+  `~r/…/` character class), introduced by hypatia#862 and present at HEAD.
+  Bisected: last green `9f2f62f5c9463c79b33a5ebf54372166ce56f349`
+  (hypatia `Escript Soundness` success, 2026-09-25). `scripts/build-hypatia.sh`
+  now pins that revision (comment records the rule: only move the pin after
+  the target revision's own Escript Soundness is green). Upstream fix filed:
+  https://github.com/hyperpolymath/hypatia/issues/869. The check name is
+  unchanged (standards#994 AC3 — renames orphan open PRs).
+
+| `governance / Workflow security linter`
+| Was (post-#98 and on `main` 2026-09-23T12:30Z); *no longer* — green on
+  `main` runs 2026-09-27T09:48Z and 2026-09-28T07:50Z.
+| *Fixed.* Green on the default branch.
+| Same adoption as Allowlist Preflight: `standards@2479cf76` accepts
+  first-line SPDX inside the leading comment block and enforces locking in its
+  dedicated lockfile-verification job, instead of demanding inline SHAs from
+  locked workflows.
+|===
+
+No check was retired, no required-check setting was changed, nothing was
+wrapped in `continue-on-error`, and no check was silenced: the two "fixed"
+checks measure green on `main`, and the one exemption (`SonarQube`) is written
+above with its reason and review date.
+
+== Adjacent reds found while working (outside the four, fixed in the same PR)
+
+These are not part of #100's acceptance criteria but were red on the default
+branch and would have contaminated any "green on main" evidence:
+
+* `governance / Actions lockfile verify` + `actions.lock is in sync with the
+  workflow YAML` + startup deaths of `CodeQL`, `E2E`, `OikosBot`: PR #112
+  (Dependabot, merged 2026-09-28T07:50Z) rewrote three `uses:` refs without
+  touching `actions.lock`. GitHub enforces the lockfile natively at startup
+  (runner log: `Using locked action versions from the workflow's lockfile`),
+  so the three workflows created zero jobs — the standards#968 class,
+  re-introduced *after* the cure. Fixed by re-syncing the lock to the new pins
+  and reviewing them (`foundation_ci_security_test.sh` now records the v4.38.2
+  review: annotated tag `v4.38.2` dereferences to
+  `2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2`).
+* `estate-rules`: two stacked causes — `ULTRAPLAN-2026-09-27.adoc` (#106) not
+  on the root allowlist, and three `.md` files under `docs/` (#111) below the
+  second step. Both resolved via the mechanisms the checks themselves provide
+  (justified allowlist entries), with reasons recorded inline.
+* `lint` (`Code Quality` → "CI security regressions"): the pin-review ratchet
+  rejected #112's unreviewed CodeQL bump. Resolved by performing the review,
+  not by deleting the assertion.
+* `Deposit findings for gitbot-fleet`: cascade of the Hypatia build failure
+  (missing `hypatia-findings` artifact); heals with the pin fix.
+
+== Foundational follow-through (the loop-breaker)
+
+Dependabot rewrites `uses:` and never updates `actions.lock`; the lock is
+platform-enforced; therefore *every* routine grouped actions bump desyncs this
+repo's CI. Measured on this repo: #112 killed three workflows hours after
+#111 had revived them, and auto-merge completed anyway because the lock gates
+are not in the required set. Mitigations landed here:
+
+* `.github/dependabot.yml`: `open-pull-requests-limit: 0` for
+  `github-actions` — GitHub's security-only switch (security PRs still flow;
+  routine desync-producing bumps stop). Revisit condition recorded inline.
+* `scripts/update-actions-lock.sh` vendored byte-identical from
+  `hyperpolymath/standards@a2ff696ab8f5e0b38823ad3b5cdff72772093c6e` — the
+  gates' remediation text referenced it, but the file did not exist in this
+  repo.
+
+Fed back upstream (see the issue thread for links): hypatia#869 (compile
+break), standards#994 class notes (SonarQube token class; Hypatia consumer
+pinning; lock mechanism confirmation), rsr-template-repo (template carries the
+same latent desync for non-codeql actions; dead `gh.io/actions-lockfile` doc
+URL in the lock header).
+
+== Local verification (all with gawk 4.1.0 built from source in this session)
+
+* `scripts/check-lock-sync.sh` — pass, transitively closed, 0 dangling edges
+  (reproduced the pre-fix 6-violation state first; single-cause: #112).
+* `tests/workflows/check_lock_sync_test.sh` — 21/21 (was 20/21 pre-fix, the
+  failure being "accepts the repository's current lockfile").
+* `tests/workflows/ci_triage_test.sh` — 8/8; `foundation_ci_security_test.sh`
+  — 6/6; `validate_workflows_test.sh` — all 31 workflows.
+* `scripts/check-root-shape.sh` + `scripts/check-no-md-in-docs.sh` — pass.
+* `git diff --check` — pass.
+
+Hosted evidence for the four contexts is recorded on the issue itself at
+closure time.
+
+== Residual reds NOT covered by #100
+
+* `scan / Hypatia Neurosymbolic Analysis` (standards reusable) builds
+  *HEAD*, so it stays red until hypatia#869 lands; tracked upstream.
+* `E2E + Aspect + Bench` was already failing (not startup-dead) at the last
+  in-sync `main` before #112 — a real test failure, separate from this issue.

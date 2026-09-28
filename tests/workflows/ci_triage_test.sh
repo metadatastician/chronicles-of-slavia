@@ -19,7 +19,7 @@ case "$1" in
       printf '#!/bin/sh\nexit 0\n' > "$dir/hypatia-cli.sh"
       chmod +x "$dir/hypatia-cli.sh"
     fi ;;
-  rev-parse) echo 43124f025af26dadc9d268460410a205cfccefe8 ;;
+  rev-parse) echo 9f2f62f5c9463c79b33a5ebf54372166ce56f349 ;;
 esac
 MOCK
 cat > "$tmp/bin/mix" <<'MOCK'

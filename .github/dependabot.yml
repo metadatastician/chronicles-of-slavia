@@ -5,6 +5,29 @@
 version: 2
 updates:
   # GitHub Actions
+  #
+  # open-pull-requests-limit: 0 = GitHub's "security-only" switch: routine
+  # version-update PRs are suppressed while Dependabot SECURITY PRs still
+  # flow (same semantics as the cargo block in
+  # hyperpolymath/rsr-template-repo's dependabot.yml).
+  #
+  # Why this repo cannot take routine actions bumps today: Dependabot rewrites
+  # `uses:` refs and never updates `.github/workflows/actions.lock`, and
+  # GitHub enforces that lockfile natively at workflow startup ("Using locked
+  # action versions from the workflow's lockfile"; gh.io/actions-lockfile ->
+  # github-early-access/actions-locked-dependencies). Every grouped actions
+  # bump therefore desyncs the lock and GitHub refuses to start the affected
+  # workflows (jobs=0, startup_failure) — measured: PR #112 (2026-09-28)
+  # silently killed CodeQL/E2E/OikosBot the day after PR #111 revived them,
+  # and auto-merge completed anyway because the lock gates are not in the
+  # required set. Root cause is estate-wide: hyperpolymath/standards#968.
+  #
+  # When a security bump does arrive: run scripts/update-actions-lock.sh
+  # (vendored from hyperpolymath/standards@a2ff696) in the SAME PR, satisfy
+  # tests/workflows/foundation_ci_security_test.sh (pin review) and the lock
+  # gates, then merge. Re-enable routine bumps here once the estate template
+  # ships a lock-heal for Dependabot PRs (tracked with
+  # hyperpolymath/rsr-template-repo + hyperpolymath/standards).
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -13,7 +36,7 @@ updates:
       actions:
         patterns:
           - "*"
-    open-pull-requests-limit: 2
+    open-pull-requests-limit: 0
 
   # Rust/Cargo (engine workspace)
   - package-ecosystem: "cargo"
