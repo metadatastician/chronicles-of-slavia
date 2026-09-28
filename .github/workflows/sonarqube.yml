@@ -6,6 +6,15 @@
 # (Settings -> Secrets and variables -> Actions) and a SonarCloud project:
 # https://sonarcloud.io/project/overview?id=metadatastician_chronicles-of-slavia
 # Mirrors the boj-server arrangement.
+#
+# EXEMPT under issue #100 (determined 2026-09-28, review due 2026-10-05): the scan
+# fails before any analysis because the first authenticated call is rejected —
+# GET https://api.sonarcloud.io/analysis/jres -> HTTP 403 "check ... SONAR_TOKEN"
+# (the repository secret must be rotated; the project key also does not resolve
+# anonymously, so confirm project provisioning after rotating). The workflow keeps
+# running on every push/PR and keeps reporting red; nothing is muted, demoted, or
+# removed from any required-check set. Full determination table:
+# docs/reports/ci/issue-100-closure-2026-09-28.adoc
 name: SonarQube
 on:
   push:
